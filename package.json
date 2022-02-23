@@ -2,26 +2,44 @@
   "name": "dc-extension-translation-dashboard",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
-    "@testing-library/jest-dom": "^5.11.10",
-    "@testing-library/react": "^11.2.6",
-    "@testing-library/user-event": "^12.8.3",
+    "@date-io/date-fns": "^1.3.13",
+    "@material-ui/core": "^4.12.3",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.60",
+    "@material-ui/pickers": "^3.3.10",
+    "axios": "^0.21.1",
+    "dc-extensions-sdk": "^2.0.0",
+    "dc-management-sdk-js": "github:PikinerLiliya/dc-management-sdk-js#feature/getLocalizedContentItems",
+    "jsonpath": "^1.1.1",
+    "lodash": "^4.17.21",
+    "material-ui-popup-state": "^1.8.3",
+    "moment": "^2.29.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3",
-    "web-vitals": "^1.1.1"
+    "react-redux": "^7.2.4",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0",
+    "redux": "^4.1.0",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.4.0",
+    "typesafe-actions": "^5.1.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "lint": "eslint './src/**/*.{js,jsx,ts,tsx}'",
+    "lint:css": "stylelint './src/**/*.styles.ts'",
+    "lint:fix": "eslint --fix './src/**/*.{js,jsx,ts,tsx}'",
+    "start": "HTTPS=true react-scripts start",
+    "build": "run-s clean build-react",
+    "build-react": "react-scripts build",
+    "clean": "trash lib build",
+    "version:patch": "standard-version",
+    "version:minor": "standard-version --release-as minor",
+    "version:major": "standard-version --release-as major",
+    "prepare-patch-release": "run-s all version:patch publish",
+    "prepare-minor-release": "run-s all version:minor publish",
+    "prepare-major-release": "run-s all version:major publish"
   },
   "browserslist": {
     "production": [
@@ -34,5 +52,27 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/jsonpath": "^0.2.0",
+    "@types/lodash": "^4.14.170",
+    "@types/react": "^17.0.3",
+    "@types/react-dom": "^17.0.3",
+    "@types/react-router": "^5.1.13",
+    "@types/react-router-dom": "^5.1.7",
+    "@types/redux-logger": "^3.0.8",
+    "chalk": "^4.1.2",
+    "copyfiles": "^2.4.1",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.4.1",
+    "progress-bar-webpack-plugin": "^2.1.0",
+    "react-scripts": "4.0.3",
+    "standard-version": "^9.2.0",
+    "trash-cli": "^4.0.0",
+    "typescript": "^4.4.4",
+    "webpack-bundle-analyzer": "^4.5.0"
   }
 }
