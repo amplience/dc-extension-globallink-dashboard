@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Dispatch } from 'redux';
-import { nodes as jpNodes } from 'jsonpath';
+import jp from 'jsonpath';
 import {
   ContentType,
   DynamicContent,
@@ -237,7 +237,7 @@ export const createSubmission =
             if (contentType && contentType.translatableFields) {
               const fileJson = contentType.translatableFields.reduce(
                 (acc: any, field: string) => {
-                  const nodes = jpNodes(contentItem.body, `$.${field}`);
+                  const nodes = jp.nodes(contentItem.body, `$.${field}`);
 
                   nodes.forEach(({ path, value }) => {
                     if (value && !ContentLink.isContentLink(value)) {

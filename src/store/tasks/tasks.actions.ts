@@ -1,5 +1,5 @@
 import { Dispatch } from 'redux';
-import { apply as jpApply } from 'jsonpath/';
+import jp from 'jsonpath';
 import throttle from 'lodash/throttle';
 import {
   WorkflowState,
@@ -241,7 +241,7 @@ const downloadAndApply = async (
 
           (resp.translations || []).forEach(({ key, value }: any) => {
             if ((value && Array.isArray(value) && value.length) || value) {
-              jpApply(updatedBody, `$.${key}`, () =>
+              jp.apply(updatedBody, `$.${key}`, () =>
                 value && value.length && value.length === 1 ? value[0] : value
               );
             }
@@ -284,7 +284,7 @@ const downloadAndApply = async (
                 updatedBodyObj[key] =
                   (nestedLocalized && nestedLocalized.body && nestedLocalized.body[key]) || "";
               } */
-              jpApply(updatedBodyObj, `$.${key}`, () =>
+              jp.apply(updatedBodyObj, `$.${key}`, () =>
                 value && value.length && value.length === 1 ? value[0] : value
               );
             });
