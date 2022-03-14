@@ -11,9 +11,10 @@ const PAGE_SIZE = 20;
 
 const convertToFormData = (item: any) => {
   const formData = new FormData();
+  const keys = Object.keys(item);
 
-  for (let k = Object.keys(item).length - 1; k >= 0; k--) {
-    const key = Object.keys(item)[k];
+  for (let k = keys.length - 1; k >= 0; k--) {
+    const key = keys[k];
     if (item[key]) {
       formData.append(key, item[key] || '');
     }

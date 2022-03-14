@@ -1,6 +1,7 @@
 import { DashboardExtension, init } from 'dc-extensions-sdk';
 import { Dispatch } from 'redux';
 import axios from 'axios';
+import { DynamicContent } from 'dc-management-sdk-js';
 import GCCRestApi from '../../utils/GCCRestApi';
 import { setError } from '../error/error.actions';
 import {
@@ -39,6 +40,7 @@ export const fetchSDK = () => async (dispatch: Dispatch) => {
       SDK: extension,
       params,
       connected: true,
+      dcManagement: new DynamicContent({}, {}, extension && extension.client),
     };
 
     const GCCInstance = new GCCRestApi({

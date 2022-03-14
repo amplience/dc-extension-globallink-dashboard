@@ -1,9 +1,8 @@
 import { Dispatch } from 'redux';
-import { apply as jpApply } from 'jsonpath/';
+import jsonpath from 'jsonpath';
 import throttle from 'lodash/throttle';
 import {
   WorkflowState,
-  DynamicContent,
   ContentGraph,
   ContentItem,
   Page,
@@ -117,6 +116,41 @@ const getAllTasks = async ({
   return tasks;
 };
 
+const getContentItemToUpdate = async ({
+  locale,
+  unique_identifier,
+  dcManagement,
+}) => {
+  const sourceContentItem = await dcManagement.contentItems.get(
+    unique_identifier
+  );
+
+  const allLocalized = await getAllLocalization(sourceContentItem);
+  let contentItemToUpdate = allLocalized.find(
+    ({ locale: contentLocale }: any) => contentLocale === locale
+  );
+
+  if (!contentItemToUpdate) {
+    await sourceContentItem.related.localize([locale]);
+
+    const localized: ContentItem | undefined =
+      await getLocalizedAfterJobStarted(sourceContentItem, locale);
+
+    contentItemToUpdate = await dcManagement.contentItems.get(
+      localized && localized.id
+    );
+  } else {
+    contentItemToUpdate = await dcManagement.contentItems.get(
+      contentItemToUpdate.id
+    );
+  }
+
+  return {
+    contentItemToUpdate,
+    sourceContentItem,
+  };
+};
+
 export const applyAllTranslations =
   (submission: SubmissionInt) =>
   async (dispatch: AppDispatch, getState: () => RootState) => {
@@ -124,12 +158,11 @@ export const applyAllTranslations =
       const {
         Api,
         projects,
-        sdk: { SDK, params },
+        sdk: { params, dcManagement },
         submissions: {
           pagination: { page },
         },
       }: RootStateInt = getState();
-      const dcManagement = new DynamicContent({}, {}, SDK && SDK.client);
       const failedCount = 0;
 
       dispatch(setContentLoader(true));
@@ -183,6 +216,121 @@ export const applyAllTranslations =
     }
   };
 
+const applyToItem = async ({
+  contentItemToUpdate,
+  translations = [],
+  body,
+  updatedBodyObj,
+}) => {
+  translations.forEach(({ key, value }: any) => {
+    if (value) {
+      jsonpath.apply(updatedBodyObj, `$.${key}`, () =>
+        value && value.length && value.length === 1 ? value[0] : value
+      );
+    }
+  });
+
+  return contentItemToUpdate.related.update({
+    ...contentItemToUpdate.toJSON(),
+    body: {
+      ...contentItemToUpdate.body,
+      ...body,
+      ...updatedBodyObj,
+    },
+  });
+};
+
+const deepApply = async ({
+  sourceContentItem,
+  contentItemToUpdate,
+  dcManagement,
+  translatedTask,
+  source_locale,
+  locale,
+}) => {
+  const mapping: any = {};
+
+  await ContentGraph.deepCopy(
+    [sourceContentItem.id],
+    dcManagement.contentItems.get,
+    async (contentItem, body) => {
+      if (mapping[contentItem.id]) {
+        return mapping[contentItem.id];
+      }
+
+      if (contentItemToUpdate && contentItem.id === sourceContentItem.id) {
+        const updatedBody = {
+          ...(contentItemToUpdate && contentItemToUpdate.body),
+        };
+
+        return (mapping[contentItemToUpdate.id] = applyToItem({
+          contentItemToUpdate,
+          translations: translatedTask.translations,
+          body,
+          updatedBodyObj: updatedBody,
+        }));
+      }
+
+      if (source_locale && contentItem.locale === source_locale.locale) {
+        const allNestedLocalized = await getAllLocalization(contentItem);
+
+        let nestedLocalized = allNestedLocalized.find(
+          ({ locale: contentLocale }: any) => contentLocale === locale
+        );
+
+        nestedLocalized = await dcManagement.contentItems.get(
+          nestedLocalized && nestedLocalized.id
+        );
+
+        const updatedBodyObj = {
+          ...(nestedLocalized && nestedLocalized.body),
+        };
+
+        const translations = translatedTask.nested[contentItem.id];
+
+        if (translations) {
+          if (!nestedLocalized && !contentItem.locale) {
+            await contentItem.related.setLocale(source_locale.locale);
+          }
+
+          if (!nestedLocalized) {
+            await contentItem.related.localize([locale]);
+
+            let localized: ContentItem | undefined =
+              await getLocalizedAfterJobStarted(contentItem, locale);
+
+            localized = await dcManagement.contentItems.get(
+              localized && localized.id
+            );
+
+            return (
+              localized &&
+              (mapping[localized.id] = await applyToItem({
+                contentItemToUpdate: localized,
+                translations,
+                body,
+                updatedBodyObj,
+              }))
+            );
+          }
+
+          return (
+            nestedLocalized &&
+            (mapping[nestedLocalized.id] = await applyToItem({
+              contentItemToUpdate: nestedLocalized,
+              translations,
+              body,
+              updatedBodyObj,
+            }))
+          );
+        }
+      }
+
+      return (mapping[contentItem.id] = contentItem);
+    }
+  );
+};
+
 const downloadAndApply = async (
   {
     dcManagement,
@@ -197,140 +345,23 @@ const downloadAndApply = async (
   dispatch: Dispatch<any>
 ) => {
   try {
-    const sourceContentItem = await dcManagement.contentItems.get(
-      unique_identifier
-    );
+    const translatedTask = await Api.downloadTask(task_id, selectedProject);
 
-    const allLocalized = await getAllLocalization(sourceContentItem);
+    const { sourceContentItem, contentItemToUpdate } =
+      await getContentItemToUpdate({
+        locale,
+        dcManagement,
+        unique_identifier,
+      });
 
-    const resp = await Api.downloadTask(task_id, selectedProject);
-
-    let contentItemToUpdate = allLocalized.find(
-      ({ locale: contentLocale }: any) => contentLocale === locale
-    );
-
-    if (!contentItemToUpdate) {
-      await sourceContentItem.related.localize([locale]);
-
-      const localized: ContentItem | undefined =
-        await getLocalizedAfterJobStarted(sourceContentItem, locale);
-
-      contentItemToUpdate = await dcManagement.contentItems.get(
-        localized && localized.id
-      );
-    } else {
-      contentItemToUpdate = await dcManagement.contentItems.get(
-        contentItemToUpdate.id
-      );
-    }
-
-    const mapping: any = {};
-
-    await ContentGraph.deepCopy(
-      [sourceContentItem.id],
-      dcManagement.contentItems.get,
-      async (contentItem, body) => {
-        if (mapping[contentItem.id]) {
-          return mapping[contentItem.id];
-        }
-
-        if (contentItem.id === sourceContentItem.id) {
-          const updatedBody = {
-            ...(contentItemToUpdate && contentItemToUpdate.body),
-          };
-
-          (resp.translations || []).forEach(({ key, value }: any) => {
-            if ((value && Array.isArray(value) && value.length) || value) {
-              jpApply(updatedBody, `$.${key}`, () =>
-                value && value.length && value.length === 1 ? value[0] : value
-              );
-            }
-          });
-
-          return (
-            contentItemToUpdate &&
-            (mapping[contentItemToUpdate.id] =
-              await contentItemToUpdate.related.update({
-                ...contentItemToUpdate.toJSON(),
-                body: {
-                  ...contentItemToUpdate.body,
-                  ...body,
-                  ...updatedBody,
-                },
-              }))
-          );
-        }
-
-        if (source_locale && contentItem.locale === source_locale.locale) {
-          const allNestedLocalized = await getAllLocalization(contentItem);
-
-          let nestedLocalized = allNestedLocalized.find(
-            ({ locale: contentLocale }: any) => contentLocale === locale
-          );
-
-          nestedLocalized = await dcManagement.contentItems.get(
-            nestedLocalized && nestedLocalized.id
-          );
-
-          const updatedBodyObj = {
-            ...(nestedLocalized && nestedLocalized.body),
-          };
-
-          const translations = resp.nested[contentItem.id];
-
-          if (translations) {
-            translations.forEach(({ key, value }: any) => {
-              /* if (!updatedBodyObj[key]) {
-                updatedBodyObj[key] =
-                  (nestedLocalized && nestedLocalized.body && nestedLocalized.body[key]) || "";
-              } */
-              jpApply(updatedBodyObj, `$.${key}`, () =>
-                value && value.length && value.length === 1 ? value[0] : value
-              );
-            });
-
-            if (!nestedLocalized && !contentItem.locale) {
-              await contentItem.related.setLocale(source_locale.locale);
-            }
-
-            if (!nestedLocalized) {
-              await contentItem.related.localize([locale]);
-
-              let localized: ContentItem | undefined =
-                await getLocalizedAfterJobStarted(contentItem, locale);
-
-              localized = await dcManagement.contentItems.get(
-                localized && localized.id
-              );
-
-              return (
-                localized &&
-                (mapping[localized.id] = await localized.related.update({
-                  ...localized.toJSON(),
-                  body: {
-                    ...localized.body,
-                    ...body,
-                    ...updatedBodyObj,
-                  },
-                }))
-              );
-            }
-
-            return (mapping[nestedLocalized.id] =
-              await nestedLocalized.related.update({
-                ...nestedLocalized.toJSON(),
-                body: {
-                  ...nestedLocalized.body,
-                  ...body,
-                  ...updatedBodyObj,
-                },
-              }));
-          }
-        }
-
-        return (mapping[contentItem.id] = contentItem);
-      }
-    );
+    await deepApply({
+      sourceContentItem,
+      contentItemToUpdate,
+      dcManagement,
+      translatedTask,
+      source_locale,
+      locale,
+    });
 
     await Api.updateTaskMetadata(task_id, selectedProject, {
       localizedId: contentItemToUpdate && contentItemToUpdate.id,
@@ -364,10 +395,9 @@ export const downloadTask =
       const {
         Api,
         projects,
-        sdk: { SDK, params },
+        sdk: { params, dcManagement },
         tasks: { pagination },
       }: RootStateInt = getState();
-      const dcManagement = new DynamicContent({}, {}, SDK && SDK.client);
 
       await downloadAndApply(
         {

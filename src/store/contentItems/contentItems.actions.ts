@@ -3,7 +3,6 @@ import {
   ContentItem,
   ContentRepository,
   ContentType,
-  DynamicContent,
   EnumFacet,
   Hub,
   Page,
@@ -78,7 +77,7 @@ export const getContentItems =
     try {
       const {
         sdk: {
-          SDK,
+          dcManagement,
           params: { projects, hubId, statuses },
         },
         contentTypes: { data: contentTypesList },
@@ -92,7 +91,7 @@ export const getContentItems =
       const project = projects.find((el) => el.id === selectedProject);
 
       if (project && !project.contentTypes) {
-        return dispatch(setError('No contentTypes fount in project'));
+        return dispatch(setError('No Content Types found in project'));
       }
 
       if (data && Math.ceil(data.length / 10) >= pageNumber && !filter) {
@@ -123,8 +122,6 @@ export const getContentItems =
       const uris: string[] = (project?.contentTypes || [])
         .filter((el: any) => !el.dependency)
         .map((el: any) => el.uri.toLowerCase());
-
-      const dcManagement = new DynamicContent({}, {}, SDK && SDK.client);
 
       const hub = await dcManagement.hubs.get(hubId);
       const facets = await hub.related.contentItems.facet(

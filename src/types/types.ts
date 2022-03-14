@@ -1,5 +1,5 @@
 import { DashboardExtension } from 'dc-extensions-sdk';
-import { ContentItem, ContentType } from 'dc-management-sdk-js';
+import { ContentItem, ContentType, DynamicContent } from 'dc-management-sdk-js';
 
 export interface Option {
   label: string;
@@ -159,6 +159,7 @@ export interface ParamsInt {
 export interface SDKInterface {
   connected: boolean;
   SDK?: DashboardExtension;
+  dcManagement: DynamicContent;
   params: ParamsInt;
 }
 

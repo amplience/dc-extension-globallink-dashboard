@@ -9,10 +9,16 @@ import SubmissionCreateForm from './components/SubmissionCreateForm';
 import Tasks from './components/Tasks';
 import Submissions from './components/Submissions';
 import { RootState } from './store/store';
-import { SDKInterface } from './types/types';
+import { LoadingsInterface, SDKInterface } from './types/types';
 
 const RouterComponent = () => {
-  const { connected, loadings } = useSelector((state: RootState) => ({
+  const {
+    connected,
+    loadings,
+  }: {
+    loadings: LoadingsInterface;
+    connected: boolean;
+  } = useSelector((state: RootState) => ({
     connected: (state.sdk as SDKInterface).connected,
     loadings: state.loadings,
   }));

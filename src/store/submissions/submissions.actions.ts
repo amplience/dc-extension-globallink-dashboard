@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Dispatch } from 'redux';
-import { nodes as jpNodes } from 'jsonpath';
+import jsonpath from 'jsonpath';
 import {
   ContentType,
-  DynamicContent,
   WorkflowState,
   ContentGraph,
   ContentLink,
@@ -180,9 +179,8 @@ export const createSubmission =
         Api,
         projects: { selectedProject },
         contentTypes: { data: hubContentTypes },
-        sdk: { SDK, params },
+        sdk: { params, dcManagement },
       }: RootStateInt = getState();
-      const dcManagement = new DynamicContent({}, {}, SDK && SDK.client);
       const project = params.projects.find(
         (el: any) => el.id === selectedProject
       );
@@ -237,7 +235,7 @@ export const createSubmission =
             if (contentType && contentType.translatableFields) {
               const fileJson = contentType.translatableFields.reduce(
                 (acc: any, field: string) => {
-                  const nodes = jpNodes(contentItem.body, `$.${field}`);
+                  const nodes = jsonpath.nodes(contentItem.body, `$.${field}`);
 
                   nodes.forEach(({ path, value }) => {
                     if (value && !ContentLink.isContentLink(value)) {
