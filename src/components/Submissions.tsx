@@ -29,6 +29,7 @@ import { useStyles } from './Tasks';
 export const SUBMISSION_STATUSES: { [key: string]: string } = {
   Delivered: 'Translation Complete',
   Completed: 'Translation Ready',
+  Translate: 'Translating',
 };
 
 const Submissions = (props) => {
@@ -181,6 +182,10 @@ const Submissions = (props) => {
               {
                 label: 'Translation Ready',
                 value: 'Completed',
+              },
+              {
+                label: 'Translating',
+                value: 'Translate',
               },
               {
                 label: 'Pre-process',
