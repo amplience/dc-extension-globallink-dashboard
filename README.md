@@ -1,71 +1,29 @@
-# Getting Started with Create React App
+# dc-extension-globallink-connect
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The GlobalLink Connect dashboard extension allows content producers in Amplience Dynamic Content to submit content for translation using GlobalLink Connect Cloud API, monitor the translation status, and to apply completed translations to [localized content items](https://amplience.com/docs/production/contentitemlocalization.html).
 
-## Available Scripts
+![](./docs/images/review-submissions.png)
 
-In the project directory, you can run:
+You can use our deployed version of this extension (builds from the "production" branch) - [https://globallink-connect.extensions.content.amplience.net](https://globallink-connect.extensions.content.amplience.net/)
 
-### `npm start`
+*As this is an open source project you're welcome to host your own "fork" of this project. You can use any standard static hosting service (Netlify, Amplify, Vercel, etc.) if you wish. Further information can be found on the [Hosting](https://github.com/amplience/dc-extension-dom-editor/blob/master/HOSTING.md) page.*
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Features
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+The GlobalLink Connect dashboard extension for Dynamic Content adds the following functionality to your Dynamic Content hub.
 
-### `npm test`
+* Manage your translations from within Dynamic Content:
+  * Submit translation requests to GlobalLink Connect for your content without needing to leave the platform.
+  * Review the statuses of your GlobalLink submissions & tasks from within the platform.
+  * Localise your content and apply any completed translations with just a couple of clicks.
+* Choose what to translate:
+  * A highly configurable extension means you can configure which content types (and which fields within those types) can be sent for translation.
+  * Per-type configuration allows you to choose the granularity of your submissions; from indivdual components to whole pages.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Installing & Configuring the extension
 
-### `npm run build`
+Please click [here](docs/CONFIGURATION.md) for technical guidance on how to configure the GlobalLink Connect extension, and tailor it to your organisation's specific requirements.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Using the extension
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-# dc-extension-translation-dashboard
+Please click [here](docs/USAGE.md) for guidance on how to use the configured GlobalLink Connect extension to submit content within Dynamic Content for translation and how to manage translations on completion.
