@@ -9,6 +9,14 @@ const useStyles = makeStyles(() => ({
     alignItems: 'center',
     display: 'flex',
     height: '50px',
+
+    '&.tableLoader': {
+      justifyContent: 'flex-start',
+    },
+    '&.tableLoader > div': {
+      height: '4px',
+      width: '4px',
+    },
   },
   loadingDotsDot: {
     animation: 'dot-keyframes 1.5s infinite ease-in-out',

@@ -26,7 +26,7 @@ import { applyAllTranslations } from '../store/tasks/tasks.actions';
 import SubmissionFilterBar from './SubmissionFilterBar';
 import { useStyles } from './Tasks';
 
-const SUBMISSION_STATUSES: { [key: string]: string } = {
+export const SUBMISSION_STATUSES: { [key: string]: string } = {
   Delivered: 'Translation Complete',
   Completed: 'Translation Ready',
 };

@@ -29,6 +29,7 @@ import {
 } from '../types/types';
 import { FilterStatus, useStyles } from './FilterBar';
 import FilterIcon from '../styles/FilterIcon.svg';
+import { SUBMISSION_STATUSES } from './Submissions';
 
 const SubmissionFilterBar = ({
   filterOptions,
@@ -146,7 +147,7 @@ const SubmissionFilterBar = ({
                     <FilterStatus
                       key={state}
                       popupState={popupState}
-                      label={state}
+                      label={SUBMISSION_STATUSES[state] || state}
                       value={state}
                       onClear={() => onRemoveFilterValue('state', state)}
                     />
@@ -162,7 +163,10 @@ const SubmissionFilterBar = ({
                 <div className={classes.filterValue}>
                   <FilterStatus
                     popupState={popupState}
-                    label={appliedFilter.submission_name}
+                    label={
+                      SUBMISSION_STATUSES[appliedFilter.submission_name] ||
+                      appliedFilter.submission_name
+                    }
                     value={appliedFilter.submission_name}
                     onClear={() => onRemoveTextFilter('submission_name')}
                   />
@@ -204,11 +208,6 @@ const SubmissionFilterBar = ({
                       onClear={() => onRemoveTextFilter('is_overdue', 0)}
                     />
                   ) : null}
-                  {/* {appliedFilter.is_redelivery ? <FilterStatus
-                  popupState={popupState} label={"Redelivery"}
-                  value={appliedFilter.is_redelivery}
-                  onClear={() => onRemoveTextFilter("is_redelivery", 0)}
-                /> : null} */}
                 </div>
               </div>
             ) : null}
