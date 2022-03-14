@@ -11,7 +11,13 @@ import { RootState } from './store/store';
 import { setError } from './store/error/error.actions';
 import RouterComponent from './Router';
 
-export const history = createBrowserHistory();
+let location = window.location.pathname;
+const lastSlash = location.lastIndexOf('/');
+if (lastSlash !== location.length - 1) {
+  location = location.substring(0, lastSlash + 1);
+}
+
+export const history = createBrowserHistory({ basename: location });
 
 const useStyles = makeStyles(() => ({
   svg: {
