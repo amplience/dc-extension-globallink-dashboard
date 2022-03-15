@@ -24,7 +24,7 @@ Alternatively, return to [README.md](../README.md) for more information on the e
 
 ## Prerequisites
 
-To configure the GlobalLink Connext extension,
+To configure the GlobalLink Connect extension,
 
 * A valid Amplience Dynamic Content user account (with Developer or Administrator permissions).
 * A valid API Key & Connector ID for GlobalLink Connect Cloud API.
@@ -59,16 +59,16 @@ _As this is an open source project you're welcome to host your own "fork" of thi
 
 ## How to configure
 
-Once the extension has been registered, it can then be configured it within the "Installation Parameters" tab of the extension.
+Once the extension has been registered, it can then be configured from within the "Installation Parameters" tab of the extension.
 
-An example configuration as well as detailed definitions can be found below, to helo you get stared with configuring your extension.
+An example configuration as well as detailed definitions can be found below, to help you get stared with configuring your extension.
 
 ### Example Configuration
 
 ```json
 {
   "apiKey": "abc123def",
-  "apiUrl": "https://connect-dev.translations.com./rest-api/v3",
+  "apiUrl": "https://connect-dev.translations.com/rest-api/v3",
   "hubId": "5ebe6b054cedfd000169e8a8",
   "maxContentInSubmission": 20,
   "statuses": {
@@ -100,7 +100,7 @@ An example configuration as well as detailed definitions can be found below, to 
       "workflow": "Machine Translation",
       "sourceLocale": "en-US",
       "targetLocales": [
-        "de-DE
+        "de-DE"
       ],
       "additionalInstructions": "Use informal tone of voice. Beware of false friends."
     }
@@ -131,13 +131,13 @@ An example configuration as well as detailed definitions can be found below, to 
 
 #### Translatable fields
 
-When configuring content types for translation, this uses of JSONPath for defining which field(s) within each content type will be sent to GlobalLink Connect for translation. Below is a table detailing common field types within Dynamic Content, and any considerations or examples which can be used to assist with setting up your own configuration.
+When configuring content types for translation, this uses  JSONPath for defining which field(s) within each content type will be sent to GlobalLink Connect for translation. Below is a table detailing common field types within Dynamic Content, and any considerations or examples which can be used to assist with setting up your own configuration.
 
 | **Property**                                                 | **Description**                                              | **Example**                                                  |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | String                                                       | Starting within the Schema's `properties` object, provide the path to the string property you would like to translate. | **Schema:**<br />![](./images/schema-string.png)<br /><br />**Config:**<br />`"translatableFields": ["header.headline"]` |
 | Array of Strings                                             | Starting within the Schema's `properties` object, provide the path to the array of strings you would like to translate, including the index selection. | **Schema:**<br />![](./images/schema-array.png)<br /><br />**Config (all in array):**<br />`"translatableFields": ["body.paragraphs[*]"]`<br />**Config (first in array):**<br />`"translatableFields": ["body.paragraphs[0]"]` |
-| Partial                                                      | This requires the fully qualified JSONPath to the [partial](https://amplience.com/docs/integration/usingpartials.html) you wish to translate.<br /><br />Starting within the Schema's `properties` object, provide the path to the partial reference.<br /><br />Then, continuing from the target schema's `definitions` object, provide the remainder of the path to the desired property. | **Schema:**<br />![](./images/schema-partial.png)<br /><br />**Config (all in array):**<br />`"translatableFields": ["body[*].paragraph"]`<br />**Config (first in array):**<br />`"translatableFields": ["body[0].paragraph"]` |
+| Partial                                                      | This requires the fully qualified JSONPath to the [partial](https://amplience.com/docs/integration/usingpartials.html) you wish to translate.<br /><br />Starting within the Schema's `properties` object, provide the path to the partial reference.<br /><br />Then, continuing from the point of reference within target schema's `definitions` object, provide the remainder of the path to the desired property. | **Schema:**<br />![](./images/schema-partial.png)<br /><br />**Config (all in array):**<br />`"translatableFields": ["body[*].paragraph"]`<br />**Config (first in array):**<br />`"translatableFields": ["body[0].paragraph"]` |
 | Content Choosers<br /><br />(eg `content-link` & `content-reference`) | This does not require a JSONPath to be provided in the parent content item.<br /><br />You would instead configure the translatable fields for any child schemas referened in the Content Link/Reference.<br /><br />The parent schema will still need to be defined within `contentTypes` in the extension's configuration if you wish for it to be available for submission. | **Schema (parent):**<br />![](./images/schema-contentlink-parent.png)<br />**Schema (child)**:<br />![](./images/schema-contentlink-child.png)<br /><br />**Config (parent):**<br />`"translatableFields": []`<br />**Config (child):**<br />`"translatableFields": ["paragraph"]` |
 
 #### Templates
