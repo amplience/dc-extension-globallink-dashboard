@@ -85,6 +85,9 @@ export const getContentItems =
         projects: { selectedProject },
         contentItems: { data, pagination },
       }: RootStateInt = getState();
+      if (!dcManagement) {
+        return dispatch(setError('No DC Management SDK found'));
+      }
 
       dispatch(setContentLoader(true));
 

@@ -1,11 +1,9 @@
 import { AnyAction } from 'redux';
-import { DynamicContent } from 'dc-management-sdk-js';
 import { SET_SDK } from './sdk.actions';
 import { SDKInterface } from '../../types/types';
 
 export const defaultSdk = {
   connected: false,
-  dcManagement: new DynamicContent({}, {}),
   params: {
     apiKey: '',
     apiUrl: '',

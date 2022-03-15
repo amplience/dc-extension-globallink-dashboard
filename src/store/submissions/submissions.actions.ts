@@ -181,6 +181,9 @@ export const createSubmission =
         contentTypes: { data: hubContentTypes },
         sdk: { params, dcManagement },
       }: RootStateInt = getState();
+      if (!dcManagement) {
+        return dispatch(setError('No DC Management SDK found'));
+      }
       const project = params.projects.find(
         (el: any) => el.id === selectedProject
       );
@@ -325,9 +328,9 @@ export const createSubmission =
       dispatch(getSubmissions(0));
 
       history.push('/');
-      dispatch(setCreateLoader(false));
+      return dispatch(setCreateLoader(false));
     } catch (e: any) {
       dispatch(setError(e.toString()));
-      dispatch(setCreateLoader(false));
+      return dispatch(setCreateLoader(false));
     }
   };

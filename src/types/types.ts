@@ -159,7 +159,7 @@ export interface ParamsInt {
 export interface SDKInterface {
   connected: boolean;
   SDK?: DashboardExtension;
-  dcManagement: DynamicContent;
+  dcManagement?: DynamicContent;
   params: ParamsInt;
 }
 

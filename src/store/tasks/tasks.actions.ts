@@ -399,6 +399,10 @@ export const downloadTask =
         tasks: { pagination },
       }: RootStateInt = getState();
 
+      if (!dcManagement) {
+        return dispatch(setError('No DC Management SDK found'));
+      }
+
       await downloadAndApply(
         {
           dcManagement,
@@ -414,10 +418,10 @@ export const downloadTask =
       );
 
       dispatch(getTasks(pagination.page || 0));
-      dispatch(setContentLoader(false));
+      return dispatch(setContentLoader(false));
     } catch (e: any) {
       dispatch(setError(e.toString()));
-      dispatch(setContentLoader(false));
+      return dispatch(setContentLoader(false));
     }
   };
 
