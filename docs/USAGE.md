@@ -66,7 +66,7 @@ Once in the “Create Submission” screen, you can then add detail to your Subm
 | **Property**            | **Description**                                              |
 | ----------------------- | ------------------------------------------------------------ |
 | Name                    | The name of your submission. Auto-generated, but can be overridden. |
-| Due Date                | The intended due date of the submission’s completion         |
+| Due Date                | The intended due date of the submission’s completion.        |
 | Submitter               | The name of the person creating the submission. This allows you to select from a drop-down of the current active users on the account. |
 | Template                | Pre-fill the submission with custom templates configured for your account. This allows selection via drop-down. |
 | Workflow                | The translation workflow which GlobalLink will use to process your submission. |
