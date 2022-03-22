@@ -19,6 +19,7 @@ import {
   Pagination,
   RootStateInt,
 } from '../../types/types';
+import { PAGE_SIZE } from '../../utils/GCCRestApi';
 
 export const SET_CONTENT_ITEMS = 'SET_CONTENT_ITEMS';
 export const SET_CONTENT_ITEMS_PAGINATION = 'SET_CONTENT_ITEMS_PAGINATION';
@@ -169,7 +170,7 @@ export const getContentItems =
               : ''
           }${(filter && filter.text) || ''}`,
           page: pageNumber - 1,
-          size: 20,
+          size: PAGE_SIZE,
           sort: 'lastModifiedDate,desc',
         }
       );

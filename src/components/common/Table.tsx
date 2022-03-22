@@ -10,6 +10,7 @@ import {
   Paper,
   Checkbox,
 } from '@material-ui/core';
+import isFunction from 'lodash/isFunction';
 
 interface Column {
   id: string;
@@ -145,7 +146,7 @@ const Table = ({
               return (
                 <TableRow
                   onDoubleClick={() =>
-                    rowClick && typeof rowClick === 'function' && rowClick(row)
+                    rowClick && isFunction(rowClick) && rowClick(row)
                   }
                   hover
                   role="checkbox"
@@ -175,7 +176,7 @@ const Table = ({
                         key={`cell_${index}_${ind}`}
                         align={column.align}
                       >
-                        {column.format && typeof column.format === 'function'
+                        {column.format && isFunction(column.format)
                           ? column.format(value || row)
                           : value}
                       </TableCell>

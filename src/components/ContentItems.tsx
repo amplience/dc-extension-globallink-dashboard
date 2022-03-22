@@ -8,6 +8,7 @@ import FilterBar from './FilterBar';
 import TablePagination from './common/TablePagination';
 import { getContentItems } from '../store/contentItems/contentItems.actions';
 import { ContentItemsInterface } from '../types/types';
+import { PAGE_SIZE } from '../utils/GCCRestApi';
 
 const useStyles = makeStyles(() => ({
   navBarContainer: {
@@ -15,7 +16,6 @@ const useStyles = makeStyles(() => ({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    // padding: '0 20px',
   },
 }));
 
@@ -36,8 +36,8 @@ const ContentItems = ({
   }: any = useSelector((state: RootState) => state.sdk);
 
   const slicedData = data.slice(
-    (pagination.page - 1) * 20,
-    (pagination.page - 1) * 20 + 20
+    (pagination.page - 1) * PAGE_SIZE,
+    (pagination.page - 1) * PAGE_SIZE + PAGE_SIZE
   );
 
   const columns = [

@@ -31,6 +31,19 @@ import { FilterStatus, useStyles } from './FilterBar';
 import FilterIcon from '../styles/FilterIcon.svg';
 import { SUBMISSION_STATUSES } from './Submissions';
 
+const options = [
+  {
+    label: 'Error',
+    value: 1,
+    key: 'is_error',
+  },
+  {
+    label: 'Overdue',
+    value: 1,
+    key: 'is_overdue',
+  },
+];
+
 const SubmissionFilterBar = ({
   filterOptions,
   filter: appliedFilter,
@@ -90,23 +103,29 @@ const SubmissionFilterBar = ({
     name,
     keyName,
     options,
+    handleChange,
   }: {
     name: string;
-    keyName: 'state';
+    keyName: string;
     options: Option[];
+    handleChange: Function;
   }) => (
     <FormControl component="fieldset">
       <FormLabel component="legend">{name}</FormLabel>
       <FormGroup aria-label={name}>
-        {options.map(({ label, value }: Option, index) => (
+        {options.map(({ label, value, key = keyName }: Option, index) => (
           <FormControlLabel
             key={index}
             value={value}
             control={
               <Checkbox
-                checked={filter[keyName] && filter[keyName].includes(value)}
+                checked={
+                  filter[key] && Array.isArray(filter[key])
+                    ? filter[key].includes(value)
+                    : Boolean(filter[key])
+                }
                 className={classes.radio}
-                onChange={() => handleChange(keyName, value || '')}
+                onChange={() => handleChange(key, value || '')}
                 color="primary"
               />
             }
@@ -116,6 +135,13 @@ const SubmissionFilterBar = ({
       </FormGroup>
     </FormControl>
   );
+
+  const handleOptionChange = (key) =>
+    setFilter({
+      ...filter,
+      [key]: filter[key] ? 0 : 1,
+    });
+
   const handleChange = (key: 'state', id: any) => {
     const currentList: string[] = filter[key] || [];
 
@@ -273,44 +299,15 @@ const SubmissionFilterBar = ({
                   name="Status"
                   keyName="state"
                   options={filterOptions.state}
+                  handleChange={handleChange}
                 />
                 <Divider flexItem orientation="vertical" />
-                <FormControl component="fieldset">
-                  <FormLabel component="legend">Options</FormLabel>
-                  <FormGroup>
-                    {[
-                      {
-                        label: 'Error',
-                        value: 1,
-                        key: 'is_error',
-                      },
-                      {
-                        label: 'Overdue',
-                        value: 1,
-                        key: 'is_overdue',
-                      },
-                    ].map(({ label, value, key }: Option) => (
-                      <FormControlLabel
-                        key={key}
-                        value={value}
-                        control={
-                          <Checkbox
-                            checked={Boolean(filter[key])}
-                            className={classes.radio}
-                            onChange={() =>
-                              setFilter({
-                                ...filter,
-                                [key]: filter[key] ? 0 : 1,
-                              })
-                            }
-                            color="primary"
-                          />
-                        }
-                        label={label}
-                      />
-                    ))}
-                  </FormGroup>
-                </FormControl>
+                <FilterBlock
+                  name="Options"
+                  keyName=""
+                  options={options}
+                  handleChange={handleOptionChange}
+                />
                 <Divider flexItem orientation="vertical" />
                 <Autocomplete
                   options={filterOptions.submitters}
