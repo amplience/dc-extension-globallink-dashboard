@@ -33,7 +33,7 @@ To configure the GlobalLink Connect extension,
 
 ### Register Extension
 
-To use the GlobalLink Connect dashboard extension, this extension must be [registered](https://amplience.com/docs/development/registeringextensions.html) as against a Hub within the Dynamic Content platform (Developer -> Extensions), to allow it to load within that Hub.
+To use the GlobalLink Connect dashboard extension, this extension must be [registered](https://amplience.com/docs/development/registeringextensions.html) against a Hub within the Dynamic Content platform (Developer -> Extensions), to allow it to load within that Hub.
 
 * Category: Dashboard
 * <a name="extension_label">Label</a>: GlobalLink Connect

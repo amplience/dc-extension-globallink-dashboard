@@ -63,16 +63,16 @@ Once the extension has loaded, ensure that you have selected the appropriate Glo
 
 Once in the “Create Submission” screen, you can then add detail to your Submission in the left-hand pane.
 
-| **Property**             | **Description**                                              |
-| ------------------------ | ------------------------------------------------------------ |
-| Name                     | The name of  your submission. Auto-generated, but can be overridden. |
-| Due Date                 | The intended  due date of the submission’s completion        |
-| Submitter                | The name of the  person creating the submission. This allows you to select from a drop-down of  the current active users on the account. |
-| Template                 | Pre-fill the  submission with custom templates configured for your account. This allows  selection via drop-down. |
-| Workflow                 | The translation  workflow which GlobalLink will use to process your submission. |
-| Source Locale            | The original  locale of the content item(s) you wish to translate. This allows selection  via drop-down of all available locales on your account. |
-| Target Locales           | The intended  locale(s) you wish to translate your content items into. This allows multiple  selections of all available locales on your account. |
-| Additional  Instructions | Any additional  information or instructions you may want to pass to GlobalLink along with the  submission. |
+| **Property**            | **Description**                                              |
+| ----------------------- | ------------------------------------------------------------ |
+| Name                    | The name of your submission. Auto-generated, but can be overridden. |
+| Due Date                | The intended due date of the submission’s completion         |
+| Submitter               | The name of the person creating the submission. This allows you to select from a drop-down of the current active users on the account. |
+| Template                | Pre-fill the submission with custom templates configured for your account. This allows selection via drop-down. |
+| Workflow                | The translation workflow which GlobalLink will use to process your submission. |
+| Source Locale           | The original locale of the content item(s) you wish to translate. This allows selection via drop-down of all available locales on your account. |
+| Target Locales          | The intended locale(s) you wish to translate your content items into. This allows multiple selections of all available locales on your account. |
+| Additional Instructions | Any additional information or instructions you may want to pass to GlobalLink along with the submission. |
 
 ![](./images/new-submission.png)
 
@@ -92,10 +92,10 @@ This list of content items can be filtered further by the filter controls at the
 
 | **Property**  | **Description**                                              |
 | ------------- | ------------------------------------------------------------ |
-| Search        | Free text  entry. Any valid content items which match your search term will be returned  in the content item picker. |
-| Repository    | Allows you to  choose which repository’s content items should show. |
-| Assignees     | Allows you to  choose one or more assignees whose content items should show. |
-| Content Types | Allows you to  chose one ore more content types of content items which should show. |
+| Search        | Free text entry.<br /><br />Any valid content items which match your search term will be returned in the content item picker. |
+| Repository    | Specifies which repository content items will be listed from.<br /><br />Only one specific repository can be selected at a time, but "All" can be chosen to list content regardless of the repository it is contained in. |
+| Assignees     | If selected, this will only return content items which have been assigned to the chosen assignee(s).<br /><br />One or more assignees can be chosen. If none are chosen, this filter will not be applied. |
+| Content Types | If selected, this will only return content items of the chosen content type(s).<br /><br />One or more content types can be chosen. If none are chosen, this filter will not be applied. |
 
 ![](./images/filter-options.png)
 
@@ -131,10 +131,10 @@ All submissions for the chosen project will be displayed by default when viewing
 
 | **Property**    | **Description**                                              |
 | --------------- | ------------------------------------------------------------ |
-| Submission Name | Free text  entry. Any submissions for the selected project which match your search term  will be returned in the submissions list. |
-| Status          | Allows you to  select one or more submission statuses to filter the list by. |
-| Options         | Allows you to  select one or more options flags to filter the list by. |
-| Submitter       | Allows you to  choose a submitter from a dropdown of active users on the account, to filter  the list by. |
+| Submission Name | Free text entry. Any submissions for the selected project which match your search term will be returned in the submissions list. |
+| Status          | Allows you to select one or more submission statuses to filter the list by. |
+| Options         | Allows you to select one or more options flags to filter the list by. |
+| Submitter       | Allows you to choose a submitter from a dropdown of active users on the account, to filter the list by. |
 
 ![](./images/submissions-filter-options.png)
 
