@@ -18,7 +18,7 @@ The GlobalLink Connect dashboard extension for Dynamic Content adds the followin
 
 ## Hosting the extension
 
-Please click [here](docs/HOSTING.md) for information on how to host the GlobalLink Connect dashboard extension. As this is an open source project you're also welcome to host your own "fork" of this project, if you wish
+Please click [here](docs/HOSTING.md) for information on how to host the GlobalLink Connect dashboard extension. As this is an open source project you're also welcome to host your own "fork" of this project, if you wish.
 
 ## Installing & Configuring the extension
 
