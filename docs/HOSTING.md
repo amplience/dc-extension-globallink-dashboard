@@ -1,12 +1,10 @@
-# Hosting the GlobalLink Connect Extension
+# dc-extension-globallink-dashboard
 
-As mentioned in the readme, the latest released version of the GlobalLink Connect Extension is hosted at [](https://globallink-connect.extensions.content.amplience.net), hosted using Amplify from the `production` branch. While our hosted version is good for using the extension verbatim, you might want to host the extension yourself for the following reasons:
-
-- Changes to the extension code to better fit your use case, or featureset.
-- Our hosted version of the extension can be updated to a newer version without warning. While all changes aim to be backwards compatible, this could suddenly change the user experience.
-- Only the latest release is available; unmerged PRs and custom modifications will require hosting elsewhere.
+## Hosting the GlobalLink Connect Extension
 
 This document describes a straightforward method of forking and hosting the extension yourself using GitHub Pages. This is useful if you want full control over your target version and features - you can easily fork this repository and host your own version of the GlobalLink Connect Extension with a few simple commands. Of course, the extension can be hosted on any static hosting service (e.g. Netlify, Amplify), this guide simply describes a simple way of doing this.
+
+Alternatively, return to [README.md](../README.md) for more information on the extension.
 
 ## Forking the repository
 
@@ -37,7 +35,7 @@ After you've published the `gh-pages` branch, you'll want to enable GitHub Pages
 
 It may take some time for the site to actually publish, but when it does you should be shown a URL for your version of the GlobalLink Connect extension.
 
-It will typically result in a URL like this: `https://<username>.github.io/dc-extension-globallink-connect/index.html`
+It will typically result in a URL like this: `https://<username>.github.io/dc-extension-globallink-dashboard/index.html`
 
 You can use this URL directly as an extension from DC. You will only have to do this once - all future publishes should update the version at this URL automatically!
 
@@ -47,7 +45,7 @@ When you fork a GitHub project, you actually create a copy of the repository at 
 
 Remotes allow you to use multiple remote git repositories and move commits between them. If you want to use new commits in our base repository, you'll want to add it as a remote as follows:
 
-`git remote add <remote-name> https://github.com/amplience/dc-extension-globallink-connect.git`
+`git remote add <remote-name> https://github.com/amplience/dc-extension-globallink-dashboard.git`
 
 Branches will then be accessible via Git. For example, you can get the master branch of a remote using the following: `<remote-name>/master`. This will let you view and use commits from our base repository to update your own.
 

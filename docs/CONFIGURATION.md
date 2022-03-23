@@ -1,8 +1,8 @@
-# dc-extension-globallink-connect
+# dc-extension-globallink-dashboard
 
 ## Configuration
 
-This section covers how to configure the GlobalLink Connect extension and tailor it to your organisation's specific requirements, and enable the sending of content from Dynamic Content for translation.
+This section covers how to configure the GlobalLink Connect dashboard extension and tailor it to your organisation's specific requirements, and enable the sending of content from Dynamic Content for translation.
 
 Alternatively, return to [README.md](../README.md) for more information on the extension.
 
@@ -35,15 +35,13 @@ To configure the GlobalLink Connect extension,
 
 To use the GlobalLink Connect dashboard extension, this extension must be [registered](https://amplience.com/docs/development/registeringextensions.html) against a Hub within the Dynamic Content platform (Developer -> Extensions), to allow it to load within that Hub.
 
-* Category: Dashboard
-* <a name="extension_label">Label</a>: GlobalLink Connect
-* Name: dc-extension-globallink-connect _(needs to be unique with the Hub)_
-* URL: [https://globallink-connect.extensions.content.amplience.net](https://globallink-connect.extensions.content.amplience.net)
-* Description: Translations dashboard utilising Transperfect's GlobalLink Connect *(can be left blank, if you wish)*
-
-Note: You can use our deployed version of this extension (builds from the "production" branch) - [https://globallink-connect.extensions.content.amplience.net](https://globallink-connect.extensions.content.amplience.net)
-
-_As this is an open source project you're welcome to host your own "fork" of this project. You can use any standard static hosting service (Netlify, Amplify, Vercel, etc.) if you wish. Further information can be found on the [Hosting](HOSTING.md) page._
+| Property                            | Value                                                        |
+| ----------------------------------- | ------------------------------------------------------------ |
+| Category                            | Dashboard                                                    |
+| <a name="extension_label">Label</a> | A label of your choice to help identify the extension.<br /><br />This will be the title of the dashboard extension's tab within the Dynamic Content Dashboard page. |
+| Name                                | A name of your choice.<br /><br />This will be automatically generated as a slugified version of the label, but may be overridden. |
+| URL                                 | The URL to your hosted extension.<br /><br />Please click [here](HOSTING.md) for information on how to host this extension. |
+| Description                         | A description of your choice to help describe the extension's purpose. |
 
 ### Permissions
 

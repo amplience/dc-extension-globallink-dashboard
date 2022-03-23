@@ -1,9 +1,9 @@
-# dc-extension-globallink-connect
+# dc-extension-globallink-dashboard
 
 
 ## Using the extension
 
-This section covers how to use the GlobalLink Connect extension to translate content within Dynamic Content.
+This section covers how to use the GlobalLink Connect dashboard extension to translate content within Dynamic Content.
 
 Alternatively, return to [README.md](../README.md) for more information on the extension.
 
