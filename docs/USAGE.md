@@ -33,7 +33,7 @@ Some values within the GlobalLink Connect dashboard are configurable at the poin
 
 | **Property**    | **Description**                                              |
 | --------------- | ------------------------------------------------------------ |
-| Extension Name  | The name of the extension as it appears within the "Dashboard" tab of Dynamic Content. This documentation refers to this as "GlobalLink Connect", but as this is configurable may vary within your environment. |
+| Extension Label | The name of the extension as it appears within the "Dashboard" tab of Dynamic Content. This documentation refers to this as "GlobalLink Connect", but as this is configurable may vary within your environment. |
 | Workflow States | A mapping of Dynamic Content’s workflow states to determine which content items can be translated, and where they are in the translation process.<br /><br />**ready:** The workflow state denoting that the content item is ready to translate. (Eg "Translation: Ready")<br />**inProgress:** The workflow state denoting that the content item has an open submission. (Eg "Translation: In-Progress")<br />**translated:** The workflow state denoting that the content item’s submission is complete, and its translations applied. (Eg "Translation: Complete") |
 
 ### Preparing your content
