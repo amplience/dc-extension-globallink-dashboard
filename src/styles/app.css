@@ -1,0 +1,61 @@
+.dc-pagination:hover {
+    background-color: transparent !important;
+}
+
+.dc-pagination, .MuiPaginationItem-ellipsis {
+    padding: 0 5px !important;
+    margin: 0 !important;
+    outline: none !important;
+    transition: color .3s;
+    color: #666 !important;
+    min-width: unset !important;
+    cursor: pointer !important;
+}
+
+.dc-pagination.Mui-selected {
+    color: #039be5 !important;
+    background-color: transparent !important;
+}
+
+.MuiTableCell-root {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.09);
+    padding: 12px;
+}
+
+.selected-item {
+    background-color: rgba(0, 0, 0, 0.09) !important;
+}
+
+@keyframes dot-keyframes {
+    0% {
+        opacity: 0.4;
+        transform: scale(1, 1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.2, 1.2);
+    }
+
+    100% {
+        opacity: 0.4;
+        transform: scale(1, 1);
+    }
+}
+
+.content-loader {
+    position: absolute;
+    top: 50%;
+    z-index: 22;
+}
+
+.tableLoader {
+    text-align: left;
+    justify-content: unset;
+    height: auto !important;
+}
+
+.tableLoader .loading-dots--dot {
+    height: 4px;
+    width: 4px;
+}

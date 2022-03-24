@@ -1,0 +1,15 @@
+src
+test
+tsconfig.json
+tslint.json
+.travis.yml
+.github
+.prettierignore
+.vscode
+.idea
+**/*.spec.*
+**/*.stories.*
+.storybook
+coverage
+.nyc_output
+*.log
