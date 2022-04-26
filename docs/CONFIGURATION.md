@@ -65,15 +65,18 @@ An example configuration as well as detailed definitions can be found below, to 
 
 ```json
 {
-  "apiKey": "abc123def",
-  "apiUrl": "https://connect-dev.translations.com/rest-api/v3",
   "hubId": "5ebe6b054cedfd000169e8a8",
-  "maxContentInSubmission": 20,
+  "vse": "19obchpyxfzms1r8yvdns9ruhi.staging.bigcontent.io",
   "statuses": {
     "ready": "60ad042ec9e77c0001270f19",
     "inProgress": "60ad043a4cedfd0001cc4b6e",
     "translated": "60ad0442c9e77c0001270f26"
   },
+  "apiKey": "abc123def",
+  "apiUrl": "https://connect-dev.translations.com/rest-api/v3",
+  "globalFilter": "dc-submissions",
+  "maxContentInSubmission": 20,
+  "dueDate": 14,
   "projects": [
     {
       "id": "abc123def",
@@ -113,10 +116,14 @@ An example configuration as well as detailed definitions can be found below, to 
 
 | **Property**                                   | **Type** | **Description**                                              |
 | ---------------------------------------------- | -------- | ------------------------------------------------------------ |
-| apiKey                                         | string   | API Key to allow the dashboard extension to authenticate with the GlobalLink Connect API. |
 | hubId                                          | string   | ID for the Dynamic Content hub from which you will be submitting your translation requests. |
-| maxContentInSubmission<br /><br />*(optional)* | integer  | The maximum number of content items which can be included in a single submission.<br /><br />(Default: 50) |
+| vse                                            | String   | URL for your preferred [Virtual Staging Environment](https://amplience.com/docs/development/virtual-staging.html) within Dynamic Content. <br /><br />Visualizations configured for content types will be sent to GlobalLink for context in their translations, using this URL. |
 | statuses                                       | object   | A mapping of Dynamic Content’s workflow states to determine which content items can be translated, and where they are in the translation process.<br /><br />**ready:** ID of the workflow state denoting that the content item is ready to translate.<br />**inProgress:** ID of the workflow state denoting that the content item has an open submission.<br />**translated:** ID of the workflow state denoting that the content item’s submission is complete, and its translations applied. |
+| apiKey                                         | string   | API Key to allow the dashboard extension to authenticate with the GlobalLink Connect API. |
+| apiUrl                                         | string   | API URL for the GlobalLink Connect Cloud API.<br /><br />The current version of the GlobalLink Dashboard extension is compatible with v3 (https://connect-dev.translations.com/rest-api/v3). |
+| globalFilter<br /><br />*(optional)*           | string   | A configurable tag which can be optionally used to globally filter submissions created within the GlobalLink Dashboard extension.<br /><br />When configured, all new submissions will be sent with the configured tag applied, and only submissions with that tag applied will appear in the list view.<br /><br />When not configured, no tag will be applied to new submissions, and all Submissions for your configured project will be displayed. |
+| maxContentInSubmission<br /><br />*(optional)* | integer  | The maximum number of content items which can be included in a single submission.<br /><br />(Default: 50) |
+| dueDate<br /><br />*(optional)*                | Integer  | The number of days from the current date, which will be used as the default due date when creating a new submission.<br /><br />(Default: 7) |
 | projects                                       | array    | Configuration of each GlobalLink Connect project from which submissions should be possible in the dashboard.<br /><br />Detailed specification [below](#_Projects). |
 | templates<br /><br />*(optional)*              | array    | Configuration of any pre-defined templates which can be used to streamline the submission process.<br /><br />Detailed specification [below](#_Templates). |
 
