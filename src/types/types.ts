@@ -44,6 +44,7 @@ export interface FilterObject {
   is_error: number;
   is_overdue: number;
   is_redelivery: number;
+  tags?: string[];
 }
 
 export interface SubmissionsFilterBarInterface {
@@ -154,6 +155,7 @@ export interface ParamsInt {
   maxContentInSubmission: number;
   templates: any;
   vse: string;
+  globalFilter?: string;
 }
 
 export interface SDKInterface {
