@@ -85,6 +85,9 @@ export const getSubmissions =
       };
       const {
         Api,
+        sdk: {
+          params: { globalFilter },
+        },
         submissions: {
           filter: storedFilter,
           pagination: { page: currentPage },
@@ -111,6 +114,10 @@ export const getSubmissions =
           },
           {}
         ) as FilterObject;
+      }
+
+      if (globalFilter) {
+        filterObject.tags = [globalFilter];
       }
 
       const { current_page_number, total_result_pages_count, submission_list } =
@@ -301,6 +308,10 @@ export const createSubmission =
         workflow: workflow,
         connector_key: selectedProject || '',
       };
+
+      if (params.globalFilter) {
+        submissionData.tags = [params.globalFilter];
+      }
 
       if (Object.keys(additional).length) {
         submissionData.attributes = additional;
