@@ -238,7 +238,10 @@ export const createSubmission =
             if (contentType && contentType.translatableFields) {
               const fileJson = contentType.translatableFields.reduce(
                 (acc: any, field: string) => {
-                  const nodes = jsonpath.nodes(contentItem.body, `$.${field}`);
+                  const nodes = jsonpath.nodes(
+                    contentItem.body,
+                    `$['${field}']`
+                  );
 
                   nodes.forEach(({ path, value }) => {
                     if (value && !ContentLink.isContentLink(value)) {

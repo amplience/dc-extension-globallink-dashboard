@@ -224,7 +224,7 @@ const applyToItem = async ({
 }) => {
   translations.forEach(({ key, value }: any) => {
     if (value) {
-      jsonpath.apply(updatedBodyObj, `$.${key}`, () =>
+      jsonpath.apply(updatedBodyObj, `$['${key}']`, () =>
         value && value.length && value.length === 1 ? value[0] : value
       );
     }
