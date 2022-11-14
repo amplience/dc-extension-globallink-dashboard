@@ -126,6 +126,7 @@ An example configuration as well as detailed definitions can be found below, to 
 | dueDate<br /><br />*(optional)*                | Integer  | The number of days from the current date, which will be used as the default due date when creating a new submission.<br /><br />(Default: 7) |
 | projects                                       | array    | Configuration of each GlobalLink Connect project from which submissions should be possible in the dashboard.<br /><br />Detailed specification [below](#_Projects). |
 | templates<br /><br />*(optional)*              | array    | Configuration of any pre-defined templates which can be used to streamline the submission process.<br /><br />Detailed specification [below](#_Templates). |
+| ownersList<br /><br />*(optional)*             | array    | The owners list passed when creating submissions. |
 
 #### Projects
 

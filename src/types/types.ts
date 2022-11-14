@@ -156,6 +156,7 @@ export interface ParamsInt {
   templates: any;
   vse: string;
   globalFilter?: string;
+  ownersList?: string[];
 }
 
 export interface SDKInterface {
@@ -184,6 +185,7 @@ export interface SubmissionInt {
   is_overdue?: number;
   is_redelivery?: number;
   language_jobs?: any;
+  owners_list?: string[];
   pd_submission_id?: any;
   workflow?: string;
   content_list_locale?: any;

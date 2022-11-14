@@ -318,6 +318,10 @@ export const createSubmission =
         submissionData.config = config;
       }
 
+      if (params.ownersList) {
+        submissionData.owners_list = params.ownersList;
+      }
+
       await Api.createSubmission(submissionData);
 
       await Promise.all(
