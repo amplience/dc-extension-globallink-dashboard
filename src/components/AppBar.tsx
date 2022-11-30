@@ -142,9 +142,7 @@ const NavBar = () => {
             inputProps={{
               margin: 'none',
             }}
-            onChange={(e) =>
-              dispatch(setProject(e.currentTarget.value as string))
-            }
+            onChange={(e) => dispatch(setProject(e.target.value as string))}
           >
             {data.map(({ connector_key, connector_name }) => (
               <MenuItem key={connector_key} value={connector_key}>
