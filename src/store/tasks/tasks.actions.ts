@@ -216,6 +216,72 @@ export const applyAllTranslations =
     }
   };
 
+const defaultValue = (type: string) => {
+  switch (type) {
+    case 'array':
+      return [];
+    case 'string':
+      return '';
+    default:
+      return {};
+  }
+};
+
+const typeFromPathItem = (item: any) => {
+  if (item.expression) {
+    switch (item.expression.type) {
+      case 'numeric_literal':
+        return 'array';
+      default:
+        break;
+    }
+  }
+
+  return 'object';
+};
+
+const ensureField = (node: any, pathString: string, fieldType: string) => {
+  // Ensure the field referenced by the path exists.
+  const path = jsonpath.parse(pathString);
+  debugger;
+
+  const root = node;
+
+  for (let i = 0; i < path.length; i++) {
+    const item = path[i];
+    if (item.expression) {
+      switch (item.expression.type) {
+        case 'root':
+          node = root;
+          break;
+        case 'identifier':
+        case 'numeric_literal':
+          let next;
+          next = node[item.expression.value];
+
+          if (!next) {
+            // Field doesn't exist. Try to create it.
+            let type = fieldType;
+
+            if (i + 1 < path.length) {
+              type = typeFromPathItem(path[i + 1]);
+            }
+
+            next = defaultValue(type);
+            node[item.expression.value] = next;
+          }
+
+          node = next;
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  return node;
+};
+
 const applyToItem = async ({
   contentItemToUpdate,
   translations = [],
@@ -224,6 +290,10 @@ const applyToItem = async ({
 }) => {
   translations.forEach(({ key, value }: any) => {
     if (value) {
+      if (value != null) {
+        ensureField(updatedBodyObj, `$.${key}`, typeof value);
+      }
+
       jsonpath.apply(updatedBodyObj, `$.${key}`, () =>
         value && value.length && value.length === 1 ? value[0] : value
       );
@@ -353,6 +423,8 @@ const downloadAndApply = async (
         dcManagement,
         unique_identifier,
       });
+
+    debugger;
 
     await deepApply({
       sourceContentItem,
