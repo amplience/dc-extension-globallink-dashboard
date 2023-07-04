@@ -254,6 +254,7 @@ const ensureField = (node: any, pathString: string, fieldType: string) => {
           node = root;
           break;
         case 'identifier':
+        case 'string_literal':
         case 'numeric_literal':
           let next;
           next = node[item.expression.value];
