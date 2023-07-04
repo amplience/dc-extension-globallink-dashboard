@@ -243,7 +243,6 @@ const typeFromPathItem = (item: any) => {
 const ensureField = (node: any, pathString: string, fieldType: string) => {
   // Ensure the field referenced by the path exists.
   const path = jsonpath.parse(pathString);
-  debugger;
 
   const root = node;
 
@@ -423,8 +422,6 @@ const downloadAndApply = async (
         dcManagement,
         unique_identifier,
       });
-
-    debugger;
 
     await deepApply({
       sourceContentItem,
