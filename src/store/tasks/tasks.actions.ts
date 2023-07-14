@@ -310,6 +310,11 @@ const applyToItem = async ({
   });
 };
 
+const getUpdatedBody = (contentItemToUpdate, contentItem) => ({
+  ...(contentItem && contentItem.body),
+  _meta: contentItemToUpdate?._meta ?? contentItem?.body?._meta,
+});
+
 const deepApply = async ({
   sourceContentItem,
   contentItemToUpdate,
@@ -329,9 +334,7 @@ const deepApply = async ({
       }
 
       if (contentItemToUpdate && contentItem.id === sourceContentItem.id) {
-        const updatedBody = {
-          ...(contentItemToUpdate && contentItemToUpdate.body),
-        };
+        const updatedBody = getUpdatedBody(contentItemToUpdate, contentItem);
 
         return (mapping[contentItemToUpdate.id] = applyToItem({
           contentItemToUpdate,
@@ -352,9 +355,7 @@ const deepApply = async ({
           nestedLocalized && nestedLocalized.id
         );
 
-        const updatedBodyObj = {
-          ...(nestedLocalized && nestedLocalized.body),
-        };
+        const updatedBodyObj = getUpdatedBody(nestedLocalized, contentItem);
 
         const translations = translatedTask.nested[contentItem.id];
 
