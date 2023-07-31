@@ -22,6 +22,7 @@ Alternatively, return to [README.md](../README.md) for more information on the e
     - [Applying translation from Tasks view](#applying-translation-from-tasks-view)
     - [Applying translation from Submissions view](#applying-translation-from-submissions-view)
     - [Completed translations](#completed-translations)
+  - [Expected behaviour](#expected-behaviour)
   - [Updating source content and retranslating](#updating-source-content-and-retranslating)
 
 <!-- /MarkdownTOC -->
@@ -166,6 +167,21 @@ As with in-progress translations, this does not prevent you from making further 
 With the translation complete, you should now also be able to find localized and translated copies of your content item(s) in the appropriate repositories for each language translated.
 
 ![](./images/content-translated.png)
+
+### Expected behaviour
+
+#### Content Setup - Item Level Localization
+This translation extension works by creating localized copies from the source content. In order for this extension to work, you must have implemented `content-item` level localization on your account. For more information about the different localization setup available in Amplience please visit our [Localization developer guide](https://amplience.com/developers/docs/dev-tools/guides-tutorials/localization/)
+
+#### Translation flow
+In order to ensure consistency, this extension follows the same process both when translating a piece of content for the first time and retranslating an item. It will overwrite the translated items based on the source and apply they translatable fields:
+
+1. Take the source item
+2. Send the translatable fields from the source item and send them for translation
+3. Once the translations have completed, set the submission in the 'ready' state
+4. When the user chooses to apply the translations it will take take the source item, apply the translated fields and either create or update the translated content items.
+
+See [Updating source content and retranslating](#updating-source-content-and-retranslating) for further details.
 
 ### Updating source content and retranslating
 
