@@ -22,6 +22,8 @@ Alternatively, return to [README.md](../README.md) for more information on the e
     - [Applying translation from Tasks view](#applying-translation-from-tasks-view)
     - [Applying translation from Submissions view](#applying-translation-from-submissions-view)
     - [Completed translations](#completed-translations)
+  - [Expected behaviour](#expected-behaviour)
+  - [Updating source content and retranslating](#updating-source-content-and-retranslating)
 
 <!-- /MarkdownTOC -->
 
@@ -165,3 +167,31 @@ As with in-progress translations, this does not prevent you from making further 
 With the translation complete, you should now also be able to find localized and translated copies of your content item(s) in the appropriate repositories for each language translated.
 
 ![](./images/content-translated.png)
+
+### Expected behaviour
+
+#### Content Setup - Item Level Localization
+This translation extension works by creating localized copies from the source content. In order for this extension to work, you must have implemented `content-item` level localization on your account. For more information about the different localization setup available in Amplience please visit our [Localization developer guide](https://amplience.com/developers/docs/dev-tools/guides-tutorials/localization/)
+
+#### Translation flow
+In order to ensure consistency, this extension follows the same process both when translating a piece of content for the first time and retranslating an item. It will overwrite the translated items based on the source and apply they translatable fields:
+
+1. Take the source item
+2. Send the translatable fields from the source item and send them for translation
+3. Once the translations have completed, set the submission in the 'ready' state
+4. When the user chooses to apply the translations it will take take the source item, apply the translated fields and either create or update the translated content items.
+
+See [Updating source content and retranslating](#updating-source-content-and-retranslating) for further details.
+
+### Updating source content and retranslating
+
+The first time a content item is translated, localized versions of the content item will be created from the source locale, and the translation will be applied on top. However, you are also allowed to iterate on content and retranslate as needed, though some simple rules need to be considered:
+
+- Re-submitting content for translation and applying will update _all_ fields based on the item with the source locale, then apply the new translation on top.
+  - Fields not submitted for translation will be copied from the source locale.
+  - Fields submitted for translation will obviously be translated again, and may change.
+  - _No changes to the target locale made manually will persist._
+- Changes to the content item for the source locale will _not_ automatically persist to the other locales, even if those fields are not to be translated.
+  - To persist changes, either copy the changes manually to each locale of the item, or _resubmit_ the item for translation.
+    - When the new submission is applied, the new base values will be copied with the new translation applied on top.
+  - It's recommended that you minimize the number of changes to content items that are localized to avoid extra work. Try to get non-localized properties like styling and image links finalized before submitting for translation.

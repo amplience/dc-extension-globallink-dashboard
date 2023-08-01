@@ -216,6 +216,72 @@ export const applyAllTranslations =
     }
   };
 
+const defaultValue = (type: string) => {
+  switch (type) {
+    case 'array':
+      return [];
+    case 'string':
+      return '';
+    default:
+      return {};
+  }
+};
+
+const typeFromPathItem = (item: any) => {
+  if (item.expression) {
+    switch (item.expression.type) {
+      case 'numeric_literal':
+        return 'array';
+      default:
+        break;
+    }
+  }
+
+  return 'object';
+};
+
+const ensureField = (node: any, pathString: string, fieldType: string) => {
+  // Ensure the field referenced by the path exists.
+  const path = jsonpath.parse(pathString);
+
+  const root = node;
+
+  for (let i = 0; i < path.length; i++) {
+    const item = path[i];
+    if (item.expression) {
+      switch (item.expression.type) {
+        case 'root':
+          node = root;
+          break;
+        case 'identifier':
+        case 'string_literal':
+        case 'numeric_literal':
+          let next;
+          next = node[item.expression.value];
+
+          if (!next) {
+            // Field doesn't exist. Try to create it.
+            let type = fieldType;
+
+            if (i + 1 < path.length) {
+              type = typeFromPathItem(path[i + 1]);
+            }
+
+            next = defaultValue(type);
+            node[item.expression.value] = next;
+          }
+
+          node = next;
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  return node;
+};
+
 const applyToItem = async ({
   contentItemToUpdate,
   translations = [],
@@ -224,6 +290,10 @@ const applyToItem = async ({
 }) => {
   translations.forEach(({ key, value }: any) => {
     if (value) {
+      if (value != null) {
+        ensureField(updatedBodyObj, `$.${key}`, typeof value);
+      }
+
       jsonpath.apply(updatedBodyObj, `$.${key}`, () =>
         value && value.length && value.length === 1 ? value[0] : value
       );
@@ -239,6 +309,11 @@ const applyToItem = async ({
     },
   });
 };
+
+const getUpdatedBody = (contentItemToUpdate, contentItem) => ({
+  ...(contentItem && contentItem.body),
+  _meta: contentItemToUpdate?._meta ?? contentItem?.body?._meta,
+});
 
 const deepApply = async ({
   sourceContentItem,
@@ -259,9 +334,7 @@ const deepApply = async ({
       }
 
       if (contentItemToUpdate && contentItem.id === sourceContentItem.id) {
-        const updatedBody = {
-          ...(contentItemToUpdate && contentItemToUpdate.body),
-        };
+        const updatedBody = getUpdatedBody(contentItemToUpdate, contentItem);
 
         return (mapping[contentItemToUpdate.id] = applyToItem({
           contentItemToUpdate,
@@ -282,9 +355,7 @@ const deepApply = async ({
           nestedLocalized && nestedLocalized.id
         );
 
-        const updatedBodyObj = {
-          ...(nestedLocalized && nestedLocalized.body),
-        };
+        const updatedBodyObj = getUpdatedBody(nestedLocalized, contentItem);
 
         const translations = translatedTask.nested[contentItem.id];
 
