@@ -184,7 +184,12 @@ const Tasks = () => {
   return (
     <>
       {content ? <Loader className="content-loader" /> : null}
-      <Table columns={columns} data={data} currentPage={pagination.page} />
+      <Table
+        columns={columns}
+        data={data}
+        currentPage={pagination.page}
+        pageSize={10}
+      />
     </>
   );
 };

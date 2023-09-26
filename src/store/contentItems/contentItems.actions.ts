@@ -98,7 +98,12 @@ export const getContentItems =
         return dispatch(setError('No Content Types found in project'));
       }
 
-      if (data && Math.ceil(data.length / 10) >= pageNumber && !filter) {
+      if (
+        data &&
+        data[(pageNumber - 1) * data.length] != null &&
+        Math.ceil(data.length / 20) >= pageNumber &&
+        !filter
+      ) {
         dispatch(setContentLoader(false));
         return dispatch(
           setPagination({
@@ -268,9 +273,20 @@ export const getContentItems =
         })
       );
 
-      dispatch(
-        setContent(filter ? mappedContent : [...data, ...mappedContent])
-      );
+      const insert = (dest, src, offset) => {
+        const newDest = [...dest];
+
+        for (let i = 0; i < src.length; i++) {
+          newDest[i + offset] = src[i];
+        }
+
+        return newDest;
+      };
+
+      const newContent = filter
+        ? mappedContent
+        : insert(data, mappedContent, (pageNumber - 1) * PAGE_SIZE);
+      dispatch(setContent(newContent));
 
       if (facets && facets.page && facets.page.number !== undefined) {
         dispatch(

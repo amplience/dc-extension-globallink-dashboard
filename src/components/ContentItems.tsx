@@ -88,6 +88,7 @@ const ContentItems = ({
         columns={columns}
         data={slicedData}
         currentPage={pagination.page}
+        pageSize={PAGE_SIZE}
       />
     </>
   );

@@ -24,6 +24,7 @@ interface TableComponentProps {
   columns: Column[];
   data: object[];
   currentPage: number;
+  pageSize: number;
   maxContentInSubmission?: number;
   checkBox?: boolean;
   rowClick?(id: number): void;
@@ -42,6 +43,7 @@ const Table = ({
   data,
   rowClick,
   currentPage = 0,
+  pageSize = 10,
   checkBox = false,
   getSelectedIds = () => {},
 }: TableComponentProps) => {
@@ -167,7 +169,7 @@ const Table = ({
                     </TableCell>
                   ) : null}
                   <TableCell key={`cell_${index}`}>
-                    {(currentPage - 1) * 10 + index + 1}
+                    {(currentPage - 1) * pageSize + index + 1}
                   </TableCell>
                   {columns.map((column, ind) => {
                     const value = row[column.id];

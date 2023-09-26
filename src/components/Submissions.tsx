@@ -209,6 +209,7 @@ const Submissions = (props) => {
         columns={columns}
         data={data}
         currentPage={pagination.page}
+        pageSize={10}
         rowClick={(row: any) => {
           dispatch(setSelectedSubmission(row));
           history.push('/tasks');
