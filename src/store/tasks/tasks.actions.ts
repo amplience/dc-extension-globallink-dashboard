@@ -282,11 +282,23 @@ const ensureField = (node: any, pathString: string, fieldType: string) => {
   return node;
 };
 
+const generateLocaleDeliveryKey = (
+  key: string | undefined,
+  locale: string
+): string | undefined => {
+  if (key == null) {
+    return undefined;
+  }
+
+  return `${key}_${locale}`;
+};
+
 const applyToItem = async ({
   contentItemToUpdate,
   translations = [],
   body,
   updatedBodyObj,
+  locale,
 }) => {
   translations.forEach(({ key, value }: any) => {
     if (value) {
@@ -299,6 +311,11 @@ const applyToItem = async ({
       );
     }
   });
+
+  updatedBodyObj._meta.deliveryKey = generateLocaleDeliveryKey(
+    body._meta.deliveryKey,
+    locale
+  );
 
   return contentItemToUpdate.related.update({
     ...contentItemToUpdate.toJSON(),
@@ -341,6 +358,7 @@ const deepApply = async ({
           translations: translatedTask.translations,
           body,
           updatedBodyObj: updatedBody,
+          locale,
         }));
       }
 
@@ -381,6 +399,7 @@ const deepApply = async ({
                 translations,
                 body,
                 updatedBodyObj,
+                locale,
               }))
             );
           }
@@ -392,6 +411,7 @@ const deepApply = async ({
               translations,
               body,
               updatedBodyObj,
+              locale,
             }))
           );
         }
