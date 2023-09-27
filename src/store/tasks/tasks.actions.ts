@@ -21,6 +21,10 @@ import {
   TaskInterface,
 } from '../../types/types';
 import { getSubmissions } from '../submissions/submissions.actions';
+import {
+  ContentDependencyInfo,
+  ContentDependencyTree,
+} from '../../utils/ContentDependencyTree';
 
 export const SET_TASKS = 'SET_TASKS';
 export const SET_TASKS_PAGINATION = 'SET_TASKS_PAGINATION';
@@ -293,12 +297,55 @@ const generateLocaleDeliveryKey = (
   return `${key}_${locale}`;
 };
 
+const updateDependencyLocales = async (result, locale, contentGet) => {
+  const tree = new ContentDependencyTree([
+    { repo: null as any, content: result },
+  ]);
+
+  const item = tree.all[0];
+  for (let i = 0; i < item.dependencies.length; i++) {
+    const target = item.dependencies[i];
+
+    const { id } = target.dependency;
+
+    // Fetch the content for ID, and determine if it has the target locale.
+    const refItem = (await contentGet(id)) as ContentItem;
+
+    if (refItem.locale != null && refItem.locale !== locale) {
+      // If it has a locale and it doesn't match the target, see if there is a localized version that can be substituted.
+      const rewriteItem = await getLocalizedAfterJobStarted(refItem, locale);
+
+      if (rewriteItem) {
+        updateDependency(target, rewriteItem.id);
+      }
+    }
+  }
+};
+
+const updateDependency = (
+  dep: ContentDependencyInfo,
+  id: string | undefined
+) => {
+  if (dep.dependency._meta.schema === '_hierarchy') {
+    dep.owner.content.body._meta.hierarchy.parentId = id;
+  } else if (dep.parent) {
+    const { parent } = dep;
+    if (id == null) {
+      delete parent[dep.index];
+    } else {
+      parent[dep.index] = dep.dependency;
+      dep.dependency.id = id;
+    }
+  }
+};
+
 const applyToItem = async ({
   contentItemToUpdate,
   translations = [],
   body,
   updatedBodyObj,
   locale,
+  contentGet,
 }) => {
   translations.forEach(({ key, value }: any) => {
     if (value) {
@@ -317,14 +364,18 @@ const applyToItem = async ({
     locale
   );
 
-  return contentItemToUpdate.related.update({
+  const result = {
     ...contentItemToUpdate.toJSON(),
     body: {
       ...contentItemToUpdate.body,
       ...body,
       ...updatedBodyObj,
     },
-  });
+  };
+
+  await updateDependencyLocales(result, locale, contentGet);
+
+  return contentItemToUpdate.related.update(result);
 };
 
 const getUpdatedBody = (contentItemToUpdate, contentItem) => ({
@@ -359,6 +410,7 @@ const deepApply = async ({
           body,
           updatedBodyObj: updatedBody,
           locale,
+          contentGet: dcManagement.contentItems.get,
         }));
       }
 
@@ -400,6 +452,7 @@ const deepApply = async ({
                 body,
                 updatedBodyObj,
                 locale,
+                contentGet: dcManagement.contentItems.get,
               }))
             );
           }
@@ -412,6 +465,7 @@ const deepApply = async ({
               body,
               updatedBodyObj,
               locale,
+              contentGet: dcManagement.contentItems.get,
             }))
           );
         }
