@@ -51,6 +51,7 @@ const ContentItems = ({
       format: (assignees: any[]) =>
         assignees && assignees.length
           ? assignees
+              .filter((assignee) => assignee != null)
               .map(({ firstName, lastName }) => `${firstName} ${lastName}`)
               .join(', ')
           : '',

@@ -196,10 +196,12 @@ const Submissions = (props) => {
                 value: 'Cancelled',
               },
             ],
-            submitters: users.map(({ firstName, lastName }: any) => ({
-              label: `${firstName} ${lastName}`,
-              value: `${firstName} ${lastName}`,
-            })),
+            submitters: users
+              .filter((assignee) => assignee != null)
+              .map(({ firstName, lastName }: any) => ({
+                label: `${firstName} ${lastName}`,
+                value: `${firstName} ${lastName}`,
+              })),
           }}
           filter={filter}
         />
