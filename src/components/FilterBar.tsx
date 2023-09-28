@@ -419,7 +419,7 @@ const FilterBar = ({
               </div>
             ) : null}
             {appliedFilter.repositories ||
-            appliedFilter.assignees ||
+            appliedFilter.assignees.length ||
             appliedFilter.text ||
             appliedFilter.contentTypes.length ||
             filter.text ? (
