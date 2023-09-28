@@ -419,6 +419,8 @@ const FilterBar = ({
               </div>
             ) : null}
             {appliedFilter.repositories ||
+            appliedFilter.assignees ||
+            appliedFilter.text ||
             appliedFilter.contentTypes.length ||
             filter.text ? (
               <div>
