@@ -1,5 +1,6 @@
 import { ContentItem } from 'dc-management-sdk-js';
 import { useSelector } from 'react-redux';
+import { Typography } from '@material-ui/core';
 import { RootState } from '../store/store';
 import Table from './common/Table';
 import Loader from './common/Loader';
@@ -51,7 +52,17 @@ const Basket = ({
   return (
     <>
       {content ? <Loader className="content-loader" /> : null}
-
+      <Typography
+        color={
+          slicedData.length < maxContentInSubmission
+            ? 'textPrimary'
+            : 'textSecondary'
+        }
+        variant="body1"
+        style={{ paddingBottom: 4 }}
+      >
+        Content Items Basket: {slicedData.length} / {maxContentInSubmission}
+      </Typography>
       <Table
         maxContentInSubmission={maxContentInSubmission}
         getSelectedIds={getSelectedIds}

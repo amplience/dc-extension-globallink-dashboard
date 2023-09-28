@@ -462,19 +462,12 @@ const SubmissionCreateForm = () => {
                   paddingBottom: '20px',
                 }}
               >
-                Content Items Basket
-                <Paper
-                  style={{
-                    marginTop: '20px',
-                  }}
-                >
-                  <Basket
-                    getSelectedIds={(content: string[]) =>
-                      setSelectedContent(content)
-                    }
-                    selectedContent={selectedContent}
-                  />
-                </Paper>
+                <Basket
+                  getSelectedIds={(content: string[]) =>
+                    setSelectedContent(content)
+                  }
+                  selectedContent={selectedContent}
+                />
               </Box>
             </>
           ) : null}

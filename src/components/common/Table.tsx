@@ -35,7 +35,6 @@ interface TableComponentProps {
 const useStyles = makeStyles(() => ({
   root: {
     width: '100%',
-    maxHeight: '40%',
   },
 }));
 
