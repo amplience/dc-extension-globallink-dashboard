@@ -52,10 +52,10 @@ const Basket = ({ selectedContent }: { selectedContent: string[] }) => {
             ? 'textPrimary'
             : 'textSecondary'
         }
-        variant="body1"
-        style={{ paddingBottom: 4 }}
+        variant="h6"
+        style={{ paddingBottom: 8 }}
       >
-        Content Items Basket: {slicedData.length} / {maxContentInSubmission}
+        Content Items Basket: {slicedData.length}/{maxContentInSubmission}
       </Typography>
       <Table
         maxContentInSubmission={maxContentInSubmission}
