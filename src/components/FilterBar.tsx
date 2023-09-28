@@ -319,6 +319,32 @@ const FilterBar = ({
     );
   };
 
+  const clearAllFilters = () => {
+    setFilter({
+      contentTypes: [],
+      assignees: [],
+      repositories: '',
+      text: '',
+    });
+    dispatch(
+      setFilterValue({
+        contentTypes: [],
+        assignees: [],
+        repositories: '',
+        text: '',
+      })
+    );
+
+    dispatch(
+      getContentItems(locale, 1, {
+        contentTypes: [],
+        assignees: [],
+        repositories: '',
+        text: '',
+      })
+    );
+  };
+
   const handleSetFilter = (e, key = 'repositories') => {
     setFilter({
       ...filter,
@@ -388,6 +414,21 @@ const FilterBar = ({
                     label={appliedFilter.text}
                     value={appliedFilter.text}
                     onClear={() => clearFilter('text')}
+                  />
+                </div>
+              </div>
+            ) : null}
+            {appliedFilter.repositories ||
+            appliedFilter.contentTypes.length ||
+            filter.text ? (
+              <div>
+                <h3 className={classes.filterName}>Filters</h3>
+                <div className={classes.filterValue}>
+                  <FilterStatus
+                    popupState={popupState}
+                    label="Clear all"
+                    value="clear-all"
+                    onClear={() => clearAllFilters()}
                   />
                 </div>
               </div>
