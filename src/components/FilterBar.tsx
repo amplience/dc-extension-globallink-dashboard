@@ -12,7 +12,10 @@ import {
   Checkbox,
   FormGroup,
   TextField,
+  Box,
+  Typography,
 } from '@material-ui/core';
+import ShoppingBasketIcon from '@material-ui/icons/ShoppingBasket';
 import PopupState, {
   bindTrigger,
   bindPopover,
@@ -35,6 +38,23 @@ export const useStyles = makeStyles(() => ({
     margin: 0,
     height: 24,
     width: 24,
+    minHeight: 24,
+    minWidth: 24,
+    borderRadius: 3,
+    '& image': {
+      width: 24,
+      height: 24,
+    },
+    '&:hover': {
+      backgroundColor: '#c5c5c5',
+    },
+  },
+  basketBtn: {
+    backgroundColor: '#c5c5c5',
+    padding: '0px 5px 0px 5px',
+    margin: '0px 10px 0px 0px',
+    height: 24,
+    // width: 24,
     minHeight: 24,
     minWidth: 24,
     borderRadius: 3,
@@ -200,6 +220,9 @@ export const FilterStatus = ({ label, onClear }: any) => (
 );
 
 const FilterBar = ({
+  setOpenBasket,
+  total,
+  max,
   facets,
   locale,
   filter: appliedFilter,
@@ -436,16 +459,34 @@ const FilterBar = ({
               </div>
             ) : null}
           </div>
-
-          <IconButton
-            ref={filterRef}
-            className={classes.filterBtn}
-            aria-label="toggle"
-            size="small"
-            {...bindTrigger(popupState)}
-          >
-            <img alt="filter icon" src={FilterIcon} />
-          </IconButton>
+          <Box>
+            <IconButton
+              className={classes.basketBtn}
+              aria-label="toggle"
+              size="small"
+              onClick={() => {
+                setOpenBasket(true);
+              }}
+            >
+              <ShoppingBasketIcon />
+              <Typography
+                variant="caption"
+                color={total < max ? 'textPrimary' : 'textSecondary'}
+                style={{ paddingLeft: 2, paddingRight: 2 }}
+              >
+                {total}/{max}
+              </Typography>
+            </IconButton>
+            <IconButton
+              ref={filterRef}
+              className={classes.filterBtn}
+              aria-label="toggle"
+              size="small"
+              {...bindTrigger(popupState)}
+            >
+              <img alt="filter icon" src={FilterIcon} />
+            </IconButton>
+          </Box>
           <Popover
             {...bindPopover(popupState)}
             anchorReference="anchorEl"

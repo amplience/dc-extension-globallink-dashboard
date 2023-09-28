@@ -9,10 +9,8 @@ import { PAGE_SIZE } from '../utils/GCCRestApi';
 
 const Basket = ({
   selectedContent,
-  getSelectedIds,
 }: {
   selectedContent: string[];
-  getSelectedIds: (content: string[]) => void;
 }) => {
   const { data, pagination }: ContentItemsInterface = useSelector(
     (state: RootState) => state.contentItems
@@ -65,7 +63,6 @@ const Basket = ({
       </Typography>
       <Table
         maxContentInSubmission={maxContentInSubmission}
-        getSelectedIds={getSelectedIds}
         columns={columns}
         data={slicedData}
         currentPage={pagination.page}
