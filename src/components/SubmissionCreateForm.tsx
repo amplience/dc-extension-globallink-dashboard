@@ -30,7 +30,7 @@ import { setError } from '../store/error/error.actions';
 const useStyles = makeStyles(() => ({
   paper: {
     padding: '20px',
-    width: '40%',
+    width: '35%',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'auto',
@@ -38,7 +38,7 @@ const useStyles = makeStyles(() => ({
   },
   paperAlt: {
     padding: '20px',
-    width: '60%',
+    width: '65%',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'auto',
