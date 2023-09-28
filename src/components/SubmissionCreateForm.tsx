@@ -32,7 +32,15 @@ import Basket from './Basket';
 const useStyles = makeStyles(() => ({
   paper: {
     padding: '20px',
-    width: '50%',
+    width: '40%',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'auto',
+    position: 'relative',
+  },
+  paperAlt: {
+    padding: '20px',
+    width: '60%',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'auto',
@@ -446,7 +454,7 @@ const SubmissionCreateForm = () => {
           elevation={1}
           variant="outlined"
           square
-          classes={{ root: classes.paper }}
+          classes={{ root: classes.paperAlt }}
         >
           {formValues.sourceLocale ? (
             <>
