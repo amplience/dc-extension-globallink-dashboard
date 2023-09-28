@@ -27,6 +27,7 @@ interface TableComponentProps {
   pageSize: number;
   maxContentInSubmission?: number;
   checkBox?: boolean;
+  indexes?: boolean;
   rowClick?(id: number): void;
   getSelectedIds?: (content: string[]) => void;
 }
@@ -34,6 +35,7 @@ interface TableComponentProps {
 const useStyles = makeStyles(() => ({
   root: {
     width: '100%',
+    maxHeight: '40%',
   },
 }));
 
@@ -45,6 +47,7 @@ const Table = ({
   currentPage = 0,
   pageSize = 10,
   checkBox = false,
+  indexes = false,
   getSelectedIds = () => {},
 }: TableComponentProps) => {
   const classes = useStyles();
@@ -111,7 +114,7 @@ const Table = ({
   const checkedAll = data.length > 0 && found > 0 && data.length === found;
   return (
     <Paper className={classes.root}>
-      <TableContainer>
+      <TableContainer style={{ maxHeight: '100%' }}>
         <TableComponent stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
@@ -129,7 +132,7 @@ const Table = ({
                   />
                 </TableCell>
               ) : null}
-              <TableCell>#</TableCell>
+              {indexes ? <TableCell>#</TableCell> : null}
               {columns.map((column, index) => (
                 <TableCell
                   key={index}
@@ -168,9 +171,11 @@ const Table = ({
                       />
                     </TableCell>
                   ) : null}
-                  <TableCell key={`cell_${index}`}>
-                    {(currentPage - 1) * pageSize + index + 1}
-                  </TableCell>
+                  {indexes ? (
+                    <TableCell key={`cell_${index}`}>
+                      {(currentPage - 1) * pageSize + index + 1}
+                    </TableCell>
+                  ) : null}
                   {columns.map((column, ind) => {
                     const value = row[column.id];
                     return (
@@ -197,6 +202,7 @@ const Table = ({
 Table.defaultProps = {
   maxContentInSubmission: 50,
   checkBox: false,
+  indexes: false,
   rowClick: () => {},
   getSelectedIds: () => {},
 };

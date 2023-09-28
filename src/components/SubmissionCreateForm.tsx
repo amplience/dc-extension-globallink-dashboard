@@ -10,6 +10,7 @@ import {
   FormControl,
   Divider,
   Button,
+  Box,
 } from '@material-ui/core';
 import { DatePicker } from '@material-ui/pickers';
 import { useDispatch, useSelector } from 'react-redux';
@@ -26,6 +27,7 @@ import ContentItems from './ContentItems';
 import { createSubmission } from '../store/submissions/submissions.actions';
 import Loader from './common/Loader';
 import { setError } from '../store/error/error.actions';
+import Basket from './Basket';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -447,12 +449,34 @@ const SubmissionCreateForm = () => {
           classes={{ root: classes.paper }}
         >
           {formValues.sourceLocale ? (
-            <ContentItems
-              getSelectedIds={(content: string[]) =>
-                setSelectedContent(content)
-              }
-              locale={formValues.sourceLocale}
-            />
+            <>
+              <ContentItems
+                getSelectedIds={(content: string[]) =>
+                  setSelectedContent(content)
+                }
+                locale={formValues.sourceLocale}
+              />
+              <Box
+                sx={{
+                  paddingTop: '20px',
+                  paddingBottom: '20px',
+                }}
+              >
+                Content Items Basket
+                <Paper
+                  style={{
+                    marginTop: '20px',
+                  }}
+                >
+                  <Basket
+                    getSelectedIds={(content: string[]) =>
+                      setSelectedContent(content)
+                    }
+                    selectedContent={selectedContent}
+                  />
+                </Paper>
+              </Box>
+            </>
           ) : null}
         </Paper>
       </div>

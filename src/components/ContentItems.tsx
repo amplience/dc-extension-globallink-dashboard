@@ -85,6 +85,7 @@ const ContentItems = ({
       <Table
         maxContentInSubmission={maxContentInSubmission}
         checkBox
+        indexes
         getSelectedIds={getSelectedIds}
         columns={columns}
         data={slicedData}
