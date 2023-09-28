@@ -54,7 +54,6 @@ export const useStyles = makeStyles(() => ({
     padding: '0px 5px 0px 5px',
     margin: '0px 10px 0px 0px',
     height: 24,
-    // width: 24,
     minHeight: 24,
     minWidth: 24,
     borderRadius: 3,
