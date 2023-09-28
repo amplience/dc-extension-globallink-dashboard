@@ -99,6 +99,39 @@ const SubmissionFilterBar = ({
     );
   };
 
+  const clearAllFilters = () => {
+    setFilter({
+      state: [],
+      submitter: '',
+      submission_name: '',
+      is_error: 0,
+      is_overdue: 0,
+      is_redelivery: 0,
+    });
+
+    dispatch(
+      setFilterValue({
+        state: [],
+        submitter: '',
+        submission_name: '',
+        is_error: 0,
+        is_overdue: 0,
+        is_redelivery: 0,
+      })
+    );
+
+    dispatch(
+      getSubmissions(1, {
+        state: [],
+        submitter: '',
+        submission_name: '',
+        is_error: 0,
+        is_overdue: 0,
+        is_redelivery: 0,
+      })
+    );
+  };
+
   const FilterBlock = ({
     name,
     keyName,
@@ -235,6 +268,21 @@ const SubmissionFilterBar = ({
                     />
                   ) : null}
                 </div>
+              </div>
+            ) : null}
+            {appliedFilter.state.length ||
+            appliedFilter.is_error ||
+            appliedFilter.is_overdue ||
+            appliedFilter.is_redelivery ||
+            appliedFilter.submitter ||
+            appliedFilter.submission_name ? (
+              <div className={classes.filterValue}>
+                <FilterStatus
+                  popupState={popupState}
+                  label="Clear all"
+                  value="clear-all"
+                  onClear={() => clearAllFilters()}
+                />
               </div>
             ) : null}
           </div>
