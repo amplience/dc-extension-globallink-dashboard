@@ -108,7 +108,7 @@ const ContentItems = ({
         variant="temporary"
         open={openBasket}
         anchor="right"
-        PaperProps={{ style: { width: '600px', padding: 20 } }}
+        PaperProps={{ style: { width: '50%', padding: 20 } }}
         onClose={() => setOpenBasket(false)}
       >
         <Basket selectedContent={selectedContent} />
