@@ -7,11 +7,7 @@ import Loader from './common/Loader';
 import { ContentItemsInterface } from '../types/types';
 import { PAGE_SIZE } from '../utils/GCCRestApi';
 
-const Basket = ({
-  selectedContent,
-}: {
-  selectedContent: string[];
-}) => {
+const Basket = ({ selectedContent }: { selectedContent: string[] }) => {
   const { data, pagination }: ContentItemsInterface = useSelector(
     (state: RootState) => state.contentItems
   );
