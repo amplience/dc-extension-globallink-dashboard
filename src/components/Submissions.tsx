@@ -160,18 +160,21 @@ const Submissions = (props) => {
                   row.state.state_name !== 'Delivered' &&
                   row.state.state_name !== 'Cancelled' &&
                   row.state.state_name !== 'Completed' ? (
-                    <MenuItem
-                      style={{ width: '280px' }}
-                      onClick={() => {
-                        dispatch(cancelSubmission(row));
-                        popupState.close();
-                      }}
-                    >
-                      <ListItemIcon>
-                        <CancelIcon fontSize="small" />
-                      </ListItemIcon>
-                      <Typography>Cancel</Typography>
-                    </MenuItem>
+                    <>
+                      <Divider />
+                      <MenuItem
+                        style={{ width: '280px' }}
+                        onClick={() => {
+                          dispatch(cancelSubmission(row));
+                          popupState.close();
+                        }}
+                      >
+                        <ListItemIcon>
+                          <CancelIcon fontSize="small" />
+                        </ListItemIcon>
+                        <Typography>Cancel</Typography>
+                      </MenuItem>
+                    </>
                   ) : null}
                 </Menu>
               </>
