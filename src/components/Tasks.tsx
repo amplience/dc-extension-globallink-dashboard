@@ -208,18 +208,21 @@ const Tasks = () => {
                   row.status !== 'Cancelled' &&
                   row.state.state_name !== 'Cancelled' &&
                   row.status !== 'Completed' ? (
-                    <MenuItem
-                      style={{ width: '280px' }}
-                      onClick={() => {
-                        dispatch(cancelTask(row));
-                        popupState.close();
-                      }}
-                    >
-                      <ListItemIcon>
-                        <CancelIcon fontSize="small" />
-                      </ListItemIcon>
-                      <Typography>Cancel</Typography>
-                    </MenuItem>
+                    <>
+                      <Divider />
+                      <MenuItem
+                        style={{ width: '280px' }}
+                        onClick={() => {
+                          dispatch(cancelTask(row));
+                          popupState.close();
+                        }}
+                      >
+                        <ListItemIcon>
+                          <CancelIcon fontSize="small" />
+                        </ListItemIcon>
+                        <Typography>Cancel</Typography>
+                      </MenuItem>
+                    </>
                   ) : null}
                 </Menu>
               </>
