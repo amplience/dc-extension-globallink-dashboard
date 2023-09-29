@@ -246,6 +246,10 @@ const Tasks = () => {
         data={data}
         currentPage={pagination.page}
         pageSize={10}
+        rowClick={(row: any) => {
+          setContentModal(row);
+          setOpenModal(true);
+        }}
       />
       <Modal
         style={{
