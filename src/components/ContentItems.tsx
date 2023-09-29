@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { makeStyles } from '@material-ui/core';
+import { Drawer, makeStyles } from '@material-ui/core';
 import { RootState } from '../store/store';
 import Table from './common/Table';
 import Loader from './common/Loader';
@@ -9,6 +9,7 @@ import TablePagination from './common/TablePagination';
 import { getContentItems } from '../store/contentItems/contentItems.actions';
 import { ContentItemsInterface } from '../types/types';
 import { PAGE_SIZE } from '../utils/GCCRestApi';
+import Basket from './Basket';
 
 const useStyles = makeStyles(() => ({
   navBarContainer: {
@@ -21,11 +22,14 @@ const useStyles = makeStyles(() => ({
 
 const ContentItems = ({
   locale,
+  selectedContent,
   getSelectedIds,
 }: {
   locale: string;
+  selectedContent: string[];
   getSelectedIds: (content: string[]) => void;
 }) => {
+  const [openBasket, setOpenBasket] = useState(false);
   const classes = useStyles();
   const dispatch = useDispatch();
   const { data, pagination, facets, filter }: ContentItemsInterface =
@@ -73,7 +77,14 @@ const ContentItems = ({
   return (
     <>
       {content ? <Loader className="content-loader" /> : null}
-      <FilterBar facets={facets} locale={locale} filter={filter} />
+      <FilterBar
+        total={selectedContent.length}
+        max={maxContentInSubmission}
+        setOpenBasket={setOpenBasket}
+        facets={facets}
+        locale={locale}
+        filter={filter}
+      />
 
       <div className={classes.navBarContainer}>
         <TablePagination
@@ -92,6 +103,16 @@ const ContentItems = ({
         currentPage={pagination.page}
         pageSize={PAGE_SIZE}
       />
+
+      <Drawer
+        variant="temporary"
+        open={openBasket}
+        anchor="right"
+        PaperProps={{ style: { width: '50%', padding: 20 } }}
+        onClose={() => setOpenBasket(false)}
+      >
+        <Basket selectedContent={selectedContent} />
+      </Drawer>
     </>
   );
 };

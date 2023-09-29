@@ -10,7 +10,6 @@ import {
   FormControl,
   Divider,
   Button,
-  Box,
 } from '@material-ui/core';
 import { DatePicker } from '@material-ui/pickers';
 import { useDispatch, useSelector } from 'react-redux';
@@ -26,13 +25,20 @@ import MultiSelectList from './common/MultiSelectList';
 import ContentItems from './ContentItems';
 import { createSubmission } from '../store/submissions/submissions.actions';
 import { setError } from '../store/error/error.actions';
-import Basket from './Basket';
 import LoadingModal from './LoadingModal';
 
 const useStyles = makeStyles(() => ({
   paper: {
     padding: '20px',
-    width: '50%',
+    width: '35%',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'auto',
+    position: 'relative',
+  },
+  paperAlt: {
+    padding: '20px',
+    width: '65%',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'auto',
@@ -447,36 +453,17 @@ const SubmissionCreateForm = () => {
           elevation={1}
           variant="outlined"
           square
-          classes={{ root: classes.paper }}
+          classes={{ root: classes.paperAlt }}
         >
           {formValues.sourceLocale ? (
             <>
               <ContentItems
+                selectedContent={selectedContent}
                 getSelectedIds={(content: string[]) =>
                   setSelectedContent(content)
                 }
                 locale={formValues.sourceLocale}
               />
-              <Box
-                sx={{
-                  paddingTop: '20px',
-                  paddingBottom: '20px',
-                }}
-              >
-                Content Items Basket
-                <Paper
-                  style={{
-                    marginTop: '20px',
-                  }}
-                >
-                  <Basket
-                    getSelectedIds={(content: string[]) =>
-                      setSelectedContent(content)
-                    }
-                    selectedContent={selectedContent}
-                  />
-                </Paper>
-              </Box>
             </>
           ) : null}
         </Paper>

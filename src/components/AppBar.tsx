@@ -109,7 +109,9 @@ const NavBar = () => {
       ),
     },
     '/tasks': {
-      label: 'Tasks List',
+      label: useSelector(
+        (state: any) => state.tasks.data[0]?.submission_name || ''
+      ),
       pagination: useSelector((state: any) => state.tasks.pagination),
       changePage: (page: number) => dispatch(getTasks(page)),
       buttons: (

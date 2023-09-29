@@ -1,5 +1,16 @@
 import React, { useEffect } from 'react';
-import { MenuItem, Menu, Icon, Paper } from '@material-ui/core';
+import {
+  MenuItem,
+  Menu,
+  Icon,
+  Paper,
+  Divider,
+  Typography,
+  ListItemIcon,
+} from '@material-ui/core';
+import SaveAltIcon from '@material-ui/icons/SaveAlt';
+import CancelIcon from '@material-ui/icons/Cancel';
+import AssignmentIcon from '@material-ui/icons/Assignment';
 import { useDispatch, useSelector } from 'react-redux';
 import PopupState, {
   bindTrigger,
@@ -117,36 +128,54 @@ const Submissions = (props) => {
                 </Icon>
                 <Menu {...bindMenu(popupState)}>
                   <MenuItem
+                    style={{ width: '280px' }}
                     onClick={() => {
                       dispatch(setSelectedSubmission(row));
                       popupState.close();
                     }}
                   >
-                    View Tasks
+                    <ListItemIcon>
+                      <AssignmentIcon fontSize="small" />
+                    </ListItemIcon>
+                    <Typography>View Tasks</Typography>
                   </MenuItem>
                   {row && row.state && row.state.state_name === 'Completed' ? (
-                    <MenuItem
-                      onClick={() => {
-                        dispatch(applyAllTranslations(row));
-                        popupState.close();
-                      }}
-                    >
-                      Apply all translations
-                    </MenuItem>
+                    <>
+                      <Divider />
+                      <MenuItem
+                        style={{ width: '280px' }}
+                        onClick={() => {
+                          dispatch(applyAllTranslations(row));
+                          popupState.close();
+                        }}
+                      >
+                        <ListItemIcon>
+                          <SaveAltIcon fontSize="small" />
+                        </ListItemIcon>
+                        <Typography>Apply all translations</Typography>
+                      </MenuItem>
+                    </>
                   ) : null}
                   {row &&
                   row.state &&
                   row.state.state_name !== 'Delivered' &&
                   row.state.state_name !== 'Cancelled' &&
                   row.state.state_name !== 'Completed' ? (
-                    <MenuItem
-                      onClick={() => {
-                        dispatch(cancelSubmission(row));
-                        popupState.close();
-                      }}
-                    >
-                      Cancel
-                    </MenuItem>
+                    <>
+                      <Divider />
+                      <MenuItem
+                        style={{ width: '280px' }}
+                        onClick={() => {
+                          dispatch(cancelSubmission(row));
+                          popupState.close();
+                        }}
+                      >
+                        <ListItemIcon>
+                          <CancelIcon fontSize="small" />
+                        </ListItemIcon>
+                        <Typography>Cancel</Typography>
+                      </MenuItem>
+                    </>
                   ) : null}
                 </Menu>
               </>

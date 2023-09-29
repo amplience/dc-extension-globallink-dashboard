@@ -1,18 +1,13 @@
 import { ContentItem } from 'dc-management-sdk-js';
 import { useSelector } from 'react-redux';
+import { Typography } from '@material-ui/core';
 import { RootState } from '../store/store';
 import Table from './common/Table';
 import Loader from './common/Loader';
 import { ContentItemsInterface } from '../types/types';
 import { PAGE_SIZE } from '../utils/GCCRestApi';
 
-const Basket = ({
-  selectedContent,
-  getSelectedIds,
-}: {
-  selectedContent: string[];
-  getSelectedIds: (content: string[]) => void;
-}) => {
+const Basket = ({ selectedContent }: { selectedContent: string[] }) => {
   const { data, pagination }: ContentItemsInterface = useSelector(
     (state: RootState) => state.contentItems
   );
@@ -51,10 +46,19 @@ const Basket = ({
   return (
     <>
       {content ? <Loader className="content-loader" /> : null}
-
+      <Typography
+        color={
+          slicedData.length < maxContentInSubmission
+            ? 'textPrimary'
+            : 'textSecondary'
+        }
+        variant="h6"
+        style={{ paddingBottom: 8 }}
+      >
+        Content Items Basket: {slicedData.length}/{maxContentInSubmission}
+      </Typography>
       <Table
         maxContentInSubmission={maxContentInSubmission}
-        getSelectedIds={getSelectedIds}
         columns={columns}
         data={slicedData}
         currentPage={pagination.page}

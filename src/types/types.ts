@@ -24,8 +24,11 @@ export interface FacetsInt {
 
 export interface FilterBarInterface {
   facets: FacetsInt;
+  total: number;
+  max: number;
   locale: string;
   filter: FilterInt;
+  setOpenBasket: (openBasket: boolean) => void;
 }
 
 export interface SubmissionFilterInt {
