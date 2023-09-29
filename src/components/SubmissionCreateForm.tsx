@@ -25,9 +25,9 @@ import {
 import MultiSelectList from './common/MultiSelectList';
 import ContentItems from './ContentItems';
 import { createSubmission } from '../store/submissions/submissions.actions';
-import Loader from './common/Loader';
 import { setError } from '../store/error/error.actions';
 import Basket from './Basket';
+import LoadingModal from './LoadingModal';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -185,9 +185,10 @@ const SubmissionCreateForm = () => {
       },
     });
   };
+
   return (
     <form onSubmit={onSubmit}>
-      {create ? <Loader className="content-loader" /> : null}
+      <LoadingModal loadProgress={create} />
       <Button
         variant="contained"
         color="primary"

@@ -1,3 +1,5 @@
+import { LoadProgress } from './loadProgress';
+
 export const SET_CONTENT = 'SET_CONTENT';
 export const SET_TABLE = 'SET_TABLE';
 export const SET_CREATE = 'SET_CREATE';
@@ -19,7 +21,7 @@ export const setLoaderById = (id: number, value: boolean) => ({
   id,
 });
 
-export const setCreateLoader = (value: boolean) => ({
+export const setCreateLoader = (value: LoadProgress | undefined) => ({
   type: SET_CREATE,
   value,
 });

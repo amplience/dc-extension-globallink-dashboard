@@ -25,6 +25,7 @@ import {
 import { applyAllTranslations } from '../store/tasks/tasks.actions';
 import SubmissionFilterBar from './SubmissionFilterBar';
 import { useStyles } from './Tasks';
+import LoadingModal from './LoadingModal';
 
 export const SUBMISSION_STATUSES: { [key: string]: string } = {
   Delivered: 'Translation Complete',
@@ -39,7 +40,7 @@ const Submissions = (props) => {
   const { data, pagination, filter }: SubmissionsInterface = useSelector(
     (state: RootStateInt) => state.submissions
   );
-  const { content, loadingIds }: LoadingsInterface = useSelector(
+  const { content, loadingIds, create }: LoadingsInterface = useSelector(
     (state: RootStateInt) => state.loadings
   );
   const { data: users }: { data: UserInterface[] } = useSelector(
@@ -164,6 +165,7 @@ const Submissions = (props) => {
   return (
     <>
       {content ? <Loader className="content-loader" /> : null}
+      <LoadingModal loadProgress={create} />
       <Paper
         elevation={1}
         variant="outlined"

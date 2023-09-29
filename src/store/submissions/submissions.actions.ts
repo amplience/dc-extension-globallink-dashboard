@@ -26,6 +26,12 @@ import {
   SubmissionInt,
   FilterObject,
 } from '../../types/types';
+import {
+  createProgress,
+  setProgress,
+  setProgressError,
+  setProgressStage,
+} from '../loadings/loadProgress';
 
 export const SET_SUBMISSIONS = 'SET_SUBMISSIONS';
 export const SET_SELECTED_SUBMISSION = 'SET_SELECTED_SUBMISSION';
@@ -181,6 +187,8 @@ export const createSubmission =
     config: { [key: string]: any };
   }) =>
   async (dispatch: AppDispatch, getState: () => RootState) => {
+    const loadProgress = createProgress('Creating Submission...', 3);
+
     try {
       const {
         Api,
@@ -195,7 +203,14 @@ export const createSubmission =
         (el: any) => el.id === selectedProject
       );
 
-      dispatch(setCreateLoader(true));
+      setProgressStage(
+        loadProgress,
+        0,
+        'Scanning content...',
+        contentItems.length,
+        dispatch
+      );
+
       const idMappingTable: { [key: string]: any } = {};
       const tasks: string[] = [];
 
@@ -204,6 +219,14 @@ export const createSubmission =
         idMappingTable[contentItemId] = {
           nested: {},
         };
+
+        setProgress(
+          loadProgress,
+          contentItems.length - 1 - i,
+          `Scanning: ${contentItemId}`,
+          dispatch
+        );
+
         await ContentGraph.deepCopy(
           [contentItemId],
           dcManagement.contentItems.get,
@@ -290,6 +313,8 @@ export const createSubmission =
         tasks.push(content_id);
       }
 
+      setProgressStage(loadProgress, 1, 'Creating submission...', 1, dispatch);
+
       const submissionData: SubmissionInt = {
         submission_name: name,
         due_date: dueDate && new Date(dueDate).getTime(),
@@ -320,6 +345,18 @@ export const createSubmission =
 
       await Api.createSubmission(submissionData);
 
+      setProgressStage(
+        loadProgress,
+        2,
+        'Assigning workflow states...',
+        contentItems.length,
+        dispatch
+      );
+
+      let completeCount = 0;
+
+      setProgress(loadProgress, 0, 'Assigning states...', dispatch);
+
       await Promise.all(
         contentItems.map(async (id: string) => {
           const contentItem: ContentItem = await dcManagement.contentItems.get(
@@ -332,6 +369,13 @@ export const createSubmission =
             );
           }
 
+          setProgress(
+            loadProgress,
+            ++completeCount,
+            'Assigning states...',
+            dispatch
+          );
+
           return contentItem;
         })
       );
@@ -339,9 +383,10 @@ export const createSubmission =
       dispatch(getSubmissions(0));
 
       history.push('/');
-      return dispatch(setCreateLoader(false));
+      return dispatch(setCreateLoader(undefined));
     } catch (e: any) {
       dispatch(setError(e.toString()));
-      return dispatch(setCreateLoader(false));
+
+      return setProgressError(loadProgress, e.toString(), dispatch);
     }
   };

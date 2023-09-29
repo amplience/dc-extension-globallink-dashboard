@@ -21,6 +21,7 @@ import {
   SDKInterface,
   TaskInterface,
 } from '../types/types';
+import LoadingModal from './LoadingModal';
 
 export const useStyles = makeStyles(() => ({
   status: {
@@ -51,7 +52,7 @@ const Tasks = () => {
   const { data, pagination }: TasksInterface = useSelector(
     (state: RootState) => state.tasks
   );
-  const { content, loadingIds }: LoadingsInterface = useSelector(
+  const { content, loadingIds, create }: LoadingsInterface = useSelector(
     (state: RootState) => state.loadings
   );
 
@@ -184,6 +185,7 @@ const Tasks = () => {
   return (
     <>
       {content ? <Loader className="content-loader" /> : null}
+      <LoadingModal loadProgress={create} />
       <Table
         columns={columns}
         data={data}

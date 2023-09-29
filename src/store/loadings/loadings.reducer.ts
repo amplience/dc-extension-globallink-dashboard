@@ -6,11 +6,12 @@ import {
   SET_LOADING_BY_ID,
 } from './loadings.actions';
 import { LoadingsInterface } from '../../types/types';
+import { LoadProgress } from './loadProgress';
 
 const defaultState = {
   content: false,
   table: false,
-  create: false,
+  create: undefined,
   loadingIds: {},
 };
 
@@ -32,7 +33,7 @@ export function loadingsReducer(
     case SET_CREATE:
       return {
         ...state,
-        create: Boolean(action.value),
+        create: action.value as LoadProgress,
       };
     case SET_LOADING_BY_ID:
       return {
