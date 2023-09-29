@@ -1,5 +1,16 @@
 import React, { useEffect } from 'react';
-import { MenuItem, Menu, Icon, makeStyles } from '@material-ui/core';
+import {
+  MenuItem,
+  Menu,
+  Icon,
+  makeStyles,
+  Modal,
+  Typography,
+  Paper,
+  Box,
+  Divider,
+  ListItemIcon,
+} from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import PopupState, {
   bindTrigger,
@@ -7,6 +18,11 @@ import PopupState, {
   InjectedProps,
 } from 'material-ui-popup-state';
 import ErrorOutline from '@material-ui/icons/ErrorOutline';
+import SaveAltIcon from '@material-ui/icons/SaveAlt';
+import CancelIcon from '@material-ui/icons/Cancel';
+import InputIcon from '@material-ui/icons/Input';
+import AssignmentIcon from '@material-ui/icons/Assignment';
+import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
 import { RootState } from '../store/store';
 import Table from './common/Table';
 import Loader from './common/Loader';
@@ -46,6 +62,8 @@ const TASK_STATUSES: { [key: string]: string } = {
 };
 
 const Tasks = () => {
+  const [openModal, setOpenModal] = React.useState(false);
+  const [contentModal, setContentModal] = React.useState<TaskInterface>();
   const dispatch = useDispatch();
   const classes = useStyles();
   const { data, pagination }: TasksInterface = useSelector(
@@ -56,6 +74,10 @@ const Tasks = () => {
   );
 
   const { SDK }: SDKInterface = useSelector((state: RootState) => state.sdk);
+
+  const handleClose = () => {
+    setOpenModal(false);
+  };
 
   const columns = [
     {
@@ -109,36 +131,22 @@ const Tasks = () => {
                 >
                   ...
                 </Icon>
-                <Menu {...bindMenu(popupState)}>
-                  {row.status === 'Completed' ? (
-                    <MenuItem
-                      onClick={() => {
-                        dispatch(downloadTask(row));
-                        popupState.close();
-                      }}
-                    >
-                      Apply Translation
-                    </MenuItem>
-                  ) : null}
-                  {row.metadata && row.metadata.localizedId ? (
-                    <MenuItem
-                      onClick={() => {
-                        // @ts-ignore
-                        if (SDK && SDK.applicationNavigator && SDK.options) {
-                          const href = SDK.applicationNavigator.openContentItem(
-                            { id: row.metadata.localizedId },
-                            { returnHref: true }
-                          );
-                          // @ts-ignore
-                          SDK.options.window.open(href, '_blank');
-                        }
-                        popupState.close();
-                      }}
-                    >
-                      View Translated
-                    </MenuItem>
-                  ) : null}
+                <Menu {...bindMenu(popupState)} style={{ width: '400px' }}>
                   <MenuItem
+                    style={{ width: '280px' }}
+                    onClick={() => {
+                      setContentModal(row);
+                      setOpenModal(true);
+                      popupState.close();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <AssignmentIcon fontSize="small" />
+                    </ListItemIcon>
+                    <Typography>View Details</Typography>
+                  </MenuItem>
+                  <MenuItem
+                    style={{ width: '280px' }}
                     onClick={() => {
                       // @ts-ignore
                       if (SDK && SDK.applicationNavigator && SDK.options) {
@@ -152,19 +160,65 @@ const Tasks = () => {
                       popupState.close();
                     }}
                   >
-                    View Source
+                    <ListItemIcon>
+                      <InputIcon fontSize="small" />
+                    </ListItemIcon>
+                    <Typography>View Source</Typography>
                   </MenuItem>
+                  {row.metadata && row.metadata.localizedId ? (
+                    <MenuItem
+                      style={{ width: '280px' }}
+                      onClick={() => {
+                        // @ts-ignore
+                        if (SDK && SDK.applicationNavigator && SDK.options) {
+                          const href = SDK.applicationNavigator.openContentItem(
+                            { id: row.metadata.localizedId },
+                            { returnHref: true }
+                          );
+                          // @ts-ignore
+                          SDK.options.window.open(href, '_blank');
+                        }
+                        popupState.close();
+                      }}
+                    >
+                      <ListItemIcon>
+                        <AssignmentTurnedInIcon fontSize="small" />
+                      </ListItemIcon>
+                      <Typography>View Translated</Typography>
+                    </MenuItem>
+                  ) : null}
+                  {row.status === 'Completed' ? (
+                    <>
+                      <Divider />
+                      <MenuItem
+                        style={{ width: '280px' }}
+                        onClick={() => {
+                          dispatch(downloadTask(row));
+                          popupState.close();
+                        }}
+                      >
+                        <ListItemIcon>
+                          <SaveAltIcon fontSize="small" />
+                        </ListItemIcon>
+                        <Typography>Apply Translation</Typography>
+                      </MenuItem>
+                    </>
+                  ) : null}
                   {row.status !== 'Delivered' &&
                   row.status !== 'Cancelled' &&
                   row.state.state_name !== 'Cancelled' &&
                   row.status !== 'Completed' ? (
                     <MenuItem
+                      style={{ width: '280px' }}
                       onClick={() => {
                         dispatch(cancelTask(row));
                         popupState.close();
                       }}
                     >
-                      Cancel
+                      <ListItemIcon>
+                        <CancelIcon fontSize="small" />
+                      </ListItemIcon>
+                      <Typography>Cancel</Typography>
                     </MenuItem>
                   ) : null}
                 </Menu>
@@ -190,6 +244,29 @@ const Tasks = () => {
         currentPage={pagination.page}
         pageSize={10}
       />
+      <Modal
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        open={openModal}
+        onClose={handleClose}
+      >
+        <Paper
+          style={{
+            width: '800px',
+            height: '500px',
+            padding: 20,
+          }}
+        >
+          <Box style={{ maxHeight: '500px', overflow: 'scroll' }}>
+            <Typography variant="body1" component="pre">
+              {JSON.stringify(contentModal, null, 4)}
+            </Typography>
+          </Box>
+        </Paper>
+      </Modal>
     </>
   );
 };
