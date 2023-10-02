@@ -30,7 +30,7 @@ import LoadingModal from './LoadingModal';
 const useStyles = makeStyles(() => ({
   paper: {
     padding: '20px',
-    width: '35%',
+    width: '30%',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'auto',
@@ -38,7 +38,7 @@ const useStyles = makeStyles(() => ({
   },
   paperAlt: {
     padding: '20px',
-    width: '65%',
+    width: '70%',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'auto',
@@ -50,7 +50,7 @@ const useStyles = makeStyles(() => ({
   },
   formControl: {
     display: 'block',
-    width: 400,
+    width: '100%',
     marginTop: 30,
     '& > div': {
       width: '100%',
@@ -221,6 +221,9 @@ const SubmissionCreateForm = () => {
           classes={{ root: classes.paper }}
         >
           <Typography variant="h5">New Submission Details</Typography>
+          <Typography variant="h6" style={{ marginTop: 20 }}>
+            General Configuration
+          </Typography>
           <FormControl className={classes.formControl}>
             <TextField
               label="Name"
@@ -284,7 +287,9 @@ const SubmissionCreateForm = () => {
             </Select>
           </FormControl>
           <FormControl className={classes.formControl}>
-            <InputLabel id="workflow-label">Workflow</InputLabel>
+            <InputLabel required id="workflow-label">
+              Workflow
+            </InputLabel>
             <Select
               labelId="workflow-label"
               label="Workflow"
@@ -294,6 +299,7 @@ const SubmissionCreateForm = () => {
               onChange={handleChange}
               classes={{ outlined: classes.select }}
             >
+              <MenuItem value="">None</MenuItem>
               {selectedProjectConfig &&
                 selectedProjectConfig.workflows &&
                 selectedProjectConfig.workflows.map((label: string) => (
@@ -304,7 +310,9 @@ const SubmissionCreateForm = () => {
             </Select>
           </FormControl>
           <FormControl className={classes.formControl}>
-            <InputLabel id="source-locale-label">Source Locale</InputLabel>
+            <InputLabel id="source-locale-label" required>
+              Source Locale
+            </InputLabel>
             <Select
               labelId="source-locale-label"
               label="Source Locale"
@@ -314,6 +322,7 @@ const SubmissionCreateForm = () => {
               onChange={handleChange}
               classes={{ outlined: classes.select }}
             >
+              <MenuItem value="">None</MenuItem>
               {sourceLocales.map(({ locale_label, connector_locale }: any) => (
                 <MenuItem
                   value={connector_locale}
@@ -346,7 +355,7 @@ const SubmissionCreateForm = () => {
             />
           </FormControl>
           <Divider className={classes.divider} />
-          <Typography variant="h5">Custom Parameters</Typography>
+          <Typography variant="h6">Custom Parameters</Typography>
           {selectedProjectConfig.submission_options.attributes.map(
             ({
               key,
@@ -406,7 +415,7 @@ const SubmissionCreateForm = () => {
           )}
 
           <Divider className={classes.divider} />
-          <Typography variant="h5">Custom Configuration</Typography>
+          <Typography variant="h6">Custom Configuration</Typography>
           {selectedProjectConfig.submission_options.config.map(
             ({
               key,
@@ -475,7 +484,11 @@ const SubmissionCreateForm = () => {
                 locale={formValues.sourceLocale}
               />
             </>
-          ) : null}
+          ) : (
+            <Typography>
+              Choose a Source Locale to list Content Items...
+            </Typography>
+          )}
         </Paper>
       </div>
     </form>

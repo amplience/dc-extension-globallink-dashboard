@@ -6,6 +6,8 @@ import {
   ListItem,
   List,
   ListItemText,
+  Typography,
+  Box,
 } from '@material-ui/core';
 
 interface ListInterface {
@@ -16,8 +18,8 @@ interface ListInterface {
 const useStyles = makeStyles(() =>
   createStyles({
     root: {
-      width: 400,
-      maxHeight: 200,
+      width: '100%',
+      maxHeight: 260,
       overflow: 'auto',
       border: '1px solid rgba(0, 0, 0, 0.09)',
       borderRadius: 4,
@@ -25,6 +27,8 @@ const useStyles = makeStyles(() =>
     subheader: {
       background: '#fff',
       borderBottom: '1px solid rgba(0, 0, 0, 0.09)',
+      paddingTop: 20,
+      marginBottom: 10,
     },
   })
 );
@@ -69,7 +73,11 @@ const MultiSelectList = ({
       className={classes.root}
       subheader={
         <ListSubheader classes={{ root: classes.subheader }} component="div">
-          Target Locales
+          <Box style={{ display: 'flex' }}>
+            <Typography>Target Locales</Typography>
+            <div>&nbsp;</div>
+            <Typography style={{ verticalAlign: 'top' }}>*</Typography>
+          </Box>
         </ListSubheader>
       }
     >
