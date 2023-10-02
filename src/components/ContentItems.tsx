@@ -51,7 +51,7 @@ const ContentItems = ({
     },
     {
       id: 'assignees',
-      label: 'Assign',
+      label: 'Assignees',
       format: (assignees: any[]) =>
         assignees && assignees.length
           ? assignees

@@ -132,12 +132,14 @@ const Table = ({
                   />
                 </TableCell>
               ) : null}
-              {indexes ? <TableCell>#</TableCell> : null}
+              {indexes ? (
+                <TableCell style={{ fontWeight: 'bold' }}>#</TableCell>
+              ) : null}
               {columns.map((column, index) => (
                 <TableCell
                   key={index}
                   align={column.align}
-                  style={{ minWidth: column.minWidth }}
+                  style={{ minWidth: column.minWidth, fontWeight: 'bold' }}
                 >
                   {column.label}
                 </TableCell>

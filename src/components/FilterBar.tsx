@@ -506,7 +506,7 @@ const FilterBar = ({
             <div className={classes.popover}>
               <div className={classes.filterHeading}>
                 <TextField
-                  placeholder="Search"
+                  placeholder="Content item name"
                   name="label"
                   value={filter.text}
                   style={{
