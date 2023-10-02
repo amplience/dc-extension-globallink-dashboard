@@ -161,10 +161,20 @@ const SubmissionCreateForm = () => {
 
     setTemplate(template);
 
+    let { workflow } = template;
+
+    if (
+      selectedProjectConfig &&
+      selectedProjectConfig.workflows &&
+      selectedProjectConfig.workflows.indexOf(workflow) === -1
+    ) {
+      workflow = '';
+    }
+
     if (template) {
       return setFormValues({
         ...formValues,
-        workflow: template.workflow,
+        workflow,
         sourceLocale: template.sourceLocale,
         targetLocales: template.targetLocales,
         additionalInstructions: template.additionalInstructions,
