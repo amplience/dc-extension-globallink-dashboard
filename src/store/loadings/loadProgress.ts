@@ -1,5 +1,5 @@
 import { AppDispatch } from '../store';
-import { setCreateLoader } from './loadings.actions';
+import { setDialogLoader } from './loadings.actions';
 
 export enum SubmissionStage {}
 
@@ -53,7 +53,7 @@ export function setProgressTitle(
   progress.title = title;
   progress.stageTotal = stageTotal;
 
-  dispatch(setCreateLoader({ ...progress }));
+  dispatch(setDialogLoader({ ...progress }));
 }
 
 export function setProgressStage(
@@ -67,7 +67,7 @@ export function setProgressStage(
   progress.stageName = stageName;
   progress.totalProgress = totalProgress;
 
-  dispatch(setCreateLoader({ ...progress }));
+  dispatch(setDialogLoader({ ...progress }));
 }
 
 export function setProgress(
@@ -81,7 +81,7 @@ export function setProgress(
     text,
   };
 
-  dispatch(setCreateLoader({ ...progress }));
+  dispatch(setDialogLoader({ ...progress }));
 }
 
 export function setProgressText(
@@ -91,7 +91,7 @@ export function setProgressText(
 ) {
   progress.currentProgress.text = text;
 
-  dispatch(setCreateLoader({ ...progress }));
+  dispatch(setDialogLoader({ ...progress }));
 }
 
 export function setProgressError(
@@ -101,5 +101,5 @@ export function setProgressError(
 ) {
   progress.error = error;
 
-  return dispatch(setCreateLoader({ ...progress }));
+  return dispatch(setDialogLoader({ ...progress }));
 }

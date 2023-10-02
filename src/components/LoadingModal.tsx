@@ -10,7 +10,7 @@ import {
 import { useEffect, useReducer } from 'react';
 import { useDispatch } from 'react-redux';
 import { LoadProgress } from '../store/loadings/loadProgress';
-import { setCreateLoader } from '../store/loadings/loadings.actions';
+import { setDialogLoader } from '../store/loadings/loadings.actions';
 
 const timeSpanString = (span: number): string => {
   const seconds = Math.floor((span / 1000) % 60);
@@ -70,7 +70,7 @@ const LoadingModal = ({
   }, [drawNum, visible]);
 
   const closeError = () => {
-    dispatch(setCreateLoader(undefined));
+    dispatch(setDialogLoader(undefined));
   };
 
   const progress = loadProgress ?? defaultLoadProgress;

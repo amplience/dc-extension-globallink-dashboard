@@ -70,7 +70,7 @@ const Tasks = () => {
   const { data, pagination }: TasksInterface = useSelector(
     (state: RootState) => state.tasks
   );
-  const { content, loadingIds, create }: LoadingsInterface = useSelector(
+  const { content, loadingIds, dialog }: LoadingsInterface = useSelector(
     (state: RootState) => state.loadings
   );
 
@@ -242,7 +242,7 @@ const Tasks = () => {
   return (
     <>
       {content ? <Loader className="content-loader" /> : null}
-      <LoadingModal loadProgress={create} />
+      <LoadingModal loadProgress={dialog} />
       <Table
         columns={columns}
         data={data}

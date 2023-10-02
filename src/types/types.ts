@@ -172,7 +172,7 @@ export interface SDKInterface {
 export interface LoadingsInterface {
   content: boolean;
   table: boolean;
-  create: LoadProgress | undefined;
+  dialog: LoadProgress | undefined;
   loadingIds: { [key: string]: boolean };
 }
 

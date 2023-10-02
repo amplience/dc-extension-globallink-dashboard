@@ -85,7 +85,7 @@ const SubmissionCreateForm = () => {
   const { data }: { data: UserInterface[] } = useSelector(
     (state: RootState) => state.users
   );
-  const { create }: LoadingsInterface = useSelector(
+  const { dialog }: LoadingsInterface = useSelector(
     (state: RootState) => state.loadings
   );
   const sourceLocales = selectedProjectConfig.supported_locales.filter(
@@ -194,7 +194,7 @@ const SubmissionCreateForm = () => {
 
   return (
     <form onSubmit={onSubmit}>
-      <LoadingModal loadProgress={create} />
+      <LoadingModal loadProgress={dialog} />
       <Button
         variant="contained"
         color="primary"

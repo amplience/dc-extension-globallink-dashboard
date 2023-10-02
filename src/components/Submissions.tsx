@@ -51,7 +51,7 @@ const Submissions = (props) => {
   const { data, pagination, filter }: SubmissionsInterface = useSelector(
     (state: RootStateInt) => state.submissions
   );
-  const { content, loadingIds, create }: LoadingsInterface = useSelector(
+  const { content, loadingIds, dialog }: LoadingsInterface = useSelector(
     (state: RootStateInt) => state.loadings
   );
   const { data: users }: { data: UserInterface[] } = useSelector(
@@ -194,7 +194,7 @@ const Submissions = (props) => {
   return (
     <>
       {content ? <Loader className="content-loader" /> : null}
-      <LoadingModal loadProgress={create} />
+      <LoadingModal loadProgress={dialog} />
       <Paper
         elevation={1}
         variant="outlined"

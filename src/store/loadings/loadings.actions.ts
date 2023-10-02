@@ -2,7 +2,7 @@ import { LoadProgress } from './loadProgress';
 
 export const SET_CONTENT = 'SET_CONTENT';
 export const SET_TABLE = 'SET_TABLE';
-export const SET_CREATE = 'SET_CREATE';
+export const SET_DIALOG = 'SET_DIALOG';
 export const SET_LOADING_BY_ID = 'SET_LOADING_BY_ID';
 
 export const setContentLoader = (value: boolean) => ({
@@ -21,7 +21,7 @@ export const setLoaderById = (id: number, value: boolean) => ({
   id,
 });
 
-export const setCreateLoader = (value: LoadProgress | undefined) => ({
-  type: SET_CREATE,
+export const setDialogLoader = (value: LoadProgress | undefined) => ({
+  type: SET_DIALOG,
   value,
 });

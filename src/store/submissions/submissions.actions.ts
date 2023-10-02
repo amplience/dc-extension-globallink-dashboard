@@ -17,7 +17,7 @@ import {
 } from '../tasks/tasks.actions';
 import {
   setContentLoader,
-  setCreateLoader,
+  setDialogLoader,
 } from '../loadings/loadings.actions';
 import {
   Pagination,
@@ -383,7 +383,7 @@ export const createSubmission =
       dispatch(getSubmissions(0));
 
       history.push('/');
-      return dispatch(setCreateLoader(undefined));
+      return dispatch(setDialogLoader(undefined));
     } catch (e: any) {
       dispatch(setError(e.toString()));
 

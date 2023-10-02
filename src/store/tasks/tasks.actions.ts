@@ -11,7 +11,7 @@ import { AppDispatch, RootState } from '../store';
 import { setError } from '../error/error.actions';
 import {
   setContentLoader,
-  setCreateLoader,
+  setDialogLoader,
   setLoaderById,
   setTableLoader,
 } from '../loadings/loadings.actions';
@@ -265,7 +265,7 @@ export const applyAllTranslations =
       dispatch(setLoaderById(submission.submission_id || 0, false));
       dispatch(setContentLoader(false));
       dispatch(getSubmissions(page || 0));
-      dispatch(setCreateLoader(undefined));
+      dispatch(setDialogLoader(undefined));
     } catch (e: any) {
       setProgressError(loadProgress, e.toString(), dispatch);
       dispatch(setError(e.toString()));
@@ -655,7 +655,7 @@ const downloadAndApply = async (
 
     setProgress(loadProgress, 2, 'Confirming task completion.', dispatch);
     await Api.confirmDownload(task_id, selectedProject);
-    setCreateLoader(undefined);
+    setDialogLoader(undefined);
 
     return false;
   } catch (e: any) {
