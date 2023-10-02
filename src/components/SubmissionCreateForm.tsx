@@ -10,6 +10,7 @@ import {
   FormControl,
   Divider,
   Button,
+  FormHelperText,
 } from '@material-ui/core';
 import { DatePicker } from '@material-ui/pickers';
 import { useDispatch, useSelector } from 'react-redux';
@@ -51,7 +52,7 @@ const useStyles = makeStyles(() => ({
   formControl: {
     display: 'block',
     width: '100%',
-    marginTop: 30,
+    marginTop: 20,
     '& > div': {
       width: '100%',
     },
@@ -268,6 +269,9 @@ const SubmissionCreateForm = () => {
                 <TextField {...params} label="Submitter" margin="normal" />
               )}
             />
+            <FormHelperText id="submitter-helper-text">
+              Empty submitter will default to Amplience
+            </FormHelperText>
           </FormControl>
           <FormControl className={classes.formControl}>
             <InputLabel id="template-label">Template</InputLabel>
@@ -285,6 +289,10 @@ const SubmissionCreateForm = () => {
                 </MenuItem>
               ))}
             </Select>
+            <FormHelperText id="workflow-helper-text">
+              Clearing Template will also clear Workflow, Source Locale and
+              Target Locales
+            </FormHelperText>
           </FormControl>
           <FormControl className={classes.formControl}>
             <InputLabel required id="workflow-label">

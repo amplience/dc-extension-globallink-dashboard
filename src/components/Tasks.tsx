@@ -190,7 +190,7 @@ const Tasks = () => {
                   ) : null}
                   {row.status === 'Completed' ? (
                     <>
-                      <Divider />
+                      <Divider style={{ margin: 5 }} />
                       <MenuItem
                         style={{ width: '280px' }}
                         onClick={() => {
@@ -210,7 +210,7 @@ const Tasks = () => {
                   row.state.state_name !== 'Cancelled' &&
                   row.status !== 'Completed' ? (
                     <>
-                      <Divider />
+                      <Divider style={{ margin: 5 }} />
                       <MenuItem
                         style={{ width: '280px' }}
                         onClick={() => {

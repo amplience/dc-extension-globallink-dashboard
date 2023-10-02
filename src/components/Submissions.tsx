@@ -141,7 +141,7 @@ const Submissions = (props) => {
                   </MenuItem>
                   {row && row.state && row.state.state_name === 'Completed' ? (
                     <>
-                      <Divider />
+                      <Divider style={{ margin: 5 }} />
                       <MenuItem
                         style={{ width: '280px' }}
                         onClick={() => {
@@ -162,7 +162,7 @@ const Submissions = (props) => {
                   row.state.state_name !== 'Cancelled' &&
                   row.state.state_name !== 'Completed' ? (
                     <>
-                      <Divider />
+                      <Divider style={{ margin: 5 }} />
                       <MenuItem
                         style={{ width: '280px' }}
                         onClick={() => {
