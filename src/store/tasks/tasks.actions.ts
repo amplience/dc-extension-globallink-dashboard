@@ -267,7 +267,7 @@ export const applyAllTranslations =
       dispatch(getSubmissions(page || 0));
       dispatch(setDialogLoader(undefined));
     } catch (e: any) {
-      setProgressError(loadProgress, e.toString(), dispatch);
+      setProgressError(loadProgress, e, dispatch);
       dispatch(setError(e.toString()));
       dispatch(setContentLoader(false));
     }
@@ -659,7 +659,7 @@ const downloadAndApply = async (
 
     return false;
   } catch (e: any) {
-    setProgressError(loadProgress, e.toString(), dispatch);
+    setProgressError(loadProgress, e, dispatch);
     dispatch(setError(e.message));
     return Api.errorTask(task_id, selectedProject, e.message);
   }

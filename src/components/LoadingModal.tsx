@@ -7,7 +7,7 @@ import {
   DialogContent,
   DialogContentText,
 } from '@material-ui/core';
-import { useEffect, useReducer } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { LoadProgress } from '../store/loadings/loadProgress';
 import { setDialogLoader } from '../store/loadings/loadings.actions';
@@ -42,7 +42,8 @@ const defaultLoadProgress = {
     text: '',
   },
   error: undefined,
-};
+  errorTime: 0,
+} as LoadProgress;
 
 const LoadingModal = ({
   loadProgress,
@@ -52,6 +53,7 @@ const LoadingModal = ({
   const dispatch = useDispatch();
   const visible = loadProgress != null;
   const [drawNum, redraw] = useReducer((x) => x + 1, 0);
+  const [lastError, setLastError] = useState(defaultLoadProgress);
 
   useEffect(() => {
     let active = true;
@@ -70,16 +72,17 @@ const LoadingModal = ({
   }, [drawNum, visible]);
 
   const closeError = () => {
+    setLastError(loadProgress ?? lastError);
     dispatch(setDialogLoader(undefined));
   };
 
-  const progress = loadProgress ?? defaultLoadProgress;
+  const progress = loadProgress ?? lastError;
 
   const progressFrac = progress.currentProgress.num / progress.totalProgress;
   const totalProgressPct =
     ((progress.stageNumber + progressFrac) / progress.stageTotal) * 100;
 
-  const now = Date.now();
+  const now = progress.error ? progress.errorTime ?? 0 : Date.now();
   const sinceStart = timeSpanString(now - progress.startTime);
   // const sinceStageStart = timeSpanString(now - progress.stageStartTime);
 
@@ -97,6 +100,7 @@ const LoadingModal = ({
           variant="determinate"
           value={totalProgressPct}
           style={{ marginBottom: '12px' }}
+          color={progress.error ? 'secondary' : 'primary'}
         />
         <DialogContentText id="alert-dialog-progress">
           {progress.currentProgress.text}

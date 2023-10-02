@@ -21,6 +21,7 @@ export interface LoadProgress {
   };
 
   error?: string;
+  errorTime?: number;
 }
 
 export function createProgress(
@@ -96,10 +97,19 @@ export function setProgressText(
 
 export function setProgressError(
   progress: LoadProgress,
-  error: string,
+  error: any,
   dispatch: AppDispatch
 ) {
-  progress.error = error;
+  progress.error = error.toString();
+  progress.errorTime = Date.now();
+
+  if (error.response && error.response.data) {
+    if (error.response.data.message) {
+      progress.error = `Status ${
+        error.response.data.status ?? error.response.status
+      }: ${error.response.data.message}`;
+    }
+  }
 
   return dispatch(setDialogLoader({ ...progress }));
 }

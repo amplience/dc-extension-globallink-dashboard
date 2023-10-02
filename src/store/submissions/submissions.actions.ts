@@ -387,6 +387,6 @@ export const createSubmission =
     } catch (e: any) {
       dispatch(setError(e.toString()));
 
-      return setProgressError(loadProgress, e.toString(), dispatch);
+      return setProgressError(loadProgress, e, dispatch);
     }
   };
