@@ -155,6 +155,10 @@ const Table = ({
                   onDoubleClick={() =>
                     rowClick && isFunction(rowClick) && rowClick(row)
                   }
+                  style={{
+                    cursor:
+                      rowClick && isFunction(rowClick) ? 'pointer' : 'default',
+                  }}
                   hover
                   role="checkbox"
                   tabIndex={-1}
@@ -205,7 +209,7 @@ Table.defaultProps = {
   maxContentInSubmission: 50,
   checkBox: false,
   indexes: false,
-  rowClick: () => {},
+  rowClick: null,
   getSelectedIds: () => {},
 };
 
