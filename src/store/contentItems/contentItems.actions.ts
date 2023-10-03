@@ -73,7 +73,13 @@ const getAllContentTypes = async (
 };
 
 export const getContentItems =
-  (locale: string, pageNumber: number, filter?: any, onlyFacets?: boolean) =>
+  (
+    locale: string,
+    pageNumber: number,
+    filter?: any,
+    onlyFacets?: boolean,
+    clear?: boolean
+  ) =>
   async (dispatch: Dispatch, getState: () => RootState) => {
     try {
       const {
@@ -84,8 +90,9 @@ export const getContentItems =
         contentTypes: { data: contentTypesList },
         users: { data: usersList },
         projects: { selectedProject },
-        contentItems: { data, pagination },
+        contentItems: { pagination, data },
       }: RootStateInt = getState();
+
       if (!dcManagement) {
         return dispatch(setError('No DC Management SDK found'));
       }
@@ -96,6 +103,10 @@ export const getContentItems =
 
       if (project && !project.contentTypes) {
         return dispatch(setError('No Content Types found in project'));
+      }
+
+      if (clear) {
+        data.splice(0, data.length);
       }
 
       if (
@@ -283,9 +294,11 @@ export const getContentItems =
         return newDest;
       };
 
-      const newContent = filter
-        ? mappedContent
-        : insert(data, mappedContent, (pageNumber - 1) * PAGE_SIZE);
+      const newContent = insert(
+        data,
+        mappedContent,
+        (pageNumber - 1) * PAGE_SIZE
+      );
       dispatch(setContent(newContent));
 
       if (facets && facets.page && facets.page.number !== undefined) {

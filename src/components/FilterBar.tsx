@@ -241,7 +241,7 @@ const FilterBar = ({
     onlyFacets?: boolean
   ) => {
     dispatch(setFilterValue(filterItem));
-    dispatch(getContentItems(locale, 1, filterItem, onlyFacets));
+    dispatch(getContentItems(locale, 1, filterItem, onlyFacets, !onlyFacets));
     popupState.close();
   };
 

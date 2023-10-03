@@ -89,7 +89,9 @@ const ContentItems = ({
       <div className={classes.navBarContainer}>
         <TablePagination
           pagination={pagination}
-          changePage={(page: number) => dispatch(getContentItems(locale, page))}
+          changePage={(page: number) =>
+            dispatch(getContentItems(locale, page, filter))
+          }
         />
       </div>
 
