@@ -194,4 +194,23 @@ The first time a content item is translated, localized versions of the content i
 - Changes to the content item for the source locale will _not_ automatically persist to the other locales, even if those fields are not to be translated.
   - To persist changes, either copy the changes manually to each locale of the item, or _resubmit_ the item for translation.
     - When the new submission is applied, the new base values will be copied with the new translation applied on top.
-  - It's recommended that you minimize the number of changes to content items that are localized to avoid extra work. Try to get non-localized properties like styling and image links finalized before submitting for translation.
+  - It is recommended that you minimize the number of changes to content items that are localized to avoid extra work. Try to get non-localized properties like styling and image links finalized before submitting for translation.
+
+### Delivery Keys
+Delivery keys must be 'websafe' charecters and also unique to an Amplience Dynamic Content hub. When localizing content with this extension will attempt the following:
+
+* If there IS NOT delivery key in the source item, then will be no delivery keys in the translated items
+* If there IS a delivery key in the source item, then the delivery key for the translated item will be attempted with the source delivery key with a suffix of the target locale `mydeliverykey_fr-FR`
+
+#### Delivery Key Patterns / Validation
+If your delivery key has a pattern / validation regular expression, there is a chance that the translated content will not be created. If there is a delivery key present in the source item, the extension will attempt to create the translated content item with the locale appended to the end if the delivery key (see above).
+
+If your validation in your schemas for your content types does not allow for this then you have the following options:
+1) Alter the delivery key validation in your schema
+2) Create and host a custom version of this extension see `src/store/tasks/tasks.actions.ts` and `generateLocaleDeliveryKey`
+
+#### Mandatory Delivery Keys with localization
+Mandatory delivery keys are not supported with this extension.
+If you would like to use this extension with delivery keys it is recommended to not have the delivery key as mandatory in your schema.
+
+More information about [Amplience Delivery Keys](https://amplience.com/developers/docs/concepts/content-delivery/#delivery-key)
