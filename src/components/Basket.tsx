@@ -16,8 +16,8 @@ const Basket = ({ selectedContent }: { selectedContent: string[] }) => {
     params: { maxContentInSubmission = 50 },
   }: any = useSelector((state: RootState) => state.sdk);
 
-  const slicedData = data.filter((item: ContentItem) =>
-    selectedContent.includes(item.id)
+  const slicedData = data.filter(
+    (item: ContentItem) => item && selectedContent.includes(item.id)
   );
 
   const columns = [

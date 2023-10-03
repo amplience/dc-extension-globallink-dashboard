@@ -36,7 +36,7 @@ const TablePagination = ({
       page={pagination.page}
       count={pagination.totalCount}
       defaultPage={pagination.page}
-      siblingCount={0}
+      siblingCount={1}
       boundaryCount={1}
       renderItem={(item: any) => (
         <PaginationItem
