@@ -1,13 +1,20 @@
 import { ContentItem } from 'dc-management-sdk-js';
 import { useSelector } from 'react-redux';
-import { Typography } from '@material-ui/core';
+import { Box, Button, IconButton, Typography } from '@material-ui/core';
+import CloseIcon from '@material-ui/icons/Close';
 import { RootState } from '../store/store';
 import Table from './common/Table';
 import Loader from './common/Loader';
 import { ContentItemsInterface } from '../types/types';
 import { PAGE_SIZE } from '../utils/GCCRestApi';
 
-const Basket = ({ selectedContent }: { selectedContent: string[] }) => {
+const Basket = ({
+  selectedContent,
+  setOpenBasket,
+}: {
+  selectedContent: string[];
+  setOpenBasket: (state: boolean) => void;
+}) => {
   const { data, pagination }: ContentItemsInterface = useSelector(
     (state: RootState) => state.contentItems
   );
@@ -45,6 +52,11 @@ const Basket = ({ selectedContent }: { selectedContent: string[] }) => {
 
   return (
     <>
+      <Box style={{ display: 'flex', justifyContent: 'right' }}>
+        <IconButton onClick={() => setOpenBasket(false)}>
+          <CloseIcon />
+        </IconButton>
+      </Box>
       {content ? <Loader className="content-loader" /> : null}
       <Typography
         color={
@@ -64,6 +76,15 @@ const Basket = ({ selectedContent }: { selectedContent: string[] }) => {
         currentPage={pagination.page}
         pageSize={PAGE_SIZE}
       />
+      <Box style={{ marginTop: 20, display: 'flex', justifyContent: 'left' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setOpenBasket(false)}
+        >
+          Close
+        </Button>
+      </Box>
     </>
   );
 };

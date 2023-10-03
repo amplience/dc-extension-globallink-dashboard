@@ -113,7 +113,10 @@ const ContentItems = ({
         PaperProps={{ style: { width: '50%', padding: 20 } }}
         onClose={() => setOpenBasket(false)}
       >
-        <Basket selectedContent={selectedContent} />
+        <Basket
+          setOpenBasket={setOpenBasket}
+          selectedContent={selectedContent}
+        />
       </Drawer>
     </>
   );
