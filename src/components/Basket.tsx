@@ -27,7 +27,7 @@ const Basket = ({ selectedContent }: { selectedContent: string[] }) => {
     },
     {
       id: 'assignees',
-      label: 'Assign',
+      label: 'Assignees',
       format: (assignees: any[]) =>
         assignees && assignees.length
           ? assignees

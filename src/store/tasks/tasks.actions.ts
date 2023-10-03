@@ -105,6 +105,7 @@ const getAllTasks = async ({
   pageNumber,
   selectedProject,
   submissionId,
+  totalFetched = 0,
 }: any): Promise<TaskInterface[]> => {
   const { total_records_count, tasks_list } = await Api.getTasks({
     selectedProject,
@@ -112,17 +113,20 @@ const getAllTasks = async ({
     pageNumber: pageNumber || 1,
   });
 
+  totalFetched += tasks_list.length;
+
   tasks = tasks.concat(
     tasks_list.filter(({ status }: any) => status === 'Completed')
   );
 
-  if (total_records_count > tasks.length) {
+  if (total_records_count > totalFetched) {
     return getAllTasks({
       Api,
       tasks,
       pageNumber: pageNumber + 1,
       selectedProject,
       submissionId,
+      totalFetched,
     });
   }
 
