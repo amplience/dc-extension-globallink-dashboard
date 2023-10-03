@@ -125,7 +125,8 @@ const Table = ({
                     checked={checkedAll}
                     disabled={
                       !checkedAll &&
-                      (Object.keys(selected).length >= maxContentInSubmission ||
+                      (Object.keys(selected).length >=
+                        maxContentInSubmission - data.length + 1 ||
                         data.length > maxContentInSubmission)
                     }
                     onChange={handleSelectAllClick}
