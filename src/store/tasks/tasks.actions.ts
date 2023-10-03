@@ -241,21 +241,24 @@ export const applyAllTranslations =
         );
 
         dispatch(setLoaderById(task_id, true));
-        await downloadAndApply(
-          {
-            dcManagement,
-            Api,
-            task_id,
-            unique_identifier,
-            locale,
-            selectedProject: projects.selectedProject,
-            params,
-            source_locale: submission.source_locale,
-            loadProgress,
-          },
-          dispatch
-        );
-        dispatch(setLoaderById(task_id, false));
+        try {
+          await downloadAndApply(
+            {
+              dcManagement,
+              Api,
+              task_id,
+              unique_identifier,
+              locale,
+              selectedProject: projects.selectedProject,
+              params,
+              source_locale: submission.source_locale,
+              loadProgress,
+            },
+            dispatch
+          );
+        } finally {
+          dispatch(setLoaderById(task_id, false));
+        }
       }
 
       if (failedCount) {
@@ -272,6 +275,7 @@ export const applyAllTranslations =
       dispatch(setDialogLoader(undefined));
     } catch (e: any) {
       setProgressError(loadProgress, e, dispatch);
+      dispatch(setLoaderById(submission.submission_id || 0, false));
       dispatch(setError(e.toString()));
       dispatch(setContentLoader(false));
     }
@@ -708,8 +712,10 @@ export const downloadTask =
       );
 
       dispatch(getTasks(pagination.page || 0));
+      dispatch(setDialogLoader(undefined));
       return dispatch(setContentLoader(false));
     } catch (e: any) {
+      setProgressError(loadProgress, e, dispatch);
       dispatch(setError(e.toString()));
       return dispatch(setContentLoader(false));
     }
