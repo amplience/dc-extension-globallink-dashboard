@@ -663,13 +663,13 @@ const downloadAndApply = async (
 
     setProgress(loadProgress, 2, 'Confirming task completion.', dispatch);
     await Api.confirmDownload(task_id, selectedProject);
-    setDialogLoader(undefined);
 
     return false;
   } catch (e: any) {
-    setProgressError(loadProgress, e, dispatch);
     dispatch(setError(e.message));
-    return Api.errorTask(task_id, selectedProject, e.message);
+    await Api.errorTask(task_id, selectedProject, e.message);
+
+    throw e;
   }
 };
 

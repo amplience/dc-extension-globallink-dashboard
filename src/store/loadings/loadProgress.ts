@@ -104,10 +104,16 @@ export function setProgressError(
   progress.errorTime = Date.now();
 
   if (error.response && error.response.data) {
-    if (error.response.data.message) {
-      progress.error = `Status ${
-        error.response.data.status ?? error.response.status
-      }: ${error.response.data.message}`;
+    const { data } = error.response;
+    if (data.message) {
+      progress.error = `Status ${data.status ?? error.response.status}: ${
+        data.message
+      }`;
+    } else if (data.errors && data.errors.length) {
+      const error = data.errors[0];
+      progress.error = `${error.code} (${error.entity}): ${error.message} ${
+        error.invalidValue ? `(${error.invalidValue})` : ''
+      }`;
     }
   }
 
