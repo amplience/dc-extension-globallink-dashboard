@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   MenuItem,
   Menu,
@@ -37,6 +37,7 @@ import { applyAllTranslations } from '../store/tasks/tasks.actions';
 import SubmissionFilterBar from './SubmissionFilterBar';
 import { useStyles } from './Tasks';
 import LoadingModal from './LoadingModal';
+import ConfirmationDialog from './ConfirmationDialog';
 
 export const SUBMISSION_STATUSES: { [key: string]: string } = {
   Delivered: 'Translation Complete',
@@ -57,6 +58,9 @@ const Submissions = (props) => {
   const { data: users }: { data: UserInterface[] } = useSelector(
     (state: RootStateInt) => state.users
   );
+
+  const [applyRow, setApplyRow] = useState<SubmissionInt | undefined>();
+  const [applyDialogShow, setApplyDialogShow] = useState(false);
 
   const columns = [
     {
@@ -145,7 +149,8 @@ const Submissions = (props) => {
                       <MenuItem
                         style={{ width: '280px' }}
                         onClick={() => {
-                          dispatch(applyAllTranslations(row));
+                          setApplyRow(row);
+                          setApplyDialogShow(true);
                           popupState.close();
                         }}
                       >
@@ -191,8 +196,22 @@ const Submissions = (props) => {
     }
   }, [pagination, dispatch, filter]);
 
+  const applyTask = (apply: boolean) => {
+    if (apply && applyRow) {
+      dispatch(applyAllTranslations(applyRow));
+    }
+
+    setApplyDialogShow(false);
+  };
+
   return (
     <>
+      <ConfirmationDialog
+        open={applyDialogShow}
+        title="Confirm Translation"
+        description={`This will apply all translation tasks for "${applyRow?.submission_name}".`}
+        onResult={applyTask}
+      />
       {content ? <Loader className="content-loader" /> : null}
       <LoadingModal loadProgress={dialog} />
       <Paper

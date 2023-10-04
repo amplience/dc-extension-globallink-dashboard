@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   MenuItem,
   Menu,
@@ -38,6 +38,7 @@ import {
   TaskInterface,
 } from '../types/types';
 import LoadingModal from './LoadingModal';
+import ConfirmationDialog from './ConfirmationDialog';
 
 export const useStyles = makeStyles(() => ({
   status: {
@@ -75,6 +76,9 @@ const Tasks = () => {
   );
 
   const { SDK }: SDKInterface = useSelector((state: RootState) => state.sdk);
+
+  const [applyRow, setApplyRow] = useState<TaskInterface | undefined>();
+  const [applyDialogShow, setApplyDialogShow] = useState(false);
 
   const handleClose = () => {
     setOpenModal(false);
@@ -194,7 +198,8 @@ const Tasks = () => {
                       <MenuItem
                         style={{ width: '280px' }}
                         onClick={() => {
-                          dispatch(downloadTask(row));
+                          setApplyRow(row);
+                          setApplyDialogShow(true);
                           popupState.close();
                         }}
                       >
@@ -239,8 +244,22 @@ const Tasks = () => {
     }
   }, [pagination, dispatch]);
 
+  const applyTask = (apply: boolean) => {
+    if (apply && applyRow) {
+      dispatch(dispatch(downloadTask(applyRow)));
+    }
+
+    setApplyDialogShow(false);
+  };
+
   return (
     <>
+      <ConfirmationDialog
+        open={applyDialogShow}
+        title="Confirm Translation"
+        description={`This will apply the task:\n\n"${applyRow?.name} ${applyRow?.target_locale?.locale_display_name}"`}
+        onResult={applyTask}
+      />
       {content ? <Loader className="content-loader" /> : null}
       <LoadingModal loadProgress={dialog} />
       <Table
