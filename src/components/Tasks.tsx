@@ -271,7 +271,7 @@ const Tasks = () => {
 
   const applyTask = (apply: boolean) => {
     if (apply && applyRow) {
-      dispatch(dispatch(downloadTask(applyRow)));
+      dispatch(downloadTask(applyRow));
     }
 
     setApplyDialogShow(false);
