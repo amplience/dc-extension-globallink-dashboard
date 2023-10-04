@@ -66,11 +66,6 @@ const Submissions = (props) => {
     (state: RootStateInt) => state.users
   );
 
-  window.onbeforeunload = (event) => {
-    event.preventDefault();
-    return (event.returnValue = '');
-  };
-
   const [applyRow, setApplyRow] = useState<SubmissionInt | undefined>();
   const [applyDialogShow, setApplyDialogShow] = useState(false);
 
