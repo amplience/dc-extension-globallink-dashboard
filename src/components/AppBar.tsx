@@ -92,7 +92,11 @@ const NavBar = () => {
       buttons: (
         <>
           <LinkRouter color="inherit" to="/" underline="none">
-            <Button variant="outlined" color="primary">
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => dispatch(getSubmissions())}
+            >
               Back
             </Button>
           </LinkRouter>
@@ -124,7 +128,11 @@ const NavBar = () => {
             <RefreshIcon />
           </IconButton>
           <LinkRouter color="inherit" to="/" underline="none">
-            <Button variant="outlined" color="primary">
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => dispatch(getSubmissions())}
+            >
               Back
             </Button>
           </LinkRouter>

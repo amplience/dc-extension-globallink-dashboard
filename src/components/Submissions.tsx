@@ -11,6 +11,11 @@ import {
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import CancelIcon from '@material-ui/icons/Cancel';
 import AssignmentIcon from '@material-ui/icons/Assignment';
+import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import { useDispatch, useSelector } from 'react-redux';
 import PopupState, {
   bindTrigger,
@@ -44,6 +49,8 @@ export const SUBMISSION_STATUSES: { [key: string]: string } = {
   Completed: 'Translation Ready',
   Translate: 'Translating',
 };
+
+export const POLLING_TIME = 15000;
 
 const Submissions = (props) => {
   const dispatch = useDispatch();
@@ -103,13 +110,41 @@ const Submissions = (props) => {
       label: 'Status',
       format: (row: SubmissionInt) => (
         <div>
-          <span className={classes.status}>
+          <span
+            className={classes.status}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+            }}
+          >
+            {row.state &&
+            (row.state.state_name === 'Pre-process' ||
+              row.state.state_name === 'Translate' ||
+              row.state.state_name === 'Analyzed' ||
+              row.state.state_name === 'Started') ? (
+              <HourglassEmptyIcon style={{ marginRight: 5 }} />
+            ) : null}
+            {row.state && row.state.state_name === 'Completed' ? (
+              <ThumbUpIcon color="primary" style={{ marginRight: 5 }} />
+            ) : null}
+            {row.state && row.state.state_name === 'Cancelled' ? (
+              <HighlightOffIcon color="action" style={{ marginRight: 5 }} />
+            ) : null}
+            {row.state && row.state.state_name === 'Delivered' ? (
+              <CheckCircleIcon htmlColor="#33aa33" style={{ marginRight: 5 }} />
+            ) : null}
             {row.state
               ? SUBMISSION_STATUSES[row.state.state_name] ||
                 row.state.state_name
               : ''}
+            {row.is_error ? (
+              <ErrorOutline
+                className={classes.icon}
+                style={{ marginLeft: 5 }}
+              />
+            ) : null}
           </span>
-          {row.is_error ? <ErrorOutline className={classes.icon} /> : null}
         </div>
       ),
     },
@@ -128,7 +163,7 @@ const Submissions = (props) => {
                   className="menu-icon"
                   {...bindTrigger(popupState)}
                 >
-                  ...
+                  <MoreHorizIcon fontSize="small" />
                 </Icon>
                 <Menu {...bindMenu(popupState)}>
                   <MenuItem
@@ -194,6 +229,17 @@ const Submissions = (props) => {
     if (pagination && !pagination.page) {
       dispatch(getSubmissions(1, filter));
     }
+    if (POLLING_TIME) {
+      const interval = setInterval(() => {
+        if (pagination && !pagination.page) {
+          dispatch(getSubmissions(1, filter));
+        } else if (pagination && pagination.page) {
+          dispatch(getSubmissions(pagination.page, filter));
+        }
+      }, POLLING_TIME);
+      return () => clearInterval(interval);
+    }
+    return () => {};
   }, [pagination, dispatch, filter]);
 
   const applyTask = (apply: boolean) => {
@@ -256,7 +302,6 @@ const Submissions = (props) => {
           filter={filter}
         />
       </Paper>
-
       <Table
         columns={columns}
         data={data}

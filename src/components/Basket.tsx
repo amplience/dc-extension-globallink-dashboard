@@ -1,13 +1,22 @@
 import { ContentItem } from 'dc-management-sdk-js';
 import { useSelector } from 'react-redux';
-import { Typography } from '@material-ui/core';
+import { Box, Button, IconButton, Typography } from '@material-ui/core';
+import CloseIcon from '@material-ui/icons/Close';
 import { RootState } from '../store/store';
 import Table from './common/Table';
 import Loader from './common/Loader';
 import { ContentItemsInterface } from '../types/types';
 import { PAGE_SIZE } from '../utils/GCCRestApi';
 
-const Basket = ({ selectedContent }: { selectedContent: string[] }) => {
+const Basket = ({
+  selectedContent,
+  setOpenBasket,
+  getSelectedIds,
+}: {
+  selectedContent: string[];
+  setOpenBasket: (state: boolean) => void;
+  getSelectedIds: (content: string[]) => void;
+}) => {
   const { data, pagination }: ContentItemsInterface = useSelector(
     (state: RootState) => state.contentItems
   );
@@ -45,6 +54,11 @@ const Basket = ({ selectedContent }: { selectedContent: string[] }) => {
 
   return (
     <>
+      <Box style={{ display: 'flex', justifyContent: 'right' }}>
+        <IconButton size="small" onClick={() => setOpenBasket(false)}>
+          <CloseIcon />
+        </IconButton>
+      </Box>
       {content ? <Loader className="content-loader" /> : null}
       <Typography
         color={
@@ -58,12 +72,24 @@ const Basket = ({ selectedContent }: { selectedContent: string[] }) => {
         Content Items Basket: {slicedData.length}/{maxContentInSubmission}
       </Typography>
       <Table
+        removeButton
         maxContentInSubmission={maxContentInSubmission}
         columns={columns}
         data={slicedData}
+        selectedContent={selectedContent}
+        getSelectedIds={getSelectedIds}
         currentPage={pagination.page}
         pageSize={PAGE_SIZE}
       />
+      <Box style={{ marginTop: 20, display: 'flex', justifyContent: 'left' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setOpenBasket(false)}
+        >
+          Close
+        </Button>
+      </Box>
     </>
   );
 };

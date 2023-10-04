@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   makeStyles,
   Table as TableComponent,
@@ -9,7 +9,9 @@ import {
   TableRow,
   Paper,
   Checkbox,
+  IconButton,
 } from '@material-ui/core';
+import CloseIcon from '@material-ui/icons/Close';
 import isFunction from 'lodash/isFunction';
 
 interface Column {
@@ -23,10 +25,12 @@ interface Column {
 interface TableComponentProps {
   columns: Column[];
   data: object[];
+  selectedContent?: string[];
   currentPage: number;
   pageSize: number;
   maxContentInSubmission?: number;
   checkBox?: boolean;
+  removeButton?: boolean;
   indexes?: boolean;
   rowClick?(id: number): void;
   getSelectedIds?: (content: string[]) => void;
@@ -47,13 +51,18 @@ const Table = ({
   currentPage = 0,
   pageSize = 10,
   checkBox = false,
+  removeButton = false,
   indexes = false,
+  selectedContent = [],
   getSelectedIds = () => {},
 }: TableComponentProps) => {
   const classes = useStyles();
-  const [selected, setSelected] = React.useState<{ [key: string]: boolean }>(
-    {}
-  );
+  const selectedMap: { [key: string]: boolean } = {};
+  selectedContent.forEach((id: string) => {
+    selectedMap[id] = true;
+  });
+  const [selected, setSelected] =
+    React.useState<{ [key: string]: boolean }>(selectedMap);
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -111,6 +120,21 @@ const Table = ({
     0
   );
 
+  useEffect(() => {
+    const selectedMap: { [key: string]: boolean } = {};
+    selectedContent.forEach((id: string) => {
+      selectedMap[id] = true;
+    });
+    setSelected({
+      ...selectedMap,
+    });
+    getSelectedIds(
+      Object.keys({
+        ...selectedMap,
+      })
+    );
+  }, [selectedContent]);
+
   const checkedAll = data.length > 0 && found > 0 && data.length === found;
   return (
     <Paper className={classes.root}>
@@ -118,6 +142,21 @@ const Table = ({
         <TableComponent stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
+              {removeButton ? (
+                <TableCell padding="checkbox">
+                  <IconButton
+                    title="Remove all"
+                    size="small"
+                    color="primary"
+                    onClick={() => {
+                      setSelected({});
+                      getSelectedIds([]);
+                    }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </TableCell>
+              ) : null}
               {checkBox ? (
                 <TableCell padding="checkbox">
                   <Checkbox
@@ -165,6 +204,18 @@ const Table = ({
                   tabIndex={-1}
                   key={`row_${index}`}
                 >
+                  {removeButton ? (
+                    <TableCell padding="checkbox">
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        title="Remove"
+                        onClick={() => handleClick(row.id)}
+                      >
+                        <CloseIcon />
+                      </IconButton>
+                    </TableCell>
+                  ) : null}
                   {checkBox ? (
                     <TableCell padding="checkbox">
                       <Checkbox
@@ -209,8 +260,10 @@ const Table = ({
 Table.defaultProps = {
   maxContentInSubmission: 50,
   checkBox: false,
+  removeButton: false,
   indexes: false,
   rowClick: null,
+  selectedContent: [],
   getSelectedIds: () => {},
 };
 

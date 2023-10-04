@@ -482,10 +482,12 @@ const SubmissionCreateForm = () => {
           square
           classes={{ root: classes.paperAlt }}
         >
+          <Typography variant="h5">Content Items Selection</Typography>
           {formValues.sourceLocale ? (
             <>
               <ContentItems
                 selectedContent={selectedContent}
+                setSelectedContent={setSelectedContent}
                 getSelectedIds={(content: string[]) =>
                   setSelectedContent(content)
                 }
@@ -493,7 +495,7 @@ const SubmissionCreateForm = () => {
               />
             </>
           ) : (
-            <Typography>
+            <Typography style={{ marginTop: 20 }}>
               Choose a Source Locale to list Content Items...
             </Typography>
           )}
