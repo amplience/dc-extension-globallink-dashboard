@@ -114,6 +114,7 @@ const Submissions = (props) => {
             {row.state &&
             (row.state.state_name === 'Pre-process' ||
               row.state.state_name === 'Translate' ||
+              row.state.state_name === 'Analyzed' ||
               row.state.state_name === 'Started') ? (
               <HourglassEmptyIcon style={{ marginRight: 5 }} />
             ) : null}
