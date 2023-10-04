@@ -27,6 +27,7 @@ import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import { RootState } from '../store/store';
 import Table from './common/Table';
 import Loader from './common/Loader';
@@ -159,7 +160,7 @@ const Tasks = () => {
                   className={classes.menuIcon}
                   {...bindTrigger(popupState)}
                 >
-                  ...
+                  <MoreHorizIcon fontSize="small" />
                 </Icon>
                 <Menu {...bindMenu(popupState)} style={{ width: '400px' }}>
                   <MenuItem
