@@ -15,6 +15,7 @@ import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import { useDispatch, useSelector } from 'react-redux';
 import PopupState, {
   bindTrigger,
@@ -47,6 +48,8 @@ export const SUBMISSION_STATUSES: { [key: string]: string } = {
   Completed: 'Translation Ready',
   Translate: 'Translating',
 };
+
+export const POLLING_TIME = 15000;
 
 const Submissions = (props) => {
   const dispatch = useDispatch();
@@ -156,7 +159,7 @@ const Submissions = (props) => {
                   className="menu-icon"
                   {...bindTrigger(popupState)}
                 >
-                  ...
+                  <MoreHorizIcon fontSize="small" />
                 </Icon>
                 <Menu {...bindMenu(popupState)}>
                   <MenuItem
@@ -221,6 +224,17 @@ const Submissions = (props) => {
     if (pagination && !pagination.page) {
       dispatch(getSubmissions(1, filter));
     }
+    if (POLLING_TIME) {
+      const interval = setInterval(() => {
+        if (pagination && !pagination.page) {
+          dispatch(getSubmissions(1, filter));
+        } else if (pagination && pagination.page) {
+          dispatch(getSubmissions(pagination.page, filter));
+        }
+      }, POLLING_TIME);
+      return () => clearInterval(interval);
+    }
+    return () => {};
   }, [pagination, dispatch, filter]);
 
   return (
@@ -269,7 +283,6 @@ const Submissions = (props) => {
           filter={filter}
         />
       </Paper>
-
       <Table
         columns={columns}
         data={data}
