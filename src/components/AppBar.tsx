@@ -71,13 +71,11 @@ const NavBar = () => {
     (state: RootState) => state.submissions
   );
   const [applyDialogShow, setApplyDialogShow] = useState(false);
-  const [enableApplyAll, setEnableApplyAll] = useState(true);
 
   const applyAll = (apply: boolean) => {
     if (apply) {
       dispatch(applyAllTranslations(selectedSubmission));
     }
-    setEnableApplyAll(false);
     setApplyDialogShow(false);
   };
 
@@ -134,7 +132,6 @@ const NavBar = () => {
       ),
       pagination: useSelector((state: any) => state.tasks.pagination),
       changePage: (page: number) => {
-        setEnableApplyAll(true);
         dispatch(getTasks(page));
       },
       buttons: (
@@ -165,10 +162,7 @@ const NavBar = () => {
             variant="contained"
             color="primary"
             style={{ marginLeft: 32, height: 34 }}
-            disabled={
-              !enableApplyAll ||
-              selectedSubmission.state?.state_name !== 'Completed'
-            }
+            disabled={selectedSubmission.state?.state_name !== 'Completed'}
             onClick={() => {
               setApplyDialogShow(true);
             }}
