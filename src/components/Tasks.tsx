@@ -123,7 +123,7 @@ const Tasks = () => {
             flexWrap: 'wrap',
           }}
         >
-          {row.status === 'Translate' ? (
+          {row.status === 'Translate' || row.status === 'Processing' ? (
             <CircularProgress size="1rem" style={{ marginRight: 5 }} />
           ) : null}
           {row.status === 'Completed' ? (
