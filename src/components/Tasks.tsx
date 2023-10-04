@@ -23,6 +23,10 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import InputIcon from '@material-ui/icons/Input';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
+import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import { RootState } from '../store/store';
 import Table from './common/Table';
 import Loader from './common/Loader';
@@ -107,11 +111,32 @@ const Tasks = () => {
       id: '_status',
       label: 'Status',
       format: (row: TaskInterface) => (
-        <div title={row.error_message}>
+        <div
+          title={row.error_message}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
+          {row.status === 'Translate' ? (
+            <HourglassEmptyIcon style={{ marginRight: 5 }} />
+          ) : null}
+          {row.status === 'Completed' ? (
+            <ThumbUpIcon color="primary" style={{ marginRight: 5 }} />
+          ) : null}
+          {row.status === 'Cancelled' ? (
+            <HighlightOffIcon color="action" style={{ marginRight: 5 }} />
+          ) : null}
+          {row.status === 'Delivered' ? (
+            <CheckCircleIcon htmlColor="#33aa33" style={{ marginRight: 5 }} />
+          ) : null}
           <span className={classes.status}>
             {TASK_STATUSES[row.status] || row.status}
           </span>
-          {row.is_error ? <ErrorOutline className={classes.icon} /> : null}
+          {row.is_error ? (
+            <ErrorOutline className={classes.icon} style={{ marginLeft: 5 }} />
+          ) : null}
         </div>
       ),
     },

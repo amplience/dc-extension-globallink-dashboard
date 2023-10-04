@@ -11,6 +11,10 @@ import {
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import CancelIcon from '@material-ui/icons/Cancel';
 import AssignmentIcon from '@material-ui/icons/Assignment';
+import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import { useDispatch, useSelector } from 'react-redux';
 import PopupState, {
   bindTrigger,
@@ -99,13 +103,40 @@ const Submissions = (props) => {
       label: 'Status',
       format: (row: SubmissionInt) => (
         <div>
-          <span className={classes.status}>
+          <span
+            className={classes.status}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+            }}
+          >
+            {row.state &&
+            (row.state.state_name === 'Pre-process' ||
+              row.state.state_name === 'Translate' ||
+              row.state.state_name === 'Started') ? (
+              <HourglassEmptyIcon style={{ marginRight: 5 }} />
+            ) : null}
+            {row.state && row.state.state_name === 'Completed' ? (
+              <ThumbUpIcon color="primary" style={{ marginRight: 5 }} />
+            ) : null}
+            {row.state && row.state.state_name === 'Cancelled' ? (
+              <HighlightOffIcon color="action" style={{ marginRight: 5 }} />
+            ) : null}
+            {row.state && row.state.state_name === 'Delivered' ? (
+              <CheckCircleIcon htmlColor="#33aa33" style={{ marginRight: 5 }} />
+            ) : null}
             {row.state
               ? SUBMISSION_STATUSES[row.state.state_name] ||
                 row.state.state_name
               : ''}
+            {row.is_error ? (
+              <ErrorOutline
+                className={classes.icon}
+                style={{ marginLeft: 5 }}
+              />
+            ) : null}
           </span>
-          {row.is_error ? <ErrorOutline className={classes.icon} /> : null}
         </div>
       ),
     },
