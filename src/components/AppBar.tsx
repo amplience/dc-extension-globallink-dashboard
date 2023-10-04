@@ -133,7 +133,10 @@ const NavBar = () => {
         (state: any) => state.tasks.data[0]?.submission_name || ''
       ),
       pagination: useSelector((state: any) => state.tasks.pagination),
-      changePage: (page: number) => dispatch(getTasks(page)),
+      changePage: (page: number) => {
+        setEnableApplyAll(true);
+        dispatch(getTasks(page));
+      },
       buttons: (
         <Box
           style={{
@@ -164,7 +167,7 @@ const NavBar = () => {
             style={{ marginLeft: 32, height: 34 }}
             disabled={
               !enableApplyAll ||
-              selectedSubmission.state?.state_name === 'Delivered'
+              selectedSubmission.state?.state_name !== 'Completed'
             }
             onClick={() => {
               setApplyDialogShow(true);
