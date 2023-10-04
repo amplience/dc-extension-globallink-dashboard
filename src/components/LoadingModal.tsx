@@ -15,7 +15,7 @@ import { setDialogLoader } from '../store/loadings/loadings.actions';
 const timeSpanString = (span: number): string => {
   const seconds = Math.floor((span / 1000) % 60);
   const minutes = Math.floor((span / (1000 * 60)) % 60);
-  const hours = Math.floor(span / (1000 * 60 * 24));
+  const hours = Math.floor(span / (1000 * 60 * 60));
 
   const padMins = String(minutes).padStart(2, '0');
   const padSecs = String(seconds).padStart(2, '0');
