@@ -10,6 +10,7 @@ import {
   Box,
   Divider,
   ListItemIcon,
+  CircularProgress,
 } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import PopupState, {
@@ -23,7 +24,6 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import InputIcon from '@material-ui/icons/Input';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
-import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
@@ -124,7 +124,7 @@ const Tasks = () => {
           }}
         >
           {row.status === 'Translate' ? (
-            <HourglassEmptyIcon style={{ marginRight: 5 }} />
+            <CircularProgress size="1rem" style={{ marginRight: 5 }} />
           ) : null}
           {row.status === 'Completed' ? (
             <ThumbUpIcon color="primary" style={{ marginRight: 5 }} />
