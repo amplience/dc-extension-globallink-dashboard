@@ -486,6 +486,7 @@ const SubmissionCreateForm = () => {
             <>
               <ContentItems
                 selectedContent={selectedContent}
+                setSelectedContent={setSelectedContent}
                 getSelectedIds={(content: string[]) =>
                   setSelectedContent(content)
                 }

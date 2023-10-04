@@ -11,9 +11,11 @@ import { PAGE_SIZE } from '../utils/GCCRestApi';
 const Basket = ({
   selectedContent,
   setOpenBasket,
+  getSelectedIds,
 }: {
   selectedContent: string[];
   setOpenBasket: (state: boolean) => void;
+  getSelectedIds: (content: string[]) => void;
 }) => {
   const { data, pagination }: ContentItemsInterface = useSelector(
     (state: RootState) => state.contentItems
@@ -53,7 +55,7 @@ const Basket = ({
   return (
     <>
       <Box style={{ display: 'flex', justifyContent: 'right' }}>
-        <IconButton onClick={() => setOpenBasket(false)}>
+        <IconButton size="small" onClick={() => setOpenBasket(false)}>
           <CloseIcon />
         </IconButton>
       </Box>
@@ -70,9 +72,12 @@ const Basket = ({
         Content Items Basket: {slicedData.length}/{maxContentInSubmission}
       </Typography>
       <Table
+        removeButton
         maxContentInSubmission={maxContentInSubmission}
         columns={columns}
         data={slicedData}
+        selectedContent={selectedContent}
+        getSelectedIds={getSelectedIds}
         currentPage={pagination.page}
         pageSize={PAGE_SIZE}
       />

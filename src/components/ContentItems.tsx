@@ -23,10 +23,12 @@ const useStyles = makeStyles(() => ({
 const ContentItems = ({
   locale,
   selectedContent,
+  setSelectedContent,
   getSelectedIds,
 }: {
   locale: string;
   selectedContent: string[];
+  setSelectedContent: (content: string[]) => void;
   getSelectedIds: (content: string[]) => void;
 }) => {
   const [openBasket, setOpenBasket] = useState(false);
@@ -74,6 +76,10 @@ const ContentItems = ({
     }
   }, [pagination, dispatch, locale]);
 
+  useEffect(() => {
+    setSelectedContent(selectedContent);
+  }, [selectedContent]);
+
   return (
     <>
       {content ? <Loader className="content-loader" /> : null}
@@ -95,16 +101,19 @@ const ContentItems = ({
         />
       </div>
 
-      <Table
-        maxContentInSubmission={maxContentInSubmission}
-        checkBox
-        indexes
-        getSelectedIds={getSelectedIds}
-        columns={columns}
-        data={slicedData}
-        currentPage={pagination.page}
-        pageSize={PAGE_SIZE}
-      />
+      {selectedContent && (
+        <Table
+          maxContentInSubmission={maxContentInSubmission}
+          checkBox
+          indexes
+          getSelectedIds={getSelectedIds}
+          columns={columns}
+          selectedContent={selectedContent}
+          data={slicedData}
+          currentPage={pagination.page}
+          pageSize={PAGE_SIZE}
+        />
+      )}
 
       <Drawer
         variant="temporary"
@@ -116,6 +125,7 @@ const ContentItems = ({
         <Basket
           setOpenBasket={setOpenBasket}
           selectedContent={selectedContent}
+          getSelectedIds={getSelectedIds}
         />
       </Drawer>
     </>
