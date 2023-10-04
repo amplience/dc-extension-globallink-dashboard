@@ -23,7 +23,11 @@ import { RootState } from '../store/store';
 import { setProject } from '../store/project/project.actions';
 import { getSubmissions } from '../store/submissions/submissions.actions';
 import { applyAllTranslations, getTasks } from '../store/tasks/tasks.actions';
-import { ProjectStateInterface, SubmissionsInterface } from '../types/types';
+import {
+  ProjectStateInterface,
+  SubmissionsInterface,
+  TasksInterface,
+} from '../types/types';
 import TablePagination from './common/TablePagination';
 import ConfirmationDialog from './ConfirmationDialog';
 
@@ -69,6 +73,9 @@ const NavBar = () => {
   );
   const { selectedSubmission }: SubmissionsInterface = useSelector(
     (state: RootState) => state.submissions
+  );
+  const { data: tasks }: TasksInterface = useSelector(
+    (state: RootState) => state.tasks
   );
   const [applyDialogShow, setApplyDialogShow] = useState(false);
 
@@ -144,7 +151,9 @@ const NavBar = () => {
         >
           <IconButton
             title="Refresh"
-            onClick={() => dispatch(getTasks())}
+            onClick={() => {
+              dispatch(getTasks());
+            }}
             aria-label="refresh"
           >
             <RefreshIcon style={{ marginRight: 16 }} />
@@ -162,7 +171,10 @@ const NavBar = () => {
             variant="contained"
             color="primary"
             style={{ marginLeft: 32, height: 34 }}
-            disabled={selectedSubmission.state?.state_name !== 'Completed'}
+            disabled={
+              !tasks.filter((task) => task.status === 'Completed').length ||
+              selectedSubmission.state?.state_name !== 'Completed'
+            }
             onClick={() => {
               setApplyDialogShow(true);
             }}
