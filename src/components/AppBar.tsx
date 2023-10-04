@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -12,6 +12,7 @@ import {
   LinkProps,
   Button,
   IconButton,
+  Box,
 } from '@material-ui/core';
 import RefreshIcon from '@material-ui/icons/Refresh';
 
@@ -21,9 +22,10 @@ import { Link as RouterLink } from 'react-router-dom';
 import { RootState } from '../store/store';
 import { setProject } from '../store/project/project.actions';
 import { getSubmissions } from '../store/submissions/submissions.actions';
-import { getTasks } from '../store/tasks/tasks.actions';
-import { ProjectStateInterface } from '../types/types';
+import { applyAllTranslations, getTasks } from '../store/tasks/tasks.actions';
+import { ProjectStateInterface, SubmissionsInterface } from '../types/types';
 import TablePagination from './common/TablePagination';
+import ConfirmationDialog from './ConfirmationDialog';
 
 interface LinkRouterProps extends LinkProps {
   to: string;
@@ -65,6 +67,20 @@ const NavBar = () => {
   const { data, selectedProject }: ProjectStateInterface = useSelector(
     (state: RootState) => state.projects
   );
+  const { selectedSubmission }: SubmissionsInterface = useSelector(
+    (state: RootState) => state.submissions
+  );
+  const [applyDialogShow, setApplyDialogShow] = useState(false);
+  const [enableApplyAll, setEnableApplyAll] = useState(true);
+
+  const applyAll = (apply: boolean) => {
+    if (apply) {
+      dispatch(applyAllTranslations(selectedSubmission));
+    }
+    setEnableApplyAll(false);
+    setApplyDialogShow(false);
+  };
+
   const breadcrumbNameMap: { [key: string]: any } = {
     '/': {
       label: 'Submissions',
@@ -119,13 +135,19 @@ const NavBar = () => {
       pagination: useSelector((state: any) => state.tasks.pagination),
       changePage: (page: number) => dispatch(getTasks(page)),
       buttons: (
-        <>
+        <Box
+          style={{
+            display: 'flex',
+            justifyContent: 'right',
+            alignItems: 'center',
+          }}
+        >
           <IconButton
             title="Refresh"
             onClick={() => dispatch(getTasks())}
             aria-label="refresh"
           >
-            <RefreshIcon />
+            <RefreshIcon style={{ marginRight: 16 }} />
           </IconButton>
           <LinkRouter color="inherit" to="/" underline="none">
             <Button
@@ -136,85 +158,109 @@ const NavBar = () => {
               Back
             </Button>
           </LinkRouter>
-        </>
+          <Button
+            variant="contained"
+            color="primary"
+            style={{ marginLeft: 32, height: 34 }}
+            disabled={
+              !enableApplyAll ||
+              selectedSubmission.state?.state_name === 'Delivered'
+            }
+            onClick={() => {
+              setApplyDialogShow(true);
+            }}
+          >
+            Apply All
+          </Button>
+        </Box>
       ),
     },
   };
 
   return (
-    <AppBar classes={{ root: classes.navbar }} position="static">
-      <Toolbar disableGutters variant="dense">
-        <FormControl classes={{ root: classes.formControl }} variant="filled">
-          <Select
-            variant="filled"
-            value={selectedProject}
-            classes={{ filled: classes.filledInput }}
-            inputProps={{
-              margin: 'none',
-            }}
-            onChange={(e) =>
-              dispatch(setProject(e.currentTarget.value as string))
-            }
-          >
-            {data.map(({ connector_key, connector_name }) => (
-              <MenuItem key={connector_key} value={connector_key}>
-                {connector_name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+    <>
+      <ConfirmationDialog
+        open={applyDialogShow}
+        title="Confirm Translation"
+        description={`This will apply all translation tasks for "${selectedSubmission?.submission_name}".`}
+        onResult={applyAll}
+      />
+      <AppBar classes={{ root: classes.navbar }} position="static">
+        <Toolbar disableGutters variant="dense">
+          <FormControl classes={{ root: classes.formControl }} variant="filled">
+            <Select
+              variant="filled"
+              value={selectedProject}
+              classes={{ filled: classes.filledInput }}
+              inputProps={{
+                margin: 'none',
+              }}
+              onChange={(e) =>
+                dispatch(setProject(e.currentTarget.value as string))
+              }
+            >
+              {data.map(({ connector_key, connector_name }) => (
+                <MenuItem key={connector_key} value={connector_key}>
+                  {connector_name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-        <div className={classes.navBarContainer}>
-          <Route>
-            {({ location }) => {
-              const pathnames = location.pathname.split('/').filter((x) => x);
-              let lastPath = '/';
-              return (
-                <>
-                  <Breadcrumbs aria-label="breadcrumb">
-                    <LinkRouter color="inherit" to="/" underline="none">
-                      {breadcrumbNameMap['/'].label}
-                    </LinkRouter>
-                    {pathnames.map((_value, index) => {
-                      const last = index === pathnames.length - 1;
-                      const to = `/${pathnames.slice(0, index + 1).join('/')}`;
-                      if (last && breadcrumbNameMap[to]) {
-                        lastPath = to;
-                      }
-                      return last && breadcrumbNameMap[to] ? (
-                        <Typography color="textPrimary" key={to}>
-                          {breadcrumbNameMap[to].label}
-                        </Typography>
-                      ) : breadcrumbNameMap[to] ? (
-                        <LinkRouter
-                          color="inherit"
-                          to={to}
-                          key={to}
-                          underline="none"
-                        >
-                          {breadcrumbNameMap[to].label}
-                        </LinkRouter>
-                      ) : null;
-                    })}
-                  </Breadcrumbs>
-                  {breadcrumbNameMap[lastPath].pagination ? (
-                    <TablePagination
-                      pagination={breadcrumbNameMap[lastPath].pagination}
-                      changePage={breadcrumbNameMap[lastPath].changePage}
-                    />
-                  ) : null}
-                  {breadcrumbNameMap[lastPath].buttons ? (
-                    <div className={classes.buttonsBlock}>
-                      {breadcrumbNameMap[lastPath].buttons}
-                    </div>
-                  ) : null}
-                </>
-              );
-            }}
-          </Route>
-        </div>
-      </Toolbar>
-    </AppBar>
+          <div className={classes.navBarContainer}>
+            <Route>
+              {({ location }) => {
+                const pathnames = location.pathname.split('/').filter((x) => x);
+                let lastPath = '/';
+                return (
+                  <>
+                    <Breadcrumbs aria-label="breadcrumb">
+                      <LinkRouter color="inherit" to="/" underline="none">
+                        {breadcrumbNameMap['/'].label}
+                      </LinkRouter>
+                      {pathnames.map((_value, index) => {
+                        const last = index === pathnames.length - 1;
+                        const to = `/${pathnames
+                          .slice(0, index + 1)
+                          .join('/')}`;
+                        if (last && breadcrumbNameMap[to]) {
+                          lastPath = to;
+                        }
+                        return last && breadcrumbNameMap[to] ? (
+                          <Typography color="textPrimary" key={to}>
+                            {breadcrumbNameMap[to].label}
+                          </Typography>
+                        ) : breadcrumbNameMap[to] ? (
+                          <LinkRouter
+                            color="inherit"
+                            to={to}
+                            key={to}
+                            underline="none"
+                          >
+                            {breadcrumbNameMap[to].label}
+                          </LinkRouter>
+                        ) : null;
+                      })}
+                    </Breadcrumbs>
+                    {breadcrumbNameMap[lastPath].pagination ? (
+                      <TablePagination
+                        pagination={breadcrumbNameMap[lastPath].pagination}
+                        changePage={breadcrumbNameMap[lastPath].changePage}
+                      />
+                    ) : null}
+                    {breadcrumbNameMap[lastPath].buttons ? (
+                      <div className={classes.buttonsBlock}>
+                        {breadcrumbNameMap[lastPath].buttons}
+                      </div>
+                    ) : null}
+                  </>
+                );
+              }}
+            </Route>
+          </div>
+        </Toolbar>
+      </AppBar>
+    </>
   );
 };
 

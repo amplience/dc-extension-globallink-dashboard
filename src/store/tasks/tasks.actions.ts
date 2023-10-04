@@ -272,6 +272,7 @@ export const applyAllTranslations =
       dispatch(setLoaderById(submission.submission_id || 0, false));
       dispatch(setContentLoader(false));
       dispatch(getSubmissions(page || 0));
+      dispatch(getTasks());
       dispatch(setDialogLoader(undefined));
     } catch (e: any) {
       setProgressError(loadProgress, e, dispatch);
