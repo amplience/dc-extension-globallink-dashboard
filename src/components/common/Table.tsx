@@ -208,6 +208,7 @@ const Table = ({
                     <TableCell padding="checkbox">
                       <IconButton
                         size="small"
+                        color="primary"
                         title="Remove"
                         onClick={() => handleClick(row.id)}
                       >
