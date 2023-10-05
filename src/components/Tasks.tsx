@@ -11,6 +11,8 @@ import {
   Divider,
   ListItemIcon,
   CircularProgress,
+  Button,
+  IconButton,
 } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import PopupState, {
@@ -28,6 +30,7 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import CodeIcon from '@material-ui/icons/Code';
+import CloseIcon from '@material-ui/icons/Close';
 import { RootState } from '../store/store';
 import Table from './common/Table';
 import Loader from './common/Loader';
@@ -310,14 +313,37 @@ const Tasks = () => {
         <Paper
           style={{
             width: '800px',
-            height: '500px',
+            height: '520px',
             padding: 20,
           }}
         >
-          <Box style={{ maxHeight: '500px', overflow: 'scroll' }}>
+          <Box style={{ display: 'flex', justifyContent: 'right' }}>
+            <IconButton size="small" onClick={() => setOpenModal(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+          <Typography variant="h5" style={{ marginBottom: 16 }}>
+            {contentModal?.name}
+          </Typography>
+          <Box
+            style={{
+              maxHeight: '400px',
+              overflow: 'scroll',
+              marginBottom: 16,
+            }}
+          >
             <Typography variant="body1" component="pre">
               {JSON.stringify(contentModal, null, 4)}
             </Typography>
+          </Box>
+          <Box style={{ display: 'flex', justifyContent: 'right' }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setOpenModal(false)}
+            >
+              Close
+            </Button>
           </Box>
         </Paper>
       </Modal>
