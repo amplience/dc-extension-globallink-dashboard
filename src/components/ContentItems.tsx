@@ -84,9 +84,10 @@ const ContentItems = ({
     <>
       {content ? <Loader className="content-loader" /> : null}
       <FilterBar
-        total={selectedContent.length}
         max={maxContentInSubmission}
         setOpenBasket={setOpenBasket}
+        selectedContent={selectedContent}
+        setSelectedContent={setSelectedContent}
         facets={facets}
         locale={locale}
         filter={filter}
@@ -114,7 +115,6 @@ const ContentItems = ({
           pageSize={PAGE_SIZE}
         />
       )}
-
       <Drawer
         variant="temporary"
         open={openBasket}

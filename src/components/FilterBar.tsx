@@ -221,7 +221,8 @@ export const FilterStatus = ({ label, onClear }: any) => (
 
 const FilterBar = ({
   setOpenBasket,
-  total,
+  selectedContent,
+  setSelectedContent,
   max,
   facets,
   locale,
@@ -466,6 +467,7 @@ const FilterBar = ({
               size="small"
               onClick={() => {
                 dispatch(getContentItems(locale, 1, filter));
+                setSelectedContent([]);
               }}
             >
               <Refresh />
@@ -481,10 +483,12 @@ const FilterBar = ({
               <ShoppingBasketIcon />
               <Typography
                 variant="caption"
-                color={total < max ? 'textPrimary' : 'textSecondary'}
+                color={
+                  selectedContent.length < max ? 'textPrimary' : 'textSecondary'
+                }
                 style={{ paddingLeft: 2, paddingRight: 2 }}
               >
-                {total}/{max}
+                {selectedContent.length}/{max}
               </Typography>
             </IconButton>
             <IconButton
