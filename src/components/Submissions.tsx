@@ -342,8 +342,10 @@ const Submissions = (props) => {
         currentPage={pagination.page}
         pageSize={10}
         rowClick={(row: any) => {
-          dispatch(setSelectedSubmission(row));
-          history.push('/tasks');
+          if (row.state.state_name !== 'Pre-process') {
+            dispatch(setSelectedSubmission(row));
+            history.push('/tasks');
+          }
         }}
       />
       <Modal
