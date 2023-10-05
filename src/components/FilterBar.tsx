@@ -16,6 +16,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import ShoppingBasketIcon from '@material-ui/icons/ShoppingBasket';
+import Refresh from '@material-ui/icons/Refresh';
 import PopupState, {
   bindTrigger,
   bindPopover,
@@ -459,6 +460,16 @@ const FilterBar = ({
             ) : null}
           </div>
           <Box>
+            <IconButton
+              className={classes.basketBtn}
+              aria-label="toggle"
+              size="small"
+              onClick={() => {
+                dispatch(getContentItems(locale, 1, filter));
+              }}
+            >
+              <Refresh />
+            </IconButton>
             <IconButton
               className={classes.basketBtn}
               aria-label="toggle"
