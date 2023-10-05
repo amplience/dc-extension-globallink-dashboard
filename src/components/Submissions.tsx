@@ -8,6 +8,8 @@ import {
   Typography,
   ListItemIcon,
   CircularProgress,
+  Modal,
+  Box,
 } from '@material-ui/core';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import CancelIcon from '@material-ui/icons/Cancel';
@@ -16,6 +18,7 @@ import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import CodeIcon from '@material-ui/icons/Code';
 import { useDispatch, useSelector } from 'react-redux';
 import PopupState, {
   bindTrigger,
@@ -68,6 +71,12 @@ const Submissions = (props) => {
 
   const [applyRow, setApplyRow] = useState<SubmissionInt | undefined>();
   const [applyDialogShow, setApplyDialogShow] = useState(false);
+  const [openModal, setOpenModal] = React.useState(false);
+  const [contentModal, setContentModal] = React.useState<SubmissionInt>();
+
+  const handleClose = () => {
+    setOpenModal(false);
+  };
 
   const columns = [
     {
@@ -171,6 +180,19 @@ const Submissions = (props) => {
                   <MoreHorizIcon fontSize="small" />
                 </Icon>
                 <Menu {...bindMenu(popupState)}>
+                  <MenuItem
+                    style={{ width: '280px' }}
+                    onClick={() => {
+                      setContentModal(row);
+                      setOpenModal(true);
+                      popupState.close();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <CodeIcon fontSize="small" />
+                    </ListItemIcon>
+                    <Typography>View Details</Typography>
+                  </MenuItem>
                   {row &&
                   row.state &&
                   row.state.state_name !== 'Pre-process' ? (
@@ -325,6 +347,29 @@ const Submissions = (props) => {
           history.push('/tasks');
         }}
       />
+      <Modal
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        open={openModal}
+        onClose={handleClose}
+      >
+        <Paper
+          style={{
+            width: '800px',
+            height: '500px',
+            padding: 20,
+          }}
+        >
+          <Box style={{ maxHeight: '500px', overflow: 'scroll' }}>
+            <Typography variant="body1" component="pre">
+              {JSON.stringify(contentModal, null, 4)}
+            </Typography>
+          </Box>
+        </Paper>
+      </Modal>
     </>
   );
 };

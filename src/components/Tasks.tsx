@@ -28,6 +28,7 @@ import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import CodeIcon from '@material-ui/icons/Code';
 import { RootState } from '../store/store';
 import Table from './common/Table';
 import Loader from './common/Loader';
@@ -172,7 +173,7 @@ const Tasks = () => {
                     }}
                   >
                     <ListItemIcon>
-                      <AssignmentIcon fontSize="small" />
+                      <CodeIcon fontSize="small" />
                     </ListItemIcon>
                     <Typography>View Details</Typography>
                   </MenuItem>
