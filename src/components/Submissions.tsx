@@ -198,6 +198,9 @@ const Submissions = (props) => {
                   </MenuItem>
                   {row &&
                   row.state &&
+                  row.language_jobs.filter(
+                    (job: any) => job.state.state_name !== 'Pre-process'
+                  ).length &&
                   row.state.state_name !== 'Pre-process' ? (
                     <MenuItem
                       style={{ width: '280px' }}
@@ -233,6 +236,7 @@ const Submissions = (props) => {
                   {row &&
                   row.state &&
                   row.state.state_name !== 'Delivered' &&
+                  row.state.state_name !== 'Pre-process' &&
                   row.state.state_name !== 'Cancelled' &&
                   row.state.state_name !== 'Completed' ? (
                     <>
@@ -342,7 +346,12 @@ const Submissions = (props) => {
         currentPage={pagination.page}
         pageSize={10}
         rowClick={(row: any) => {
-          if (row.state.state_name !== 'Pre-process') {
+          if (
+            row.state.state_name !== 'Pre-process' &&
+            row.language_jobs.filter(
+              (job: any) => job.state.state_name !== 'Pre-process'
+            ).length
+          ) {
             dispatch(setSelectedSubmission(row));
             history.push('/tasks');
           }
