@@ -197,11 +197,18 @@ const NavBar = () => {
 
 The following tasks will be processed:
 ${tasks
-  ?.map(
+  ?.filter((task) => task.status === 'Completed')
+  .map(
     (task) => `- "${task.name}" to ${task.target_locale.locale_display_name}`
   )
   .slice(0, 3)
-  .join('\n')}${tasks.length > 3 ? `\n- and ${tasks.length - 3} more...` : ''}`}
+  .join('\n')}${
+          tasks.filter((task) => task.status === 'Completed').length > 3
+            ? `\n- and ${
+                tasks.filter((task) => task.status === 'Completed').length - 3
+              } more...`
+            : ''
+        }`}
         onResult={applyAll}
       />
       <AppBar classes={{ root: classes.navbar }} position="static">
