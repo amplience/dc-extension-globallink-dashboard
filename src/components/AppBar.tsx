@@ -191,7 +191,15 @@ const NavBar = () => {
       <ConfirmationDialog
         open={applyDialogShow}
         title="Confirm Translation"
-        description={`This will apply all translation tasks for "${selectedSubmission?.submission_name}".`}
+        description={`This will apply all translation tasks for "${
+          selectedSubmission?.submission_name
+        }".
+
+The following tasks will be processed:
+${tasks
+  ?.map((task) => `- ${task.name} to ${task.target_locale.locale_display_name}`)
+  .slice(0, 3)
+  .join('\n')}${tasks.length > 3 ? `\n- and ${tasks.length - 3} more...` : ''}`}
         onResult={applyAll}
       />
       <AppBar classes={{ root: classes.navbar }} position="static">

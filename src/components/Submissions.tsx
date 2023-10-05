@@ -171,18 +171,22 @@ const Submissions = (props) => {
                   <MoreHorizIcon fontSize="small" />
                 </Icon>
                 <Menu {...bindMenu(popupState)}>
-                  <MenuItem
-                    style={{ width: '280px' }}
-                    onClick={() => {
-                      dispatch(setSelectedSubmission(row));
-                      popupState.close();
-                    }}
-                  >
-                    <ListItemIcon>
-                      <AssignmentIcon fontSize="small" />
-                    </ListItemIcon>
-                    <Typography>View Tasks</Typography>
-                  </MenuItem>
+                  {row &&
+                  row.state &&
+                  row.state.state_name !== 'Pre-process' ? (
+                    <MenuItem
+                      style={{ width: '280px' }}
+                      onClick={() => {
+                        dispatch(setSelectedSubmission(row));
+                        popupState.close();
+                      }}
+                    >
+                      <ListItemIcon>
+                        <AssignmentIcon fontSize="small" />
+                      </ListItemIcon>
+                      <Typography>View Tasks</Typography>
+                    </MenuItem>
+                  ) : null}
                   {row && row.state && row.state.state_name === 'Completed' ? (
                     <>
                       <Divider style={{ margin: 5 }} />
@@ -207,7 +211,11 @@ const Submissions = (props) => {
                   row.state.state_name !== 'Cancelled' &&
                   row.state.state_name !== 'Completed' ? (
                     <>
-                      <Divider style={{ margin: 5 }} />
+                      {row &&
+                      row.state &&
+                      row.state.state_name !== 'Pre-process' ? (
+                        <Divider style={{ margin: 5 }} />
+                      ) : null}
                       <MenuItem
                         style={{ width: '280px' }}
                         onClick={() => {
