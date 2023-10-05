@@ -283,7 +283,7 @@ const Tasks = () => {
       <ConfirmationDialog
         open={applyDialogShow}
         title="Confirm Translation"
-        description={`This will apply the task:\n\n"${applyRow?.name} ${applyRow?.target_locale?.locale_display_name}"`}
+        description={`This will apply translation task:\n- "${applyRow?.name}" to ${applyRow?.target_locale?.locale_display_name}`}
         onResult={applyTask}
       />
       {content ? <Loader className="content-loader" /> : null}
