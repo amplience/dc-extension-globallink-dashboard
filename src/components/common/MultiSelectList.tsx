@@ -9,6 +9,9 @@ import {
   Typography,
   Box,
 } from '@material-ui/core';
+import ReactCountryFlag from 'react-country-flag';
+
+const getCountryCode = (code: string) => code.split('-')[1] || '';
 
 interface ListInterface {
   locale_label: string;
@@ -95,6 +98,10 @@ const MultiSelectList = ({
               checked.indexOf(connector_locale) !== -1 ? 'selected-item' : ''
             }
           >
+            <ReactCountryFlag
+              countryCode={getCountryCode(connector_locale)}
+              style={{ marginRight: 4 }}
+            />
             <ListItemText
               id={labelId}
               primary={`${locale_label} (${connector_locale})`}

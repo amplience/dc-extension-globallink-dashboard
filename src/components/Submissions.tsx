@@ -30,6 +30,7 @@ import PopupState, {
 } from 'material-ui-popup-state';
 import { withRouter } from 'react-router';
 import ErrorOutline from '@material-ui/icons/ErrorOutline';
+import ReactCountryFlag from 'react-country-flag';
 import {
   LoadingsInterface,
   RootStateInt,
@@ -81,6 +82,8 @@ const Submissions = (props) => {
     setOpenModal(false);
   };
 
+  const getCountryCode = (code: string) => code.split('-')[1] || '';
+
   const columns = [
     {
       id: 'submission_name',
@@ -93,8 +96,18 @@ const Submissions = (props) => {
     {
       id: 'source_locale',
       label: 'Source language',
-      format: (sourceLocale: { locale_display_name: string; locale: string }) =>
-        `${sourceLocale.locale_display_name} (${sourceLocale.locale})`,
+      format: (sourceLocale: {
+        locale_display_name: string;
+        locale: string;
+      }) => (
+        <>
+          <ReactCountryFlag
+            countryCode={getCountryCode(sourceLocale.locale)}
+            style={{ marginRight: 4 }}
+          />
+          {sourceLocale.locale_display_name} ({sourceLocale.locale})
+        </>
+      ),
     },
     {
       id: 'language_jobs',
@@ -103,13 +116,28 @@ const Submissions = (props) => {
         languageJobs: {
           target_locale: { locale_display_name: string; locale: string };
         }[]
-      ) =>
-        languageJobs
-          .map(
-            (job) =>
-              `${job.target_locale.locale_display_name} (${job.target_locale.locale})`
-          )
-          .join(', '),
+      ) => (
+        <>
+          {languageJobs
+            .sort((a, b) => {
+              if (a.target_locale.locale > b.target_locale.locale) return -1;
+              return 1;
+            })
+            .map((job) => (
+              <ReactCountryFlag
+                key={job.target_locale.locale}
+                countryCode={getCountryCode(job.target_locale.locale)}
+                style={{ marginRight: 4 }}
+              />
+            ))}
+          {languageJobs
+            .map(
+              (job) =>
+                `${job.target_locale.locale_display_name} (${job.target_locale.locale})`
+            )
+            .join(', ')}
+        </>
+      ),
     },
     {
       id: 'due_date',
@@ -388,9 +416,9 @@ const Submissions = (props) => {
               marginBottom: 16,
             }}
           >
-            <Typography variant="body1" component="pre">
+            <pre style={{ fontSize: '0.8rem' }}>
               {JSON.stringify(contentModal, null, 4)}
-            </Typography>
+            </pre>
           </Box>
           <Box style={{ display: 'flex', justifyContent: 'right' }}>
             <Button
