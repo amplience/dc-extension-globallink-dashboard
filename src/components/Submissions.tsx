@@ -233,11 +233,7 @@ const Submissions = (props) => {
                   row.state.state_name !== 'Cancelled' &&
                   row.state.state_name !== 'Completed' ? (
                     <>
-                      {row &&
-                      row.state &&
-                      row.state.state_name !== 'Pre-process' ? (
-                        <Divider style={{ margin: 5 }} />
-                      ) : null}
+                      <Divider style={{ margin: 5 }} />
                       <MenuItem
                         style={{ width: '280px' }}
                         onClick={() => {

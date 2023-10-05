@@ -22,7 +22,6 @@ import ErrorOutline from '@material-ui/icons/ErrorOutline';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import CancelIcon from '@material-ui/icons/Cancel';
 import InputIcon from '@material-ui/icons/Input';
-import AssignmentIcon from '@material-ui/icons/Assignment';
 import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
