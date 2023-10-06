@@ -24,6 +24,7 @@ Alternatively, return to [README.md](../README.md) for more information on the e
     - [Completed translations](#completed-translations)
   - [Expected behaviour](#expected-behaviour)
   - [Updating source content and retranslating](#updating-source-content-and-retranslating)
+  - [Delivery Keys](#delivery-keys)
 
 <!-- /MarkdownTOC -->
 
