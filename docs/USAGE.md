@@ -217,7 +217,7 @@ The status of the submission will be updated automatically in the submissions li
 
 Once a translation has been applied via a task or submission, the GlobalLink extension will automatically tag the source content item with the **[translated](#configurable-values)** workflow state.
 
-As with in-progress translations, this does not prevent you from making further modifications to the content item, but if you wish to submit these modifications for translation these will again need to be prepared and sent for translation, starting with the “[Preparing your content](#Preparing your content)” step.
+As with in-progress translations, this does not prevent you from making further modifications to the content item, but if you wish to submit these modifications for translation these will again need to be prepared and sent for translation, starting with the “[Preparing your content](#preparing-your-content)” step.
 
 ![](./images/content-completed.png)
 
