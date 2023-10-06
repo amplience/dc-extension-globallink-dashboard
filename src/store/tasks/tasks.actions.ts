@@ -760,32 +760,46 @@ export const getTasks =
 
       dispatch(setTableLoader(true));
 
-      const {
-        current_page_number,
-        total_result_pages_count,
-        tasks_list = [],
-      } = await Api.getTasks({
-        selectedProject: projects.selectedProject,
-        selectedSubmission: submissions?.selectedSubmission?.submission_id || 0,
-        pageNumber: pageNumber || page || 1,
-      });
+      const selectedSubmission =
+        submissions?.selectedSubmission?.submission_id || 0;
 
-      dispatch(
-        setTasks(
-          tasks_list.map((el: any) => {
-            el.due_date = submissions.selectedSubmission.due_date;
-            el.source_locale = submissions.selectedSubmission.source_locale;
-            el.state = submissions.selectedSubmission.state;
-            return el;
+      if (selectedSubmission === 0) {
+        dispatch(setTasks([]));
+        dispatch(
+          setPagination({
+            page: 0,
+            totalCount: 0,
           })
-        )
-      );
-      dispatch(
-        setPagination({
-          page: current_page_number,
-          totalCount: total_result_pages_count,
-        })
-      );
+        );
+      } else {
+        const {
+          current_page_number,
+          total_result_pages_count,
+          tasks_list = [],
+        } = await Api.getTasks({
+          selectedProject: projects.selectedProject,
+          selectedSubmission,
+          pageNumber: pageNumber || page || 1,
+        });
+
+        dispatch(
+          setTasks(
+            tasks_list.map((el: any) => {
+              el.due_date = submissions.selectedSubmission.due_date;
+              el.source_locale = submissions.selectedSubmission.source_locale;
+              el.state = submissions.selectedSubmission.state;
+              return el;
+            })
+          )
+        );
+        dispatch(
+          setPagination({
+            page: current_page_number,
+            totalCount: total_result_pages_count,
+          })
+        );
+      }
+
       dispatch(setTableLoader(false));
     } catch (e: any) {
       dispatch(setError(e.toString()));
