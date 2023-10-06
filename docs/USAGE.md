@@ -20,7 +20,7 @@ Alternatively, return to [README.md](../README.md) for more information on the e
     - [Filtering submissions](#filtering-submissions)
   - [Applying a translation](#applying-a-translation)
     - [Applying translation from Tasks view](#applying-translation-from-tasks-view)
-    - [Applying translation from Submissions view](#applying-translation-from-submissions-view)
+    - [Applying translations from Submissions view](#applying-translations-from-submissions-view)
     - [Completed translations](#completed-translations)
   - [Expected behaviour](#expected-behaviour)
   - [Updating source content and retranslating](#updating-source-content-and-retranslating)
