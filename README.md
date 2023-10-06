@@ -4,6 +4,12 @@ The GlobalLink Connect dashboard extension allows content producers in Amplience
 
 ![](./docs/images/review-submissions.png)
 
+# Table of Contents
+- [Features](#features)
+- [Hosting the extension](docs/HOSTING.md)
+- [Installing & Configuring the extension](docs/CONFIGURATION.md)
+- [Using the extension](docs/USAGE.md)
+
 ## Features
 
 The GlobalLink Connect dashboard extension for Dynamic Content adds the following functionality to your Dynamic Content hub.

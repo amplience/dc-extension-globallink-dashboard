@@ -14,6 +14,7 @@ import {
   Button,
   IconButton,
 } from '@material-ui/core';
+import ReactCountryFlag from 'react-country-flag';
 import { useDispatch, useSelector } from 'react-redux';
 import PopupState, {
   bindTrigger,
@@ -47,6 +48,8 @@ import {
 } from '../types/types';
 import LoadingModal from './LoadingModal';
 import ConfirmationDialog from './ConfirmationDialog';
+
+const getCountryCode = (code: string) => code.split('-')[1] || '';
 
 export const useStyles = makeStyles(() => ({
   status: {
@@ -99,15 +102,35 @@ const Tasks = () => {
     },
     {
       id: 'source_locale',
-      label: 'Source Language',
-      format: (sourceLocale: { locale_display_name: string; locale: string }) =>
-        `${sourceLocale.locale_display_name} (${sourceLocale.locale})`,
+      label: 'Source language',
+      format: (sourceLocale: {
+        locale_display_name: string;
+        locale: string;
+      }) => (
+        <>
+          <ReactCountryFlag
+            countryCode={getCountryCode(sourceLocale.locale)}
+            style={{ marginRight: 4 }}
+          />
+          {sourceLocale.locale_display_name} ({sourceLocale.locale})
+        </>
+      ),
     },
     {
       id: 'target_locale',
-      label: 'Target Language',
-      format: (targetLocale: { locale_display_name: string; locale: string }) =>
-        `${targetLocale.locale_display_name} (${targetLocale.locale})`,
+      label: 'Target language',
+      format: (targetLocale: {
+        locale_display_name: string;
+        locale: string;
+      }) => (
+        <>
+          <ReactCountryFlag
+            countryCode={getCountryCode(targetLocale.locale)}
+            style={{ marginRight: 4 }}
+          />
+          {targetLocale.locale_display_name} ({targetLocale.locale})
+        </>
+      ),
     },
     {
       id: 'due_date',
@@ -332,9 +355,9 @@ const Tasks = () => {
               marginBottom: 16,
             }}
           >
-            <Typography variant="body1" component="pre">
+            <pre style={{ fontSize: '0.8rem' }}>
               {JSON.stringify(contentModal, null, 4)}
-            </Typography>
+            </pre>
           </Box>
           <Box style={{ display: 'flex', justifyContent: 'right' }}>
             <Button

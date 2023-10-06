@@ -15,6 +15,7 @@ import {
 import { DatePicker } from '@material-ui/pickers';
 import { useDispatch, useSelector } from 'react-redux';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import ReactCountryFlag from 'react-country-flag';
 import { RootState } from '../store/store';
 import {
   LoadingsInterface,
@@ -67,6 +68,8 @@ const useStyles = makeStyles(() => ({
   },
   select: {},
 }));
+
+const getCountryCode = (code: string) => code.split('-')[1] || '';
 
 const SubmissionCreateForm = () => {
   const dispatch = useDispatch();
@@ -332,10 +335,13 @@ const SubmissionCreateForm = () => {
             >
               <MenuItem value="">None</MenuItem>
               {sourceLocales.map(({ locale_label, connector_locale }: any) => (
-                <MenuItem
-                  value={connector_locale}
-                  key={connector_locale}
-                >{`${locale_label} (${connector_locale})`}</MenuItem>
+                <MenuItem value={connector_locale} key={connector_locale}>
+                  <ReactCountryFlag
+                    countryCode={getCountryCode(connector_locale)}
+                    style={{ marginRight: 4 }}
+                  />
+                  {`${locale_label} (${connector_locale})`}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
