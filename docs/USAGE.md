@@ -48,7 +48,7 @@ When you create your content, there are a couple of things you will need to do t
 2. (Optionally) assign the content item to a person.
    - This is not mandatory for translation but may help with finding the content item when you create a submission, as content items can be filtered by assignee.
 3. Flag your content item as ready for translation with a workflow state.
-   - To ensure that content is not sent for translation prematurely, the GlobalLink dashboard uses workflow states to determine what can and cannot be sent for translation. To flag your content item for translation, set the workflow state to **[ready](#configurable-values)**
+   - To ensure that content is not sent for translation prematurely, the GlobalLink dashboard uses workflow states to determine what can and cannot be sent for translation. To flag your content item for translation, set the workflow state to **[ready](#configurable-values)**.
 
 Each of these settings can either be applied via the “Save content” menu when you first save a content item, or can be applied by right-clicking your content item from the content library afterwards (“Assign Locale”, “Assign to”, and “Set status” respectively).
 
@@ -228,7 +228,7 @@ With the translation complete, you should now also be able to find localized and
 ### Expected behaviour
 
 #### Content Setup - Item Level Localization
-This translation extension works by creating localized copies from the source content. In order for this extension to work, you must have implemented `content-item` level localization on your account. For more information about the different localization setup available in Amplience please visit our [Localization developer guide](https://amplience.com/developers/docs/dev-tools/guides-tutorials/localization/)
+This translation extension works by creating localized copies from the source content. In order for this extension to work, you must have implemented `content-item` level localization on your account. For more information about the different localization setup available in Amplience please visit our [Localization developer guide](https://amplience.com/developers/docs/dev-tools/guides-tutorials/localization/).
 
 #### Translation flow
 In order to ensure consistency, this extension follows the same process both when translating a piece of content for the first time and retranslating an item. It will overwrite the translated items based on the source and apply they translatable fields:
@@ -256,18 +256,18 @@ The first time a content item is translated, localized versions of the content i
 ### Delivery Keys
 Delivery keys must be 'websafe' characters and also unique to an Amplience Dynamic Content hub. When localizing content with this extension will attempt the following:
 
-* If there IS NO delivery key in the source item, then will be no delivery keys in the translated items
-* If there IS a delivery key in the source item, then the delivery key for the translated item will be attempted with the source delivery key with a suffix of the target locale `mydeliverykey_fr-FR`
+* If there IS NO delivery key in the source item, then will be no delivery keys in the translated items.
+* If there IS a delivery key in the source item, then the delivery key for the translated item will be attempted with the source delivery key with a suffix of the target locale `mydeliverykey_fr-FR`.
 
 #### Delivery Key Patterns / Validation
 If your delivery key has a pattern / validation regular expression, there is a chance that the translated content will not be created. If there is a delivery key present in the source item, the extension will attempt to create the translated content item with the locale appended to the end if the delivery key (see above).
 
 If your validation in your schemas for your content types does not allow for this then you have the following options:
-1) Alter the delivery key validation in your schema
-2) Create and host a custom version of this extension see `src/store/tasks/tasks.actions.ts` and `generateLocaleDeliveryKey`
+1) Alter the delivery key validation in your schema.
+2) Create and host a custom version of this extension see `src/store/tasks/tasks.actions.ts` and `generateLocaleDeliveryKey`.
 
 #### Mandatory Delivery Keys with localization
 Mandatory delivery keys are not supported with this extension.
 If you would like to use this extension with delivery keys it is recommended to not have the delivery key as mandatory in your schema.
 
-More information about [Amplience Delivery Keys](https://amplience.com/developers/docs/concepts/content-delivery/#delivery-key)
+More information about [Amplience Delivery Keys](https://amplience.com/developers/docs/concepts/content-delivery/#delivery-key).
