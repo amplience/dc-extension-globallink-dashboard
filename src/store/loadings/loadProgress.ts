@@ -5,6 +5,12 @@ export enum SubmissionStage {}
 
 export enum ImportStage {}
 
+export interface LoadList {
+  title?: string;
+  startTime: number;
+  progress: (LoadProgress | null)[];
+}
+
 export interface LoadProgress {
   title: string;
   startTime: number;
@@ -22,6 +28,13 @@ export interface LoadProgress {
 
   error?: string;
   errorTime?: number;
+}
+
+export interface ProgressContext {
+  array: LoadList;
+  index: number;
+  elem: LoadProgress;
+  dispatch: AppDispatch;
 }
 
 export function createProgress(
@@ -45,77 +58,166 @@ export function createProgress(
   };
 }
 
-export function setProgressTitle(
-  progress: LoadProgress,
+export function createProgressList(
+  total: number,
+  maxParallelism: number,
+  title = undefined as string | undefined,
+  startTime = 0
+): LoadList {
+  const length = Math.min(total, maxParallelism);
+  const progress = Array.from({ length }).map(() => null);
+
+  return {
+    progress,
+    startTime: startTime === 0 ? Date.now() : startTime,
+    title,
+  };
+}
+
+export function parallelProcess<T>(
+  data: T[],
+  maxParallelism: number,
+  action: (data: T, index: number) => Promise<any>
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const parallelism = Math.min(data.length, maxParallelism);
+    const remainingData = [...data];
+
+    let i = 0;
+    let ended = false;
+    let errored = false;
+    const toComplete = new Set<number>(data.map((_, index) => index));
+
+    const onError = (e: any, index: number) => {
+      // Stop other tasks from being dispatched.
+      toComplete.delete(index);
+      if (!errored) {
+        errored = true;
+        reject(e);
+      }
+    };
+
+    const nextTask = (index: number = -1) => {
+      toComplete.delete(index);
+      if (!errored) {
+        if (remainingData.length > 0) {
+          const elem = remainingData[0];
+          remainingData.splice(0, 1);
+          const newIndex = i++;
+
+          const task = action(elem, newIndex);
+
+          task.then(() => nextTask(newIndex));
+          task.catch((e) => onError(e, newIndex));
+        } else if (!ended && toComplete.size === 0) {
+          ended = true;
+          resolve();
+        }
+      }
+    };
+
+    if (parallelism === 0) {
+      resolve();
+    }
+
+    // Dispatch the initial set of tasks.
+    for (let i = 0; i < parallelism; i++) {
+      nextTask();
+    }
+  });
+}
+
+export function createProgressContext(
+  progressList: LoadList,
   title: string,
   stageTotal: number,
-  dispatch: AppDispatch
-) {
-  progress.title = title;
-  progress.stageTotal = stageTotal;
+  dispatch
+): ProgressContext {
+  // Identify a null slot to put the context into.
+  for (let i = 0; i < progressList.progress.length; i++) {
+    if (progressList.progress[i] == null) {
+      const progress = createProgress(title, stageTotal);
+      progressList.progress[i] = progress;
 
-  dispatch(setDialogLoader({ ...progress }));
+      dispatch(setDialogLoader({ ...progressList }));
+
+      return {
+        array: progressList,
+        index: i,
+        elem: progress,
+        dispatch,
+      };
+    }
+  }
+
+  throw new Error('Progress context overflow');
+}
+
+export function freeProgressContext(context: ProgressContext) {
+  context.array.progress[context.index] = null;
+
+  context.dispatch(setDialogLoader({ ...context.array }));
+}
+
+export function setProgressTitle(
+  progress: ProgressContext,
+  title: string,
+  stageTotal: number
+) {
+  progress.elem.title = title;
+  progress.elem.stageTotal = stageTotal;
+
+  progress.dispatch(setDialogLoader({ ...progress.array }));
 }
 
 export function setProgressStage(
-  progress: LoadProgress,
+  progress: ProgressContext,
   stageNumber: number,
   stageName: string,
-  totalProgress: number,
-  dispatch: AppDispatch
+  totalProgress: number
 ) {
-  progress.stageNumber = stageNumber;
-  progress.stageName = stageName;
-  progress.totalProgress = totalProgress;
+  progress.elem.stageNumber = stageNumber;
+  progress.elem.stageName = stageName;
+  progress.elem.totalProgress = totalProgress;
 
-  dispatch(setDialogLoader({ ...progress }));
+  progress.dispatch(setDialogLoader({ ...progress.array }));
 }
 
 export function setProgress(
-  progress: LoadProgress,
+  progress: ProgressContext,
   num: number,
-  text: string,
-  dispatch: AppDispatch
+  text: string
 ) {
-  progress.currentProgress = {
+  progress.elem.currentProgress = {
     num,
     text,
   };
 
-  dispatch(setDialogLoader({ ...progress }));
+  progress.dispatch(setDialogLoader({ ...progress.array }));
 }
 
-export function setProgressText(
-  progress: LoadProgress,
-  text: string,
-  dispatch: AppDispatch
-) {
-  progress.currentProgress.text = text;
+export function setProgressText(progress: ProgressContext, text: string) {
+  progress.elem.currentProgress.text = text;
 
-  dispatch(setDialogLoader({ ...progress }));
+  progress.dispatch(setDialogLoader({ ...progress.array }));
 }
 
-export function setProgressError(
-  progress: LoadProgress,
-  error: any,
-  dispatch: AppDispatch
-) {
-  progress.error = error.toString();
-  progress.errorTime = Date.now();
+export function setProgressError(progress: ProgressContext, error: any) {
+  progress.elem.error = error.toString();
+  progress.elem.errorTime = Date.now();
 
   if (error.response && error.response.data) {
     const { data } = error.response;
     if (data.message) {
-      progress.error = `Status ${data.status ?? error.response.status}: ${
+      progress.elem.error = `Status ${data.status ?? error.response.status}: ${
         data.message
       }`;
     } else if (data.errors && data.errors.length) {
       const error = data.errors[0];
-      progress.error = `${error.code} (${error.entity}): ${error.message} ${
-        error.invalidValue ? `(${error.invalidValue})` : ''
-      }`;
+      progress.elem.error = `${error.code} (${error.entity}): ${error.message}
+      ${error.invalidValue ? `(${error.invalidValue})` : ''}`;
     }
   }
 
-  return dispatch(setDialogLoader({ ...progress }));
+  return progress.dispatch(setDialogLoader({ ...progress.array }));
 }

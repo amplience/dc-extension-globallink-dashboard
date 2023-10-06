@@ -27,7 +27,10 @@ import {
   FilterObject,
 } from '../../types/types';
 import {
-  createProgress,
+  createProgressContext,
+  createProgressList,
+  freeProgressContext,
+  parallelProcess,
   setProgress,
   setProgressError,
   setProgressStage,
@@ -187,7 +190,14 @@ export const createSubmission =
     config: { [key: string]: any };
   }) =>
   async (dispatch: AppDispatch, getState: () => RootState) => {
-    const loadProgress = createProgress('Creating Submission...', 3);
+    const progress = createProgressList(1, 1);
+    const loadContext = createProgressContext(
+      progress,
+      'Creating Submission...',
+      3,
+      dispatch
+    );
+    let threadedPart = false;
 
     try {
       const {
@@ -204,116 +214,148 @@ export const createSubmission =
       );
 
       setProgressStage(
-        loadProgress,
+        loadContext,
         0,
         'Scanning content...',
-        contentItems.length,
-        dispatch
+        contentItems.length
       );
 
       const idMappingTable: { [key: string]: any } = {};
       const tasks: string[] = [];
 
-      for (let i = contentItems.length - 1; i >= 0; i--) {
-        const contentItemId = contentItems[i];
+      // Becomes multithreaded here.
+      const threadedProgress = createProgressList(
+        contentItems.length,
+        3,
+        'Creating Submission...',
+        progress.startTime
+      );
+      threadedPart = true;
+
+      await parallelProcess(contentItems, 3, async (contentItemId, index) => {
         idMappingTable[contentItemId] = {
           nested: {},
         };
 
-        setProgress(
-          loadProgress,
-          contentItems.length - 1 - i,
-          `Scanning: ${contentItemId}`,
+        const loadContext = createProgressContext(
+          threadedProgress,
+          `Submitting ${contentItemId} (${index + 1}/${contentItems.length})`,
+          1,
           dispatch
         );
 
-        await ContentGraph.deepCopy(
-          [contentItemId],
-          dcManagement.contentItems.get,
-          async (contentItem) => {
-            const contentType =
-              contentItem &&
-              project &&
-              project.contentTypes.find(
-                ({ uri }: { uri: string }) =>
-                  uri === contentItem.body._meta.schema
+        setProgressStage(loadContext, 0, `Processing: ${contentItemId}`, 2);
+        setProgress(loadContext, 0, `Scanning...`);
+
+        try {
+          await ContentGraph.deepCopy(
+            [contentItemId],
+            dcManagement.contentItems.get,
+            async (contentItem) => {
+              setProgress(
+                loadContext,
+                0,
+                `Scanning: ${contentItem?.id ?? contentItemId}`
               );
 
-            if (contentItemId === contentItem.id) {
-              const ct =
-                hubContentTypes &&
-                hubContentTypes.find(
-                  ({ contentTypeUri }: ContentType) =>
-                    contentType &&
-                    contentTypeUri &&
-                    contentType.uri &&
-                    contentTypeUri.toLowerCase() ===
-                      contentType.uri.toLowerCase()
+              const contentType =
+                contentItem &&
+                project &&
+                project.contentTypes.find(
+                  ({ uri }: { uri: string }) =>
+                    uri === contentItem.body._meta.schema
                 );
-              const defaultVizObject =
-                ct && ct.settings && ct.settings.visualizations
-                  ? ct.settings.visualizations.find((viz) => viz.default)
-                  : { templatedUri: '' };
-
-              const defaultViz =
-                defaultVizObject && defaultVizObject.templatedUri
-                  ? defaultVizObject.templatedUri
-                      .replace(/{{vse.domain}}/g, params.vse)
-                      .replace(/{{content.sys.id}}/g, contentItem.id)
-                  : '';
-              idMappingTable[contentItemId].label = contentItem.label;
-              idMappingTable[contentItemId].contextUrl = defaultViz || '';
-            }
-
-            if (contentType && contentType.translatableFields) {
-              const fileJson = contentType.translatableFields.reduce(
-                (acc: any, field: string) => {
-                  const nodes = jsonpath.nodes(contentItem.body, `$.${field}`);
-
-                  nodes.forEach(({ path, value }) => {
-                    if (value && !ContentLink.isContentLink(value)) {
-                      acc.push({
-                        key: path.join('.').replace('$.', ''),
-                        value,
-                      });
-                    }
-                  });
-
-                  return acc;
-                },
-                []
-              );
 
               if (contentItemId === contentItem.id) {
-                idMappingTable[contentItemId].translations = fileJson;
-              } else if (sourceLocale === contentItem.locale) {
-                idMappingTable[contentItemId].nested[contentItem.id] = fileJson;
+                const ct =
+                  hubContentTypes &&
+                  hubContentTypes.find(
+                    ({ contentTypeUri }: ContentType) =>
+                      contentType &&
+                      contentTypeUri &&
+                      contentType.uri &&
+                      contentTypeUri.toLowerCase() ===
+                        contentType.uri.toLowerCase()
+                  );
+                const defaultVizObject =
+                  ct && ct.settings && ct.settings.visualizations
+                    ? ct.settings.visualizations.find((viz) => viz.default)
+                    : { templatedUri: '' };
+
+                const defaultViz =
+                  defaultVizObject && defaultVizObject.templatedUri
+                    ? defaultVizObject.templatedUri
+                        .replace(/{{vse.domain}}/g, params.vse)
+                        .replace(/{{content.sys.id}}/g, contentItem.id)
+                    : '';
+                idMappingTable[contentItemId].label = contentItem.label;
+                idMappingTable[contentItemId].contextUrl = defaultViz || '';
               }
+
+              if (contentType && contentType.translatableFields) {
+                const fileJson = contentType.translatableFields.reduce(
+                  (acc: any, field: string) => {
+                    const nodes = jsonpath.nodes(
+                      contentItem.body,
+                      `$.${field}`
+                    );
+
+                    nodes.forEach(({ path, value }) => {
+                      if (value && !ContentLink.isContentLink(value)) {
+                        acc.push({
+                          key: path.join('.').replace('$.', ''),
+                          value,
+                        });
+                      }
+                    });
+
+                    return acc;
+                  },
+                  []
+                );
+
+                if (contentItemId === contentItem.id) {
+                  idMappingTable[contentItemId].translations = fileJson;
+                } else if (sourceLocale === contentItem.locale) {
+                  idMappingTable[contentItemId].nested[contentItem.id] =
+                    fileJson;
+                }
+              }
+
+              return contentItem;
             }
+          );
 
-            return contentItem;
-          }
-        );
+          setProgress(loadContext, 1, `Uploading for translation...`);
 
-        const objJsonStr = JSON.stringify(idMappingTable[contentItemId]);
+          const objJsonStr = JSON.stringify(idMappingTable[contentItemId]);
 
-        const { content_id } = await Api.createNodeFile({
-          file: new Blob([objJsonStr], {
-            type: 'application/json',
-          }),
-          unique_identifier: contentItemId,
-          public_preview_url: idMappingTable[contentItemId].contextUrl,
-          name: idMappingTable[contentItemId].label,
-          submitter,
-          source_locale: sourceLocale,
-          file_type: params.fileType || 'json',
-          connector_key: selectedProject || '',
-        });
+          const { content_id } = await Api.createNodeFile({
+            file: new Blob([objJsonStr], {
+              type: 'application/json',
+            }),
+            unique_identifier: contentItemId,
+            public_preview_url: idMappingTable[contentItemId].contextUrl,
+            name: idMappingTable[contentItemId].label,
+            submitter,
+            source_locale: sourceLocale,
+            file_type: params.fileType || 'json',
+            connector_key: selectedProject || '',
+          });
 
-        tasks.push(content_id);
-      }
+          tasks.push(content_id);
+        } catch (e) {
+          setProgressError(loadContext, e);
 
-      setProgressStage(loadProgress, 1, 'Creating submission...', 1, dispatch);
+          throw e;
+        }
+
+        freeProgressContext(loadContext);
+      });
+
+      threadedPart = false;
+
+      setProgressStage(loadContext, 1, 'Creating submission...', 1);
 
       const submissionData: SubmissionInt = {
         submission_name: name,
@@ -346,16 +388,15 @@ export const createSubmission =
       await Api.createSubmission(submissionData);
 
       setProgressStage(
-        loadProgress,
+        loadContext,
         2,
         'Assigning workflow states...',
-        contentItems.length,
-        dispatch
+        contentItems.length
       );
 
       let completeCount = 0;
 
-      setProgress(loadProgress, 0, 'Assigning states...', dispatch);
+      setProgress(loadContext, 0, 'Assigning states...');
 
       await Promise.all(
         contentItems.map(async (id: string) => {
@@ -369,12 +410,7 @@ export const createSubmission =
             );
           }
 
-          setProgress(
-            loadProgress,
-            ++completeCount,
-            'Assigning states...',
-            dispatch
-          );
+          setProgress(loadContext, ++completeCount, 'Assigning states...');
 
           return contentItem;
         })
@@ -385,8 +421,10 @@ export const createSubmission =
       history.push('/');
       return dispatch(setDialogLoader(undefined));
     } catch (e: any) {
-      dispatch(setError(e.toString()));
+      if (!threadedPart) {
+        setProgressError(loadContext, e);
+      }
 
-      return setProgressError(loadProgress, e, dispatch);
+      return dispatch(setError(e.toString()));
     }
   };

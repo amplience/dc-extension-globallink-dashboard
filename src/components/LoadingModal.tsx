@@ -6,10 +6,11 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
+  Divider,
 } from '@material-ui/core';
 import { useEffect, useReducer, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { LoadProgress } from '../store/loadings/loadProgress';
+import { LoadList, LoadProgress } from '../store/loadings/loadProgress';
 import { setDialogLoader } from '../store/loadings/loadings.actions';
 
 const timeSpanString = (span: number): string => {
@@ -48,12 +49,15 @@ const defaultLoadProgress = {
 const LoadingModal = ({
   loadProgress,
 }: {
-  loadProgress: LoadProgress | undefined;
+  loadProgress: LoadList | undefined;
 }) => {
   const dispatch = useDispatch();
   const visible = loadProgress != null;
   const [drawNum, redraw] = useReducer((x) => x + 1, 0);
-  const [lastError, setLastError] = useState(defaultLoadProgress);
+  const [lastError, setLastError] = useState<LoadList | undefined>({
+    progress: [],
+    startTime: 0,
+  });
 
   useEffect(() => {
     let active = true;
@@ -76,45 +80,74 @@ const LoadingModal = ({
     dispatch(setDialogLoader(undefined));
   };
 
-  const progress = loadProgress ?? lastError;
+  const progressList = (loadProgress ?? lastError) as LoadList;
+  const hasListTitle = progressList.title != null;
 
-  const progressFrac = progress.currentProgress.num / progress.totalProgress;
-  const totalProgressPct =
-    ((progress.stageNumber + progressFrac) / progress.stageTotal) * 100;
+  const hasError = progressList.progress.findIndex((x) => x && x.error) !== -1;
+  const now = hasError
+    ? progressList.progress.map((x) => x?.errorTime ?? Infinity).sort()[0]
+    : Date.now();
 
-  const now = progress.error ? progress.errorTime ?? 0 : Date.now();
-  const sinceStart = timeSpanString(now - progress.startTime);
-  // const sinceStageStart = timeSpanString(now - progress.stageStartTime);
+  const sinceStart = timeSpanString(now - progressList.startTime);
 
   return (
     <Dialog open={visible}>
-      <DialogTitle id="alert-dialog-title">
-        {progress.title} ({sinceStart})
-      </DialogTitle>
-      <DialogContent style={{ minWidth: '400px' }}>
-        <DialogContentText id="alert-dialog-description">
-          {progress.stageName} ({progress.stageNumber + 1} /{' '}
-          {progress.stageTotal})
-        </DialogContentText>
-        <LinearProgress
-          variant="determinate"
-          value={totalProgressPct}
-          style={{ marginBottom: '12px' }}
-          color={progress.error ? 'secondary' : 'primary'}
-        />
-        <DialogContentText id="alert-dialog-progress">
-          {progress.currentProgress.text}
-        </DialogContentText>
-        {progress.error && (
-          <DialogContentText
-            id="alert-dialog-error"
-            style={{ color: 'darkred', fontStyle: 'italic' }}
-          >
-            {progress.error}
-          </DialogContentText>
-        )}
-      </DialogContent>
-      {progress.error && (
+      {hasListTitle && (
+        <DialogTitle id="alert-dialog-title">
+          {progressList.title} ({sinceStart})
+          <Divider />
+        </DialogTitle>
+      )}
+
+      {progressList.progress.map((progress) => {
+        const pL = progress ?? defaultLoadProgress;
+
+        const progressFrac = pL.currentProgress.num / pL.totalProgress;
+        const totalProgressPct =
+          ((pL.stageNumber + progressFrac) / pL.stageTotal) * 100;
+
+        const now = pL.error ? pL.errorTime ?? 0 : Date.now();
+        const sinceStart = timeSpanString(now - pL.startTime);
+
+        return (
+          <>
+            {progress ? (
+              <>
+                <DialogTitle id="alert-dialog-title">
+                  {progress.title} {hasListTitle ? '' : `(${sinceStart})`}
+                </DialogTitle>
+                <DialogContent style={{ minWidth: '400px' }}>
+                  <DialogContentText id="alert-dialog-description">
+                    {progress.stageName} ({progress.stageNumber + 1} /{' '}
+                    {progress.stageTotal})
+                  </DialogContentText>
+                  <LinearProgress
+                    variant="determinate"
+                    value={totalProgressPct}
+                    style={{ marginBottom: '12px' }}
+                    color={progress.error ? 'secondary' : 'primary'}
+                  />
+                  <DialogContentText id="alert-dialog-progress">
+                    {progress.currentProgress.text}
+                  </DialogContentText>
+                  {progress.error && (
+                    <DialogContentText
+                      id="alert-dialog-error"
+                      style={{ color: 'darkred', fontStyle: 'italic' }}
+                    >
+                      {progress.error}
+                    </DialogContentText>
+                  )}
+                </DialogContent>
+              </>
+            ) : (
+              <></>
+            )}
+          </>
+        );
+      })}
+
+      {hasError && (
         <DialogActions>
           <Button autoFocus onClick={closeError}>
             Close

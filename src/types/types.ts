@@ -1,6 +1,6 @@
 import { DashboardExtension } from 'dc-extensions-sdk';
 import { ContentItem, ContentType, DynamicContent } from 'dc-management-sdk-js';
-import { LoadProgress } from '../store/loadings/loadProgress';
+import { LoadList } from '../store/loadings/loadProgress';
 
 export interface Option {
   label: string;
@@ -173,7 +173,7 @@ export interface SDKInterface {
 export interface LoadingsInterface {
   content: boolean;
   table: boolean;
-  dialog: LoadProgress | undefined;
+  dialog: LoadList | undefined;
   loadingIds: { [key: string]: boolean };
 }
 

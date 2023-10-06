@@ -6,7 +6,7 @@ import {
   SET_LOADING_BY_ID,
 } from './loadings.actions';
 import { LoadingsInterface } from '../../types/types';
-import { LoadProgress } from './loadProgress';
+import { LoadList } from './loadProgress';
 
 const defaultState = {
   content: false,
@@ -33,7 +33,7 @@ export function loadingsReducer(
     case SET_DIALOG:
       return {
         ...state,
-        dialog: action.value as LoadProgress,
+        dialog: action.value as LoadList | undefined,
       };
     case SET_LOADING_BY_ID:
       return {

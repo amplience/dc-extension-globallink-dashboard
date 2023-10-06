@@ -27,12 +27,14 @@ import {
   ContentDependencyTree,
 } from '../../utils/ContentDependencyTree';
 import {
-  createProgress,
+  createProgressContext,
+  createProgressList,
+  freeProgressContext,
+  parallelProcess,
   setProgress,
   setProgressError,
   setProgressStage,
   setProgressText,
-  setProgressTitle,
 } from '../loadings/loadProgress';
 
 export const SET_TASKS = 'SET_TASKS';
@@ -137,20 +139,18 @@ const getContentItemToUpdate = async ({
   locale,
   unique_identifier,
   dcManagement,
-  loadProgress,
-  dispatch,
+  loadContext,
 }) => {
-  setProgress(loadProgress, 0, `Getting root ${unique_identifier}`, dispatch);
+  setProgress(loadContext, 0, `Getting root ${unique_identifier}`);
 
   const sourceContentItem = await dcManagement.contentItems.get(
     unique_identifier
   );
 
   setProgress(
-    loadProgress,
+    loadContext,
     1,
-    `Checking for a localized version of ${sourceContentItem.label}.`,
-    dispatch
+    `Checking for a localized version of ${sourceContentItem.label}.`
   );
   const allLocalized = await getAllLocalization(sourceContentItem);
   let contentItemToUpdate = allLocalized.find(
@@ -159,10 +159,9 @@ const getContentItemToUpdate = async ({
 
   if (!contentItemToUpdate) {
     setProgress(
-      loadProgress,
+      loadContext,
       2,
-      `Creating a localized version of ${sourceContentItem.label}.`,
-      dispatch
+      `Creating a localized version of ${sourceContentItem.label}.`
     );
     await sourceContentItem.related.localize([locale]);
 
@@ -170,20 +169,18 @@ const getContentItemToUpdate = async ({
       await getLocalizedAfterJobStarted(sourceContentItem, locale);
 
     setProgress(
-      loadProgress,
+      loadContext,
       3,
-      `Fetching localized version of ${sourceContentItem.label}.`,
-      dispatch
+      `Fetching localized version of ${sourceContentItem.label}.`
     );
     contentItemToUpdate = await dcManagement.contentItems.get(
       localized && localized.id
     );
   } else {
     setProgress(
-      loadProgress,
+      loadContext,
       3,
-      `Fetching existing localized version of ${sourceContentItem.label}.`,
-      dispatch
+      `Fetching existing localized version of ${sourceContentItem.label}.`
     );
 
     contentItemToUpdate = await dcManagement.contentItems.get(
@@ -200,7 +197,17 @@ const getContentItemToUpdate = async ({
 export const applyAllTranslations =
   (submission: SubmissionInt) =>
   async (dispatch: AppDispatch, getState: () => RootState) => {
-    const loadProgress = createProgress('Fetching tasks...', 1);
+    let progress = createProgressList(1, 1);
+    let threadedPart = false;
+    const loadContext = createProgressContext(
+      progress,
+      'Fetching tasks...',
+      1,
+      dispatch
+    );
+
+    setProgressStage(loadContext, 0, 'Paginating tasks for submission.', 1);
+
     try {
       const {
         Api,
@@ -223,19 +230,26 @@ export const applyAllTranslations =
         submissionId: submission.submission_id,
       });
 
-      for (let i = allTasks.length - 1; i >= 0; i--) {
+      progress = createProgressList(
+        allTasks.length,
+        3,
+        `Applying ${allTasks.length} tasks...`,
+        progress.startTime
+      );
+
+      threadedPart = true;
+
+      await parallelProcess(allTasks, 3, async (data, index) => {
         const {
           task_id = 0,
           unique_identifier,
           target_locale: { locale },
           name,
-        } = allTasks[i];
+        } = data;
 
-        setProgressTitle(
-          loadProgress,
-          `Applying Task ${name}... (${allTasks.length - i}/${
-            allTasks.length
-          })`,
+        const loadContext = createProgressContext(
+          progress,
+          `Applying Task ${name}... (${index + 1}/${allTasks.length})`,
           4,
           dispatch
         );
@@ -252,14 +266,22 @@ export const applyAllTranslations =
               selectedProject: projects.selectedProject,
               params,
               source_locale: submission.source_locale,
-              loadProgress,
+              loadContext,
             },
             dispatch
           );
+        } catch (e: any) {
+          setProgressError(loadContext, e);
+          dispatch(setError(e.toString()));
+          dispatch(setContentLoader(false));
+
+          throw e;
         } finally {
           dispatch(setLoaderById(task_id, false));
         }
-      }
+
+        freeProgressContext(loadContext);
+      });
 
       if (failedCount) {
         dispatch(
@@ -275,7 +297,10 @@ export const applyAllTranslations =
       dispatch(getTasks());
       dispatch(setDialogLoader(undefined));
     } catch (e: any) {
-      setProgressError(loadProgress, e, dispatch);
+      if (!threadedPart) {
+        setProgressError(loadContext, e);
+      }
+
       dispatch(setLoaderById(submission.submission_id || 0, false));
       dispatch(setError(e.toString()));
       dispatch(setContentLoader(false));
@@ -363,8 +388,7 @@ const updateDependencyLocales = async (
   result,
   locale,
   contentGet,
-  loadProgress,
-  dispatch
+  loadProgress
 ) => {
   const tree = new ContentDependencyTree([
     { repo: null as any, content: result },
@@ -377,8 +401,7 @@ const updateDependencyLocales = async (
     const { id } = target.dependency;
     setProgressText(
       loadProgress,
-      `Updating ${result.label} (${locale}) dependency ${id}.`,
-      dispatch
+      `Updating ${result.label} (${locale}) dependency ${id}.`
     );
 
     // Fetch the content for ID, and determine if it has the target locale.
@@ -419,13 +442,11 @@ const applyToItem = async ({
   updatedBodyObj,
   locale,
   contentGet,
-  loadProgress,
-  dispatch,
+  loadContext,
 }) => {
   setProgressText(
-    loadProgress,
-    `Applying translations to ${contentItemToUpdate.label} (${locale}).`,
-    dispatch
+    loadContext,
+    `Applying translations to ${contentItemToUpdate.label} (${locale}).`
   );
   translations.forEach(({ key, value }: any) => {
     if (value) {
@@ -453,18 +474,11 @@ const applyToItem = async ({
     },
   };
 
-  await updateDependencyLocales(
-    result,
-    locale,
-    contentGet,
-    loadProgress,
-    dispatch
-  );
+  await updateDependencyLocales(result, locale, contentGet, loadContext);
 
   setProgressText(
-    loadProgress,
-    `Updating ${contentItemToUpdate.label} (${locale}).`,
-    dispatch
+    loadContext,
+    `Updating ${contentItemToUpdate.label} (${locale}).`
   );
   return contentItemToUpdate.related.update(result);
 };
@@ -481,8 +495,7 @@ const deepApply = async ({
   translatedTask,
   source_locale,
   locale,
-  loadProgress,
-  dispatch,
+  loadContext,
 }) => {
   const mapping: any = {};
 
@@ -504,16 +517,14 @@ const deepApply = async ({
           updatedBodyObj: updatedBody,
           locale,
           contentGet: dcManagement.contentItems.get,
-          loadProgress,
-          dispatch,
+          loadContext,
         }));
       }
 
       if (source_locale && contentItem.locale === source_locale.locale) {
         setProgressText(
-          loadProgress,
-          `Fetching localized '${contentItem.label}'`,
-          dispatch
+          loadContext,
+          `Fetching localized '${contentItem.label}'`
         );
 
         const allNestedLocalized = await getAllLocalization(contentItem);
@@ -533,9 +544,8 @@ const deepApply = async ({
         if (translations) {
           if (!nestedLocalized && !contentItem.locale) {
             setProgressText(
-              loadProgress,
-              `Setting source locale for '${contentItem.label}'`,
-              dispatch
+              loadContext,
+              `Setting source locale for '${contentItem.label}'`
             );
 
             await contentItem.related.setLocale(source_locale.locale);
@@ -543,9 +553,8 @@ const deepApply = async ({
 
           if (!nestedLocalized) {
             setProgressText(
-              loadProgress,
-              `Creating locale ${locale} for '${contentItem.label}'`,
-              dispatch
+              loadContext,
+              `Creating locale ${locale} for '${contentItem.label}'`
             );
 
             await contentItem.related.localize([locale]);
@@ -566,8 +575,7 @@ const deepApply = async ({
                 updatedBodyObj,
                 locale,
                 contentGet: dcManagement.contentItems.get,
-                loadProgress,
-                dispatch,
+                loadContext,
               }))
             );
           }
@@ -581,8 +589,7 @@ const deepApply = async ({
               updatedBodyObj,
               locale,
               contentGet: dcManagement.contentItems.get,
-              loadProgress,
-              dispatch,
+              loadContext,
             }))
           );
         }
@@ -603,38 +610,26 @@ const downloadAndApply = async (
     locale,
     params,
     source_locale,
-    loadProgress,
+    loadContext,
   }: any,
   dispatch: Dispatch<any>
 ) => {
   try {
-    setProgressStage(loadProgress, 0, 'Downloading task...', 1, dispatch);
-    setProgress(loadProgress, 0, 'Downloading task.', dispatch);
+    setProgressStage(loadContext, 0, 'Downloading task...', 1);
+    setProgress(loadContext, 0, 'Downloading task.');
     const translatedTask = await Api.downloadTask(task_id, selectedProject);
 
-    setProgressStage(
-      loadProgress,
-      1,
-      'Fetching content to update...',
-      4,
-      dispatch
-    );
+    setProgressStage(loadContext, 1, 'Fetching content to update...', 4);
     const { sourceContentItem, contentItemToUpdate } =
       await getContentItemToUpdate({
         locale,
         dcManagement,
         unique_identifier,
-        loadProgress,
-        dispatch,
+        loadContext,
       });
 
-    setProgressStage(loadProgress, 2, 'Applying translations...', 1, dispatch);
-    setProgress(
-      loadProgress,
-      0,
-      'Deep apply (this may take a while)',
-      dispatch
-    );
+    setProgressStage(loadContext, 2, 'Applying translations...', 1);
+    setProgress(loadContext, 0, 'Deep apply (this may take a while)');
 
     await deepApply({
       sourceContentItem,
@@ -643,18 +638,17 @@ const downloadAndApply = async (
       translatedTask,
       source_locale,
       locale,
-      loadProgress,
-      dispatch,
+      loadContext,
     });
 
-    setProgressStage(loadProgress, 3, 'Updating status...', 3, dispatch);
-    setProgress(loadProgress, 0, 'Updating task metadata.', dispatch);
+    setProgressStage(loadContext, 3, 'Updating status...', 3);
+    setProgress(loadContext, 0, 'Updating task metadata.');
 
     await Api.updateTaskMetadata(task_id, selectedProject, {
       localizedId: contentItemToUpdate && contentItemToUpdate.id,
     });
 
-    setProgress(loadProgress, 1, 'Updating workflow state.', dispatch);
+    setProgress(loadContext, 1, 'Updating workflow state.');
 
     if (params.statuses && params.statuses.translated) {
       await sourceContentItem.related.assignWorkflowState(
@@ -662,7 +656,7 @@ const downloadAndApply = async (
       );
     }
 
-    setProgress(loadProgress, 2, 'Confirming task completion.', dispatch);
+    setProgress(loadContext, 2, 'Confirming task completion.');
     await Api.confirmDownload(task_id, selectedProject);
 
     return false;
@@ -683,7 +677,13 @@ export const downloadTask =
     target_locale: { locale },
   }: any) =>
   async (dispatch: AppDispatch, getState: () => RootState) => {
-    const loadProgress = createProgress(`Applying task ${name}...`, 4);
+    const progress = createProgressList(1, 1);
+    const loadContext = createProgressContext(
+      progress,
+      `Applying task ${name}...`,
+      4,
+      dispatch
+    );
     try {
       dispatch(setContentLoader(true));
       const {
@@ -707,7 +707,7 @@ export const downloadTask =
           selectedProject: projects.selectedProject,
           params,
           source_locale,
-          loadProgress,
+          loadContext,
         },
         dispatch
       );
@@ -716,7 +716,7 @@ export const downloadTask =
       dispatch(setDialogLoader(undefined));
       return dispatch(setContentLoader(false));
     } catch (e: any) {
-      setProgressError(loadProgress, e, dispatch);
+      setProgressError(loadContext, e);
       dispatch(setError(e.toString()));
       return dispatch(setContentLoader(false));
     }
