@@ -106,13 +106,13 @@ Up to **[50](#configurable-values)** content items can be selected for a single 
 
 ![](./images/new-submission-send.png)
 
-When send the submission to GlobalLink, the progression of the request will be displayed in a modal dialog. You will be redirected to the submission list once the submission is sent.
+When sending the submission to GlobalLink, the progression of the request will be displayed in a modal dialog. You will be redirected to the submission list once the submission is sent.
 
 #### In-progress translations
 
 Once a content item has been sent for translation via a submission, the GlobalLink extension will automatically tag that content item with the **[inProgress](#configurable-values)** workflow state.
 
-This does not prevent you from making further modifications to the content item, but if you wish to submit these modifications for translation these will again need to be prepared and sent for translation, starting with the “[Preparing your content](#Preparing your content)” step.
+This does not prevent you from making further modifications to the content item, but if you wish to submit these modifications for translation these will again need to be prepared and sent for translation, starting with the “[Preparing your content](#preparing-your-content)” step.
 
 ![](./images/content-inprogress.png)
 
@@ -256,7 +256,7 @@ The first time a content item is translated, localized versions of the content i
 ### Delivery Keys
 Delivery keys must be 'websafe' characters and also unique to an Amplience Dynamic Content hub. When localizing content with this extension will attempt the following:
 
-* If there IS NOT delivery key in the source item, then will be no delivery keys in the translated items
+* If there IS NO delivery key in the source item, then will be no delivery keys in the translated items
 * If there IS a delivery key in the source item, then the delivery key for the translated item will be attempted with the source delivery key with a suffix of the target locale `mydeliverykey_fr-FR`
 
 #### Delivery Key Patterns / Validation
