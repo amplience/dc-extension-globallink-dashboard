@@ -127,7 +127,7 @@ Depending on the status of the submission, you will be able to:
 - `View Details` of the submission (in JSON format)
 - `Cancel` the submission, when in `Translating` state
 - `View Tasks`, when submission is in `Translation Ready`, `Translation Complete` or `Cancelled` states
-- `Apply All Translation`, when in `Translation Ready` state
+- `Apply All Translations`, when in `Translation Ready` state
 
 ![](./images/submissions-menu.png)
 
