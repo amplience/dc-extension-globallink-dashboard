@@ -78,6 +78,22 @@ const getAllLocalization = async (
 
 const throttled = throttle(getAllLocalization, 1000);
 
+const tryGetLocalized = async (
+  contentItem: ContentItem,
+  locale: string
+): Promise<ContentItem | undefined> => {
+  let localized: ContentItem | undefined = new ContentItem({});
+
+  const allLocalized = await getAllLocalization(contentItem);
+  localized =
+    allLocalized &&
+    allLocalized.find(
+      ({ locale: contentLocale }: ContentItem) => contentLocale === locale
+    );
+
+  return localized;
+};
+
 const getLocalizedAfterJobStarted = async (
   contentItem: ContentItem,
   locale: string
@@ -409,7 +425,7 @@ const updateDependencyLocales = async (
 
     if (refItem.locale != null && refItem.locale !== locale) {
       // If it has a locale and it doesn't match the target, see if there is a localized version that can be substituted.
-      const rewriteItem = await getLocalizedAfterJobStarted(refItem, locale);
+      const rewriteItem = await tryGetLocalized(refItem, locale);
 
       if (rewriteItem) {
         updateDependency(target, rewriteItem.id);
@@ -454,9 +470,7 @@ const applyToItem = async ({
         ensureField(updatedBodyObj, `$.${key}`, typeof value);
       }
 
-      jsonpath.apply(updatedBodyObj, `$.${key}`, () =>
-        value && value.length && value.length === 1 ? value[0] : value
-      );
+      jsonpath.apply(updatedBodyObj, `$.${key}`, () => value);
     }
   });
 
