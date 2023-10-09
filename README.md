@@ -9,6 +9,7 @@ The GlobalLink Connect dashboard extension allows content producers in Amplience
 - [Hosting the extension](docs/HOSTING.md)
 - [Installing & Configuring the extension](docs/CONFIGURATION.md)
 - [Using the extension](docs/USAGE.md)
+- [Support](./support.md)
 
 ## Features
 
