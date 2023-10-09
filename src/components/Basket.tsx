@@ -25,15 +25,19 @@ import { ContentItemsInterface, SDKInterface } from '../types/types';
 import { PAGE_SIZE } from '../utils/GCCRestApi';
 
 const Basket = ({
-  selectedContent,
+  basketContent,
+  removeFromBasket,
   setOpenBasket,
   getSelectedIds,
+  selectedContent,
 }: {
-  selectedContent: string[];
+  basketContent: object[];
   setOpenBasket: (state: boolean) => void;
+  removeFromBasket: (item: object) => void;
   getSelectedIds: (content: string[]) => void;
+  selectedContent: string[];
 }) => {
-  const { data, pagination }: ContentItemsInterface = useSelector(
+  const { pagination }: ContentItemsInterface = useSelector(
     (state: RootState) => state.contentItems
   );
   const { content }: any = useSelector((state: RootState) => state.loadings);
@@ -41,9 +45,7 @@ const Basket = ({
     params: { maxContentInSubmission = 50 },
   }: any = useSelector((state: RootState) => state.sdk);
 
-  const slicedData = data.filter(
-    (item: ContentItem) => item && selectedContent.includes(item.id)
-  );
+  const slicedData = basketContent;
 
   const { SDK }: SDKInterface = useSelector((state: RootState) => state.sdk);
 
@@ -131,12 +133,13 @@ const Basket = ({
         Content Items Basket: {slicedData.length}/{maxContentInSubmission}
       </Typography>
       <Table
-        removeButton
+        // removeButton
         maxContentInSubmission={maxContentInSubmission}
         columns={columns}
         data={slicedData}
-        selectedContent={selectedContent}
+        removeFromBasket={removeFromBasket}
         getSelectedIds={getSelectedIds}
+        selectedContent={selectedContent}
         currentPage={pagination.page}
         pageSize={PAGE_SIZE}
       />

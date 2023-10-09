@@ -220,8 +220,7 @@ export const FilterStatus = ({ label, onClear }: any) => (
 
 const FilterBar = ({
   setOpenBasket,
-  selectedContent,
-  setSelectedContent,
+  basketContent,
   max,
   facets,
   locale,
@@ -466,7 +465,7 @@ const FilterBar = ({
               size="small"
               onClick={() => {
                 dispatch(getContentItems(locale, 1, filter));
-                setSelectedContent([]);
+                // setSelectedContent([]);
               }}
             >
               <Refresh />
@@ -483,11 +482,11 @@ const FilterBar = ({
               <Typography
                 variant="caption"
                 color={
-                  selectedContent.length < max ? 'textPrimary' : 'textSecondary'
+                  basketContent.length < max ? 'textPrimary' : 'textSecondary'
                 }
                 style={{ paddingLeft: 2, paddingRight: 2 }}
               >
-                {selectedContent.length}/{max}
+                {basketContent.length}/{max}
               </Typography>
             </IconButton>
             <IconButton

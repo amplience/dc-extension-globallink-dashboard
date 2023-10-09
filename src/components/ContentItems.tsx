@@ -38,16 +38,30 @@ const useStyles = makeStyles(() => ({
 
 const ContentItems = ({
   locale,
-  selectedContent,
-  setSelectedContent,
   getSelectedIds,
+  selectedContent,
 }: {
   locale: string;
-  selectedContent: string[];
-  setSelectedContent: (content: string[]) => void;
   getSelectedIds: (content: string[]) => void;
+  selectedContent: string[];
 }) => {
   const [openBasket, setOpenBasket] = useState(false);
+  const [basketContent, setBasketContent] = useState<any[]>([]);
+
+  const addToBasket = (item: ContentItem): void => {
+    if (!basketContent.filter((element) => element.id === item.id).length) {
+      setBasketContent([...basketContent, item]);
+    }
+  };
+
+  const removeFromBasket = (item: any): void => {
+    if (basketContent.includes(item)) {
+      setBasketContent(
+        basketContent.filter((element) => element.id !== item.id)
+      );
+    }
+  };
+
   const classes = useStyles();
   const dispatch = useDispatch();
   const { data, pagination, facets, filter }: ContentItemsInterface =
@@ -135,18 +149,13 @@ const ContentItems = ({
     }
   }, [pagination, dispatch, locale]);
 
-  useEffect(() => {
-    setSelectedContent(selectedContent);
-  }, [selectedContent]);
-
   return (
     <>
       {content ? <Loader className="content-loader" /> : null}
       <FilterBar
         max={maxContentInSubmission}
         setOpenBasket={setOpenBasket}
-        selectedContent={selectedContent}
-        setSelectedContent={setSelectedContent}
+        basketContent={basketContent}
         facets={facets}
         locale={locale}
         filter={filter}
@@ -161,19 +170,21 @@ const ContentItems = ({
         />
       </div>
 
-      {selectedContent && (
+      {slicedData && (
         <Table
           maxContentInSubmission={maxContentInSubmission}
           checkBox
           indexes
+          removeFromBasket={removeFromBasket}
+          addToBasket={addToBasket}
           getSelectedIds={getSelectedIds}
           columns={columns}
-          selectedContent={selectedContent}
           data={slicedData}
           currentPage={pagination.page}
           pageSize={PAGE_SIZE}
         />
       )}
+      {JSON.stringify(selectedContent)}
       <Drawer
         variant="temporary"
         open={openBasket}
@@ -183,8 +194,10 @@ const ContentItems = ({
       >
         <Basket
           setOpenBasket={setOpenBasket}
-          selectedContent={selectedContent}
+          basketContent={basketContent}
           getSelectedIds={getSelectedIds}
+          removeFromBasket={removeFromBasket}
+          selectedContent={selectedContent}
         />
       </Drawer>
     </>
