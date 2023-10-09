@@ -1,13 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Drawer, makeStyles } from '@material-ui/core';
+import {
+  Drawer,
+  Icon,
+  ListItemIcon,
+  Menu,
+  MenuItem,
+  Typography,
+  makeStyles,
+} from '@material-ui/core';
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import InputIcon from '@material-ui/icons/Input';
+import PopupState, {
+  InjectedProps,
+  bindMenu,
+  bindTrigger,
+} from 'material-ui-popup-state';
+import { ContentItem } from 'dc-management-sdk-js';
 import { RootState } from '../store/store';
 import Table from './common/Table';
 import Loader from './common/Loader';
 import FilterBar from './FilterBar';
 import TablePagination from './common/TablePagination';
 import { getContentItems } from '../store/contentItems/contentItems.actions';
-import { ContentItemsInterface } from '../types/types';
+import { ContentItemsInterface, SDKInterface } from '../types/types';
 import { PAGE_SIZE } from '../utils/GCCRestApi';
 import Basket from './Basket';
 
@@ -46,6 +62,8 @@ const ContentItems = ({
     (pagination.page - 1) * PAGE_SIZE + PAGE_SIZE
   );
 
+  const { SDK }: SDKInterface = useSelector((state: RootState) => state.sdk);
+
   const columns = [
     {
       id: 'label',
@@ -67,6 +85,47 @@ const ContentItems = ({
       label: 'Content Type',
       format: (schema: any) =>
         schema && schema.settings ? schema.settings.label : '',
+    },
+    {
+      id: 'menu',
+      label: ' ',
+      format: (row: ContentItem) => (
+        <PopupState variant="popover" popupId="demo-popup-menu">
+          {(popupState: InjectedProps) => (
+            <>
+              <Icon
+                component="a"
+                className="menu-icon"
+                {...bindTrigger(popupState)}
+              >
+                <MoreHorizIcon fontSize="small" />
+              </Icon>
+              <Menu {...bindMenu(popupState)}>
+                <MenuItem
+                  style={{ width: '280px' }}
+                  onClick={() => {
+                    // @ts-ignore
+                    if (SDK && SDK.applicationNavigator && SDK.options) {
+                      const href = SDK.applicationNavigator.openContentItem(
+                        { id: row.id },
+                        { returnHref: true }
+                      );
+                      // @ts-ignore
+                      SDK.options.window.open(href, '_blank');
+                    }
+                    popupState.close();
+                  }}
+                >
+                  <ListItemIcon>
+                    <InputIcon fontSize="small" />
+                  </ListItemIcon>
+                  <Typography>View Source</Typography>
+                </MenuItem>
+              </Menu>
+            </>
+          )}
+        </PopupState>
+      ),
     },
   ];
 
