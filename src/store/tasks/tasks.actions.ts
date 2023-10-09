@@ -25,6 +25,7 @@ import { getSubmissions } from '../submissions/submissions.actions';
 import {
   ContentDependencyInfo,
   ContentDependencyTree,
+  deepCopy,
 } from '../../utils/ContentDependencyTree';
 import {
   createProgressContext,
@@ -77,6 +78,22 @@ const getAllLocalization = async (
 };
 
 const throttled = throttle(getAllLocalization, 1000);
+
+const tryGetLocalized = async (
+  contentItem: ContentItem,
+  locale: string
+): Promise<ContentItem | undefined> => {
+  let localized: ContentItem | undefined = new ContentItem({});
+
+  const allLocalized = await getAllLocalization(contentItem);
+  localized =
+    allLocalized &&
+    allLocalized.find(
+      ({ locale: contentLocale }: ContentItem) => contentLocale === locale
+    );
+
+  return localized;
+};
 
 const getLocalizedAfterJobStarted = async (
   contentItem: ContentItem,
@@ -409,7 +426,7 @@ const updateDependencyLocales = async (
 
     if (refItem.locale != null && refItem.locale !== locale) {
       // If it has a locale and it doesn't match the target, see if there is a localized version that can be substituted.
-      const rewriteItem = await getLocalizedAfterJobStarted(refItem, locale);
+      const rewriteItem = await tryGetLocalized(refItem, locale);
 
       if (rewriteItem) {
         updateDependency(target, rewriteItem.id);
@@ -454,9 +471,7 @@ const applyToItem = async ({
         ensureField(updatedBodyObj, `$.${key}`, typeof value);
       }
 
-      jsonpath.apply(updatedBodyObj, `$.${key}`, () =>
-        value && value.length && value.length === 1 ? value[0] : value
-      );
+      jsonpath.apply(updatedBodyObj, `$.${key}`, () => value);
     }
   });
 
@@ -499,7 +514,7 @@ const deepApply = async ({
 }) => {
   const mapping: any = {};
 
-  await ContentGraph.deepCopy(
+  await deepCopy(
     [sourceContentItem.id],
     dcManagement.contentItems.get,
     async (contentItem, body) => {
@@ -533,9 +548,9 @@ const deepApply = async ({
           ({ locale: contentLocale }: any) => contentLocale === locale
         );
 
-        nestedLocalized = await dcManagement.contentItems.get(
-          nestedLocalized && nestedLocalized.id
-        );
+        nestedLocalized =
+          nestedLocalized &&
+          (await dcManagement.contentItems.get(nestedLocalized.id));
 
         const updatedBodyObj = getUpdatedBody(nestedLocalized, contentItem);
 
@@ -596,7 +611,8 @@ const deepApply = async ({
       }
 
       return (mapping[contentItem.id] = contentItem);
-    }
+    },
+    true
   );
 };
 

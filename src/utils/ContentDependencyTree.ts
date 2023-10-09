@@ -62,7 +62,7 @@ export class ContentDependencyTree {
 
   constructor(items: RepositoryContentItem[]) {
     // Identify all content dependencies.
-    let info = this.identifyContentDependencies(items);
+    let info = ContentDependencyTree.identifyContentDependencies(items);
     const allInfo = info;
     this.resolveContentDependencies(info);
 
@@ -157,7 +157,7 @@ export class ContentDependencyTree {
     this.requiredSchema = Array.from(requiredSchema);
   }
 
-  private searchObjectForContentDependencies(
+  private static searchObjectForContentDependencies(
     item: RepositoryContentItem,
     body: RecursiveSearchStep,
     result: ContentDependencyInfo[],
@@ -325,7 +325,7 @@ export class ContentDependencyTree {
     return CircularDependencyStage.Standalone;
   }
 
-  private identifyContentDependencies(
+  static identifyContentDependencies(
     items: RepositoryContentItem[]
   ): ItemContentDependencies[] {
     return items.map((item) => {
@@ -447,3 +447,106 @@ export class ContentDependencyTree {
     });
   }
 }
+
+/**
+ * Similar to content graph deepCopy, but should also support refs, hierarchies, circular dependencies.
+ * @param ids Ids of the root content items to copy
+ * @param contentItemProvider Function that loads content items by id
+ * @param contentItemPicker Function that creates or returns an existing content item that should be used in place of the original
+ * @returns {Promise<any>} Mapping of old content item ids to the newly created ids
+ */
+export async function deepCopy(
+  ids: string[],
+  contentItemProvider: (id: string) => Promise<ContentItem>,
+  contentItemPicker: (original: ContentItem, body: any) => Promise<ContentItem>,
+  repeatCircular = false
+): Promise<any> {
+  const cache: any = {};
+  const mapping: any = {};
+  const circular = new Set<string>();
+
+  const rewriteItem = async (item: ContentItem): Promise<ContentItem> => {
+    // Rewrite the body so that linked items point to the id of the copy
+    const body: any = JSON.parse(JSON.stringify(item.body));
+
+    const deps = ContentDependencyTree.identifyContentDependencies([
+      { repo: undefined as any, content: { ...item, body } as ContentItem },
+    ])[0];
+
+    for (let i = 0; i < deps.dependencies.length; i++) {
+      const dep = deps.dependencies[i];
+      if (dep.dependency.id != null) {
+        updateDependency(dep, mapping[dep.dependency.id]);
+      }
+    }
+
+    // Let the application choose how to copy the item
+    const newItem = await contentItemPicker(item, body);
+    mapping[item.id] = newItem.id;
+
+    return newItem;
+  };
+
+  const processItem = (
+    id: string,
+    parents: string[] = [id]
+  ): Promise<ContentItem> => {
+    if (cache[id]) {
+      return cache[id];
+    }
+
+    return (cache[id] = contentItemProvider(id)
+      .then(async (item) => {
+        // visit children
+        const deps = ContentDependencyTree.identifyContentDependencies([
+          { repo: undefined as any, content: item },
+        ])[0];
+
+        for (let i = 0; i < deps.dependencies.length; i++) {
+          const { id } = deps.dependencies[i].dependency;
+          if (id != null) {
+            if (parents.indexOf(id) !== -1) {
+              // Circular dependency...
+              circular.add(id);
+            } else {
+              await processItem(id, [...parents, id]);
+            }
+          }
+        }
+
+        return item;
+      })
+      .then(rewriteItem));
+  };
+
+  await Promise.all(ids.map((id) => processItem(id)));
+
+  if (repeatCircular) {
+    const ids = Array.from(circular);
+
+    for (let i = 0; i < ids.length; i++) {
+      const item = await cache[ids[i]];
+
+      rewriteItem(item);
+    }
+  }
+
+  return mapping;
+}
+
+export const updateDependency = (
+  dep: ContentDependencyInfo,
+  id: string | undefined
+) => {
+  if (dep.dependency._meta.schema === '_hierarchy') {
+    dep.owner.content.body._meta.hierarchy.parentId = id;
+  } else if (dep.parent) {
+    const { parent } = dep;
+    if (id == null) {
+      delete parent[dep.index];
+    } else {
+      parent[dep.index] = dep.dependency;
+      dep.dependency.id = id;
+    }
+  }
+};
