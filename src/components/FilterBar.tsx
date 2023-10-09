@@ -119,7 +119,6 @@ export const useStyles = makeStyles(() => ({
     color: '#666',
     margin: '0 8px 0 0',
     fontWeight: 400,
-    fontFamily: 'Roboto',
   },
   filterValue: {
     display: 'flex',
