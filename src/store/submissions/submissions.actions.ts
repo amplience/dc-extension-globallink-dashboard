@@ -35,6 +35,7 @@ import {
   setProgressError,
   setProgressStage,
 } from '../loadings/loadProgress';
+import { deepCopy } from '../../utils/ContentDependencyTree';
 
 export const SET_SUBMISSIONS = 'SET_SUBMISSIONS';
 export const SET_SELECTED_SUBMISSION = 'SET_SELECTED_SUBMISSION';
@@ -248,7 +249,7 @@ export const createSubmission =
         setProgress(loadContext, 0, `Scanning...`);
 
         try {
-          await ContentGraph.deepCopy(
+          await deepCopy(
             [contentItemId],
             dcManagement.contentItems.get,
             async (contentItem) => {

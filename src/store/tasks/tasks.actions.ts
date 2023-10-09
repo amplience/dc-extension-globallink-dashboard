@@ -25,6 +25,7 @@ import { getSubmissions } from '../submissions/submissions.actions';
 import {
   ContentDependencyInfo,
   ContentDependencyTree,
+  deepCopy,
 } from '../../utils/ContentDependencyTree';
 import {
   createProgressContext,
@@ -513,7 +514,7 @@ const deepApply = async ({
 }) => {
   const mapping: any = {};
 
-  await ContentGraph.deepCopy(
+  await deepCopy(
     [sourceContentItem.id],
     dcManagement.contentItems.get,
     async (contentItem, body) => {
@@ -547,9 +548,9 @@ const deepApply = async ({
           ({ locale: contentLocale }: any) => contentLocale === locale
         );
 
-        nestedLocalized = await dcManagement.contentItems.get(
-          nestedLocalized && nestedLocalized.id
-        );
+        nestedLocalized =
+          nestedLocalized &&
+          (await dcManagement.contentItems.get(nestedLocalized.id));
 
         const updatedBodyObj = getUpdatedBody(nestedLocalized, contentItem);
 
@@ -610,7 +611,8 @@ const deepApply = async ({
       }
 
       return (mapping[contentItem.id] = contentItem);
-    }
+    },
+    true
   );
 };
 
