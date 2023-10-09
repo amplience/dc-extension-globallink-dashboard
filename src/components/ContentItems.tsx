@@ -184,7 +184,6 @@ const ContentItems = ({
           pageSize={PAGE_SIZE}
         />
       )}
-      {JSON.stringify(selectedContent)}
       <Drawer
         variant="temporary"
         open={openBasket}
