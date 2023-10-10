@@ -28,8 +28,7 @@ export interface FilterBarInterface {
   locale: string;
   filter: FilterInt;
   setOpenBasket: (openBasket: boolean) => void;
-  selectedContent: string[];
-  setSelectedContent: (content: string[]) => void;
+  basketContent: object[];
 }
 
 export interface SubmissionFilterInt {

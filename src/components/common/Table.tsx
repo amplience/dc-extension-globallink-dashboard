@@ -34,6 +34,8 @@ interface TableComponentProps {
   indexes?: boolean;
   rowClick?(id: number): void;
   getSelectedIds?: (content: string[]) => void;
+  removeFromBasket?: (item: any) => void;
+  addToBasket?: (item: any) => void;
 }
 
 const useStyles = makeStyles(() => ({
@@ -55,6 +57,8 @@ const Table = ({
   indexes = false,
   selectedContent = [],
   getSelectedIds = () => {},
+  removeFromBasket = () => {},
+  addToBasket = () => {},
 }: TableComponentProps) => {
   const classes = useStyles();
   const selectedMap: { [key: string]: boolean } = {};
@@ -100,6 +104,7 @@ const Table = ({
         ...selected,
         [id]: true,
       });
+      addToBasket(data.find((item: any) => item.id === id));
       getSelectedIds(
         Object.keys({
           ...selected,
@@ -111,7 +116,12 @@ const Table = ({
       delete sel[id];
       setSelected(sel);
       getSelectedIds(Object.keys(sel));
+      removeFromBasket(data.find((item: any) => item.id === id));
     }
+  };
+
+  const handleBasketClick = (id: string) => {
+    removeFromBasket(data.find((item: any) => item.id === id));
   };
 
   const ids = data.map(({ id }: any) => id);
@@ -150,7 +160,6 @@ const Table = ({
                     color="primary"
                     onClick={() => {
                       setSelected({});
-                      getSelectedIds([]);
                     }}
                   >
                     <CloseIcon />
@@ -210,7 +219,7 @@ const Table = ({
                         size="small"
                         color="primary"
                         title="Remove"
-                        onClick={() => handleClick(row.id)}
+                        onClick={() => handleBasketClick(row.id)}
                       >
                         <CloseIcon />
                       </IconButton>
@@ -265,6 +274,8 @@ Table.defaultProps = {
   rowClick: null,
   selectedContent: [],
   getSelectedIds: () => {},
+  removeFromBasket: () => {},
+  addToBasket: () => {},
 };
 
 export default Table;
