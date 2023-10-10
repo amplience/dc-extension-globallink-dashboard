@@ -4,7 +4,6 @@ import jsonpath from 'jsonpath';
 import {
   ContentType,
   WorkflowState,
-  ContentGraph,
   ContentLink,
   ContentItem,
 } from 'dc-management-sdk-js';
@@ -35,7 +34,7 @@ import {
   setProgressError,
   setProgressStage,
 } from '../loadings/loadProgress';
-import { deepCopy } from '../../utils/ContentDependencyTree';
+import { CircularMode, deepCopy } from '../../utils/ContentDependencyTree';
 
 export const SET_SUBMISSIONS = 'SET_SUBMISSIONS';
 export const SET_SELECTED_SUBMISSION = 'SET_SELECTED_SUBMISSION';
@@ -324,7 +323,8 @@ export const createSubmission =
               }
 
               return contentItem;
-            }
+            },
+            CircularMode.Throw
           );
 
           setProgress(loadContext, 1, `Uploading for translation...`);

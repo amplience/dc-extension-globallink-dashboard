@@ -1,12 +1,7 @@
 import { Dispatch } from 'redux';
 import jsonpath from 'jsonpath';
 import throttle from 'lodash/throttle';
-import {
-  WorkflowState,
-  ContentGraph,
-  ContentItem,
-  Page,
-} from 'dc-management-sdk-js';
+import { WorkflowState, ContentItem, Page } from 'dc-management-sdk-js';
 import { AppDispatch, RootState } from '../store';
 import { setError } from '../error/error.actions';
 import {
@@ -23,6 +18,7 @@ import {
 } from '../../types/types';
 import { getSubmissions } from '../submissions/submissions.actions';
 import {
+  CircularMode,
   ContentDependencyInfo,
   ContentDependencyTree,
   deepCopy,
@@ -612,7 +608,7 @@ const deepApply = async ({
 
       return (mapping[contentItem.id] = contentItem);
     },
-    true
+    CircularMode.Repeat
   );
 };
 

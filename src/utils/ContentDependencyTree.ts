@@ -448,6 +448,12 @@ export class ContentDependencyTree {
   }
 }
 
+export enum CircularMode {
+  Ignore,
+  Repeat,
+  Throw,
+}
+
 /**
  * Similar to content graph deepCopy, but should also support refs, hierarchies, circular dependencies.
  * @param ids Ids of the root content items to copy
@@ -459,7 +465,7 @@ export async function deepCopy(
   ids: string[],
   contentItemProvider: (id: string) => Promise<ContentItem>,
   contentItemPicker: (original: ContentItem, body: any) => Promise<ContentItem>,
-  repeatCircular = false
+  circularMode = CircularMode.Ignore
 ): Promise<any> {
   const cache: any = {};
   const mapping: any = {};
@@ -507,7 +513,13 @@ export async function deepCopy(
           if (id != null) {
             if (parents.indexOf(id) !== -1) {
               // Circular dependency...
-              circular.add(id);
+              if (circularMode === CircularMode.Throw) {
+                throw new Error(
+                  `CONTENT_ITEM_CYCLIC_DEPENDENCY: Circular dependency (${item.id}) -> (${id}) is not allowed.`
+                );
+              } else {
+                circular.add(id);
+              }
             } else {
               await processItem(id, [...parents, id]);
             }
@@ -521,7 +533,7 @@ export async function deepCopy(
 
   await Promise.all(ids.map((id) => processItem(id)));
 
-  if (repeatCircular) {
+  if (circularMode === CircularMode.Repeat) {
     const ids = Array.from(circular);
 
     for (let i = 0; i < ids.length; i++) {
