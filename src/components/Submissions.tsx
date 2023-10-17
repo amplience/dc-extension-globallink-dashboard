@@ -120,8 +120,8 @@ const Submissions = (props) => {
         <>
           {languageJobs
             .sort((a, b) => {
-              if (a.target_locale.locale > b.target_locale.locale) return -1;
-              return 1;
+              if (a.target_locale.locale > b.target_locale.locale) return 1;
+              return -1;
             })
             .map((job) => (
               <ReactCountryFlag
