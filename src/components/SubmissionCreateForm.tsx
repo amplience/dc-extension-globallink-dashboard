@@ -71,6 +71,12 @@ const useStyles = makeStyles(() => ({
 
 const getCountryCode = (code: string) => code.split('-')[1] || '';
 
+const endOfDay = (date: Date) => {
+  date.setHours(23, 59, 59, 0);
+
+  return date;
+};
+
 const SubmissionCreateForm = () => {
   const dispatch = useDispatch();
   const prevSubmitter = localStorage.getItem('submission_submitter');
@@ -104,7 +110,9 @@ const SubmissionCreateForm = () => {
     name: `Submission-${new Date().getTime()}`,
     additionalInstruction: '',
     dueDate: new Date(
-      new Date().getTime() + dueDateParam * 24 * 60 * 60 * 1000
+      endOfDay(
+        new Date(new Date().getTime() + dueDateParam * 24 * 60 * 60 * 1000)
+      )
     ),
     targetLocales: [],
     additional: {},
@@ -254,7 +262,7 @@ const SubmissionCreateForm = () => {
               onChange={(date) => {
                 setFormValues({
                   ...formValues,
-                  dueDate: date,
+                  dueDate: endOfDay(date as Date),
                 });
               }}
             />
