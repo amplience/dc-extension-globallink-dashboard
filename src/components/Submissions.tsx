@@ -105,7 +105,7 @@ const Submissions = (props) => {
             countryCode={getCountryCode(sourceLocale.locale)}
             style={{ marginRight: 4 }}
           />
-          {sourceLocale.locale_display_name} ({sourceLocale.locale})
+          {sourceLocale.locale}
         </>
       ),
     },
@@ -133,7 +133,8 @@ const Submissions = (props) => {
           {languageJobs
             .map(
               (job) =>
-                `${job.target_locale.locale_display_name} (${job.target_locale.locale})`
+                // `${job.target_locale.locale_display_name} (${job.target_locale.locale})`
+                `${job.target_locale.locale}`
             )
             .join(', ')}
         </>

@@ -112,7 +112,7 @@ const Tasks = () => {
             countryCode={getCountryCode(sourceLocale.locale)}
             style={{ marginRight: 4 }}
           />
-          {sourceLocale.locale_display_name} ({sourceLocale.locale})
+          {sourceLocale.locale}
         </>
       ),
     },
@@ -128,7 +128,7 @@ const Tasks = () => {
             countryCode={getCountryCode(targetLocale.locale)}
             style={{ marginRight: 4 }}
           />
-          {targetLocale.locale_display_name} ({targetLocale.locale})
+          {targetLocale.locale}
         </>
       ),
     },
