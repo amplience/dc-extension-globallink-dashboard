@@ -48,13 +48,13 @@ When you create your content, there are a couple of things you will need to do t
 2. (Optionally) assign the content item to a person.
    - This is not mandatory for translation but may help with finding the content item when you create a submission, as content items can be filtered by assignee.
 3. Flag your content item as ready for translation with a workflow state.
-   - To ensure that content is not sent for translation prematurely, the GlobalLink dashboard uses workflow states to determine what can and cannot be sent for translation. To flag your content item for translation, set the workflow state to **[ready](#configurable-values)**.
+   - To ensure that content is not sent for translation prematurely, the GlobalLink dashboard uses workflow states to determine what can and cannot be sent for translation. To flag your content item for translation, set the workflow state to **[Ready For Translation](#configurable-values)**.
 
 Each of these settings can either be applied via the “Save content” menu when you first save a content item, or can be applied by right-clicking your content item from the content library afterwards (“Assign Locale”, “Assign to”, and “Set status” respectively).
 
 ### Creating a submission
 
-Once you have created one or more content items and made them ready for translation, these can now be sent for submission to GlobalLink via the dashboard extension. This can be found by navigating to the “Dashboard” tab within Dynamic Content, and selecting **[GlobalLink Connect](#configurable-values)**.
+Once you have created one or more content items and made them ready for translation, these can now be sent for submission to GlobalLink via the dashboard extension. This can be found by navigating to the “Dashboard” tab within Dynamic Content, and selecting **[GlobalLink](#configurable-values)**.
 
 This will take you to the GlobalLink dashboard extension and will provide you with an overview of existing submissions and the ability to create new submissions, for any configured projects.
 
@@ -85,7 +85,7 @@ As well as the submission details, this stage will allow you to select the conte
 
 1. Locale matches your chosen source locale
 
-2. Workflow state is set to **[ready](#configurable-values)**
+2. Workflow state is set to **[Ready For Translation](#configurable-values)**
 
 3. The content type is configured to allow translation
 
@@ -215,7 +215,7 @@ The status of the submission will be updated automatically in the submissions li
 
 #### Completed translations
 
-Once a translation has been applied via a task or submission, the GlobalLink extension will automatically tag the source content item with the **[translated](#configurable-values)** workflow state.
+Once a translation has been applied via a task or submission, the GlobalLink extension will automatically tag the source content item with the **[Translation Complete](#configurable-values)** workflow state.
 
 As with in-progress translations, this does not prevent you from making further modifications to the content item, but if you wish to submit these modifications for translation these will again need to be prepared and sent for translation, starting with the “[Preparing your content](#preparing-your-content)” step.
 
@@ -231,12 +231,12 @@ With the translation complete, you should now also be able to find localized and
 This translation extension works by creating localized copies from the source content. In order for this extension to work, you must have implemented `content-item` level localization on your account. For more information about the different localization setup available in Amplience please visit our [Localization developer guide](https://amplience.com/developers/docs/dev-tools/guides-tutorials/localization/).
 
 #### Translation flow
-In order to ensure consistency, this extension follows the same process both when translating a piece of content for the first time and retranslating an item. It will overwrite the translated items based on the source and apply they translatable fields:
+In order to ensure consistency, this extension follows the same process both when translating a piece of content for the first time and retranslating an item. It will overwrite the translated items based on the source and apply the translatable fields:
 
 1. Take the source item
 2. Send the translatable fields from the source item and send them for translation
 3. Once the translations have completed, set the submission in the 'ready' state
-4. When the user chooses to apply the translations it will take take the source item, apply the translated fields and either create or update the translated content items.
+4. When the user chooses to apply the translations it will take the source item, apply the translated fields and either create or update the translated content items.
 
 See [Updating source content and retranslating](#updating-source-content-and-retranslating) for further details.
 
