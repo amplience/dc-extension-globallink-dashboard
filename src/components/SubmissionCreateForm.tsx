@@ -243,6 +243,9 @@ const SubmissionCreateForm = () => {
               name="name"
               value={formValues.name}
               onChange={handleChange}
+              inputProps={{
+                maxLength: 150,
+              }}
               InputLabelProps={{
                 shrink: true,
               }}
