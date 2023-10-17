@@ -101,11 +101,13 @@ const Submissions = (props) => {
         locale: string;
       }) => (
         <>
-          <ReactCountryFlag
-            countryCode={getCountryCode(sourceLocale.locale)}
-            style={{ marginRight: 4 }}
-          />
-          {sourceLocale.locale}
+          <span title={sourceLocale.locale_display_name}>
+            <ReactCountryFlag
+              countryCode={getCountryCode(sourceLocale.locale)}
+              style={{ marginRight: 4 }}
+            />
+            {sourceLocale.locale}
+          </span>
         </>
       ),
     },
@@ -120,23 +122,23 @@ const Submissions = (props) => {
         <>
           {languageJobs
             .sort((a, b) => {
-              if (a.target_locale.locale > b.target_locale.locale) return 1;
-              return -1;
+              if (a.target_locale.locale > b.target_locale.locale) return -1;
+              return 1;
             })
-            .map((job) => (
-              <ReactCountryFlag
-                key={job.target_locale.locale}
-                countryCode={getCountryCode(job.target_locale.locale)}
-                style={{ marginRight: 4 }}
-              />
+            .map((job, index) => (
+              <span
+                key={index}
+                title={job.target_locale.locale_display_name}
+                style={{ marginRight: 8 }}
+              >
+                <ReactCountryFlag
+                  key={job.target_locale.locale}
+                  countryCode={getCountryCode(job.target_locale.locale)}
+                  style={{ marginRight: 4 }}
+                />
+                {job.target_locale.locale}
+              </span>
             ))}
-          {languageJobs
-            .map(
-              (job) =>
-                // `${job.target_locale.locale_display_name} (${job.target_locale.locale})`
-                `${job.target_locale.locale}`
-            )
-            .join(', ')}
         </>
       ),
     },
