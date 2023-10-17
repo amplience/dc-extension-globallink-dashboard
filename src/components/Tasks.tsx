@@ -108,11 +108,13 @@ const Tasks = () => {
         locale: string;
       }) => (
         <>
-          <ReactCountryFlag
-            countryCode={getCountryCode(sourceLocale.locale)}
-            style={{ marginRight: 4 }}
-          />
-          {sourceLocale.locale}
+          <span title={sourceLocale.locale_display_name}>
+            <ReactCountryFlag
+              countryCode={getCountryCode(sourceLocale.locale)}
+              style={{ marginRight: 4 }}
+            />
+            {sourceLocale.locale}
+          </span>
         </>
       ),
     },
@@ -124,11 +126,13 @@ const Tasks = () => {
         locale: string;
       }) => (
         <>
-          <ReactCountryFlag
-            countryCode={getCountryCode(targetLocale.locale)}
-            style={{ marginRight: 4 }}
-          />
-          {targetLocale.locale}
+          <span title={targetLocale.locale_display_name}>
+            <ReactCountryFlag
+              countryCode={getCountryCode(targetLocale.locale)}
+              style={{ marginRight: 4 }}
+            />
+            {targetLocale.locale}
+          </span>
         </>
       ),
     },
