@@ -38,11 +38,11 @@ const useStyles = makeStyles(() => ({
 
 const ContentItems = ({
   locale,
-  getSelectedIds,
+  setSelectedIds,
   selectedContent,
 }: {
   locale: string;
-  getSelectedIds: (content: string[]) => void;
+  setSelectedIds: (content: string[]) => void;
   selectedContent: string[];
 }) => {
   const [openBasket, setOpenBasket] = useState(false);
@@ -55,7 +55,9 @@ const ContentItems = ({
   };
 
   const removeFromBasket = (item: any): void => {
-    if (basketContent.includes(item)) {
+    if (item == null) {
+      setBasketContent([]);
+    } else if (basketContent.includes(item)) {
       setBasketContent(
         basketContent.filter((element) => element.id !== item.id)
       );
@@ -177,7 +179,8 @@ const ContentItems = ({
           indexes
           removeFromBasket={removeFromBasket}
           addToBasket={addToBasket}
-          getSelectedIds={getSelectedIds}
+          setSelectedIds={setSelectedIds}
+          selectedContent={selectedContent}
           columns={columns}
           data={slicedData}
           currentPage={pagination.page}
@@ -194,7 +197,7 @@ const ContentItems = ({
         <Basket
           setOpenBasket={setOpenBasket}
           basketContent={basketContent}
-          getSelectedIds={getSelectedIds}
+          setSelectedIds={setSelectedIds}
           removeFromBasket={removeFromBasket}
           selectedContent={selectedContent}
         />

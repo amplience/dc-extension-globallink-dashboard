@@ -13,6 +13,7 @@ import {
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import isFunction from 'lodash/isFunction';
+import _ from 'lodash';
 
 interface Column {
   id: string;
@@ -33,7 +34,7 @@ interface TableComponentProps {
   removeButton?: boolean;
   indexes?: boolean;
   rowClick?(id: number): void;
-  getSelectedIds?: (content: string[]) => void;
+  setSelectedIds?: (content: string[]) => void;
   removeFromBasket?: (item: any) => void;
   addToBasket?: (item: any) => void;
 }
@@ -56,7 +57,7 @@ const Table = ({
   removeButton = false,
   indexes = false,
   selectedContent = [],
-  getSelectedIds = () => {},
+  setSelectedIds = () => {},
   removeFromBasket = () => {},
   addToBasket = () => {},
 }: TableComponentProps) => {
@@ -79,7 +80,7 @@ const Table = ({
         ...selected,
         ...newSelecteds,
       });
-      getSelectedIds(
+      setSelectedIds(
         Object.keys({
           ...selected,
           ...newSelecteds,
@@ -93,7 +94,7 @@ const Table = ({
       delete newUnselecteds[n.id];
     });
     setSelected(newUnselecteds);
-    getSelectedIds(Object.keys(newUnselecteds));
+    setSelectedIds(Object.keys(newUnselecteds));
   };
 
   const isSelected = (id: string) => selected[id];
@@ -105,7 +106,7 @@ const Table = ({
         [id]: true,
       });
       addToBasket(data.find((item: any) => item.id === id));
-      getSelectedIds(
+      setSelectedIds(
         Object.keys({
           ...selected,
           [id]: true,
@@ -115,7 +116,7 @@ const Table = ({
       const sel = { ...selected };
       delete sel[id];
       setSelected(sel);
-      getSelectedIds(Object.keys(sel));
+      setSelectedIds(Object.keys(sel));
       removeFromBasket(data.find((item: any) => item.id === id));
     }
   };
@@ -135,14 +136,18 @@ const Table = ({
     selectedContent.forEach((id: string) => {
       selectedMap[id] = true;
     });
-    setSelected({
-      ...selectedMap,
-    });
-    getSelectedIds(
-      Object.keys({
+
+    // If the selection matches, don't bother.
+    if (!_.isEqual(selectedMap, selected)) {
+      setSelected({
         ...selectedMap,
-      })
-    );
+      });
+      setSelectedIds(
+        Object.keys({
+          ...selectedMap,
+        })
+      );
+    }
   }, [selectedContent]);
 
   const checkedAll = data.length > 0 && found > 0 && data.length === found;
@@ -159,7 +164,7 @@ const Table = ({
                     size="small"
                     color="primary"
                     onClick={() => {
-                      setSelected({});
+                      removeFromBasket(null);
                     }}
                   >
                     <CloseIcon />
@@ -273,7 +278,7 @@ Table.defaultProps = {
   indexes: false,
   rowClick: null,
   selectedContent: [],
-  getSelectedIds: () => {},
+  setSelectedIds: () => {},
   removeFromBasket: () => {},
   addToBasket: () => {},
 };

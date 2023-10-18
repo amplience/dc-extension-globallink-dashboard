@@ -503,7 +503,7 @@ const SubmissionCreateForm = () => {
           {formValues.sourceLocale ? (
             <>
               <ContentItems
-                getSelectedIds={(content: string[]) =>
+                setSelectedIds={(content: string[]) =>
                   setSelectedContent(content)
                 }
                 selectedContent={selectedContent}

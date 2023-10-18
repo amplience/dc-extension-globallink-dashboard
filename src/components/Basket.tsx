@@ -28,13 +28,13 @@ const Basket = ({
   basketContent,
   removeFromBasket,
   setOpenBasket,
-  getSelectedIds,
+  setSelectedIds,
   selectedContent,
 }: {
   basketContent: object[];
   setOpenBasket: (state: boolean) => void;
   removeFromBasket: (item: object) => void;
-  getSelectedIds: (content: string[]) => void;
+  setSelectedIds: (content: string[]) => void;
   selectedContent: string[];
 }) => {
   const { pagination }: ContentItemsInterface = useSelector(
@@ -48,6 +48,16 @@ const Basket = ({
   const slicedData = basketContent;
 
   const { SDK }: SDKInterface = useSelector((state: RootState) => state.sdk);
+
+  const removeFromBasketAndSelected = (item: any) => {
+    if (item == null) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(selectedContent.filter((id) => id !== item.id));
+    }
+
+    removeFromBasket(item);
+  };
 
   const columns = [
     {
@@ -134,13 +144,12 @@ const Basket = ({
         Content Items Basket: {slicedData.length}/{maxContentInSubmission}
       </Typography>
       <Table
-        // removeButton
+        removeButton
         maxContentInSubmission={maxContentInSubmission}
         columns={columns}
         data={slicedData}
-        removeFromBasket={removeFromBasket}
-        getSelectedIds={getSelectedIds}
-        selectedContent={selectedContent}
+        removeFromBasket={removeFromBasketAndSelected}
+        selectedContent={[]}
         currentPage={pagination.page}
         pageSize={PAGE_SIZE}
       />
