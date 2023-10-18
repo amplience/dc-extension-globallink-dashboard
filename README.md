@@ -26,4 +26,4 @@ Please click [here](docs/CONFIGURATION.md) for technical guidance on how to conf
 
 ## Using the extension
 
-Please click [here](docs/USAGE.md) for guidance on how to use the configured GlobalLink Connect dashboard extension to submit content within Dynamic Content for translation and how to manage translations on completion. 
+Please click [here](docs/USAGE.md) for guidance on how to use the configured GlobalLink Connect dashboard extension to submit content within Dynamic Content for translation and how to manage translations on completion.   
