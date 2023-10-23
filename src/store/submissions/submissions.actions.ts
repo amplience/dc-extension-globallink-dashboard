@@ -170,7 +170,7 @@ const specialRegex = /\W|_/g;
 const pathToString = (path: string[]) => {
   let result = '';
   for (let i = path[0] === '$' ? 1 : 0; i < path.length; i++) {
-    const hasSpecialChar = path[i].match(specialRegex);
+    const hasSpecialChar = String(path[i]).match(specialRegex);
 
     if (!hasSpecialChar) {
       if (i !== 0) {
@@ -179,7 +179,7 @@ const pathToString = (path: string[]) => {
 
       result += path[i];
     } else {
-      result += `['${path[i].replaceAll("'", "\\'")}']`;
+      result += `['${String(path[i]).replaceAll("'", "\\'")}']`;
     }
   }
 
