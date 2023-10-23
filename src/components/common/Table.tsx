@@ -74,6 +74,8 @@ const Table = ({
       const newSelecteds: { [key: string]: boolean } = {};
       data.forEach((n: any) => {
         newSelecteds[n.id] = true;
+        console.log('ADDING', n.id);
+        addToBasket(n);
       });
 
       setSelected({
@@ -92,6 +94,7 @@ const Table = ({
     const newUnselecteds: { [key: string]: boolean } = { ...selected };
     data.forEach((n: any) => {
       delete newUnselecteds[n.id];
+      removeFromBasket(n);
     });
     setSelected(newUnselecteds);
     setSelectedIds(Object.keys(newUnselecteds));
