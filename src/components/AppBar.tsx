@@ -68,9 +68,11 @@ const LinkRouter = (props: LinkRouterProps) => (
 const NavBar = () => {
   const dispatch = useDispatch();
   const classes = useStyles();
-  const { data, selectedProject }: ProjectStateInterface = useSelector(
-    (state: RootState) => state.projects
-  );
+  const {
+    data,
+    selectedProject,
+    selectedProjectConfig,
+  }: ProjectStateInterface = useSelector((state: RootState) => state.projects);
   const { selectedSubmission }: SubmissionsInterface = useSelector(
     (state: RootState) => state.submissions
   );
@@ -85,6 +87,9 @@ const NavBar = () => {
     }
     setApplyDialogShow(false);
   };
+
+  // Hide actions until a selected project config is properly loaded.
+  const showButtons = Object.keys(selectedProjectConfig).length > 0;
 
   const breadcrumbNameMap: { [key: string]: any } = {
     '/': {
@@ -276,7 +281,7 @@ ${tasks
                     ) : null}
                     {breadcrumbNameMap[lastPath].buttons ? (
                       <div className={classes.buttonsBlock}>
-                        {breadcrumbNameMap[lastPath].buttons}
+                        {showButtons && breadcrumbNameMap[lastPath].buttons}
                       </div>
                     ) : null}
                   </>
