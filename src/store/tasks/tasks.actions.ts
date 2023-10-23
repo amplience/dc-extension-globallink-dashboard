@@ -464,10 +464,18 @@ const applyToItem = async ({
   translations.forEach(({ key, value }: any) => {
     if (value) {
       if (value != null) {
-        ensureField(updatedBodyObj, `$.${key}`, typeof value);
+        ensureField(
+          updatedBodyObj,
+          key[0] === '[' ? `$${key}` : `$.${key}`,
+          typeof value
+        );
       }
 
-      jsonpath.apply(updatedBodyObj, `$.${key}`, () => value);
+      jsonpath.apply(
+        updatedBodyObj,
+        key[0] === '[' ? `$${key}` : `$.${key}`,
+        () => value
+      );
     }
   });
 
@@ -612,6 +620,41 @@ const deepApply = async ({
   );
 };
 
+const fixupJSON = (json: string) => {
+  // GlobalLink seems to escape ' quotes in keys, but this breaks JSON validation.
+  // These are used for ['keys-with-special-characters'].
+  // Remove them then try again.
+
+  let result = json;
+  let startIndex = 0;
+  let index = 0;
+  do {
+    index = result.indexOf("\\'", startIndex);
+
+    if (index !== -1) {
+      // Look behind the index. Is there an odd number of preceding backslashes?
+      let lbIndex = index - 1;
+      let odd = false;
+      while (lbIndex >= 0 && result[lbIndex] === '\\') {
+        odd = !odd;
+        lbIndex--;
+      }
+
+      if (odd) {
+        // Escaped backslash before the quote, no need to do anything.
+        startIndex = index + 2;
+      } else {
+        // Remove the backslash.
+
+        result = result.substring(0, index) + result.substring(index + 1);
+        startIndex = index + 1;
+      }
+    }
+  } while (index !== -1);
+
+  return result;
+};
+
 const downloadAndApply = async (
   {
     dcManagement,
@@ -629,7 +672,11 @@ const downloadAndApply = async (
   try {
     setProgressStage(loadContext, 0, 'Downloading task...', 1);
     setProgress(loadContext, 0, 'Downloading task.');
-    const translatedTask = await Api.downloadTask(task_id, selectedProject);
+    let translatedTask = await Api.downloadTask(task_id, selectedProject);
+
+    if (typeof translatedTask === 'string') {
+      translatedTask = JSON.parse(fixupJSON(translatedTask));
+    }
 
     setProgressStage(loadContext, 1, 'Fetching content to update...', 4);
     const { sourceContentItem, contentItemToUpdate } =

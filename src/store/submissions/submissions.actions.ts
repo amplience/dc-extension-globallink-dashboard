@@ -165,6 +165,27 @@ export const cancelSubmission =
     }
   };
 
+const specialRegex = /\W|_/g;
+
+const pathToString = (path: string[]) => {
+  let result = '';
+  for (let i = path[0] === '$' ? 1 : 0; i < path.length; i++) {
+    const hasSpecialChar = path[i].match(specialRegex);
+
+    if (!hasSpecialChar) {
+      if (i !== 0) {
+        result += '.';
+      }
+
+      result += path[i];
+    } else {
+      result += `['${path[i].replaceAll("'", "\\'")}']`;
+    }
+  }
+
+  return result;
+};
+
 export const createSubmission =
   ({
     submitter,
@@ -297,13 +318,13 @@ export const createSubmission =
                   (acc: any, field: string) => {
                     const nodes = jsonpath.nodes(
                       contentItem.body,
-                      `$.${field}`
+                      field[0] === '[' ? `$${field}` : `$.${field}`
                     );
 
                     nodes.forEach(({ path, value }) => {
                       if (value && !ContentLink.isContentLink(value)) {
                         acc.push({
-                          key: path.join('.').replace('$.', ''),
+                          key: pathToString(path as any),
                           value,
                         });
                       }
