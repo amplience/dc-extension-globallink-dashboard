@@ -48,8 +48,18 @@ const ContentItems = ({
   const [openBasket, setOpenBasket] = useState(false);
   const [basketContent, setBasketContent] = useState<any[]>([]);
 
-  const addToBasket = (item: ContentItem): void => {
-    if (!basketContent.filter((element) => element.id === item.id).length) {
+  const addToBasket = (item: ContentItem | ContentItem[]): void => {
+    if (Array.isArray(item)) {
+      const set = new Set(basketContent);
+
+      item.forEach((element) => {
+        set.add(element);
+      });
+
+      setBasketContent(Array.from(set));
+    } else if (
+      !basketContent.filter((element) => element.id === item.id).length
+    ) {
       setBasketContent([...basketContent, item]);
     }
   };
@@ -57,6 +67,12 @@ const ContentItems = ({
   const removeFromBasket = (item: any): void => {
     if (item == null) {
       setBasketContent([]);
+    } else if (Array.isArray(item)) {
+      setBasketContent(
+        basketContent.filter(
+          (element) => item.findIndex((nElem) => nElem.id === element.id) === -1
+        )
+      );
     } else if (basketContent.includes(item)) {
       setBasketContent(
         basketContent.filter((element) => element.id !== item.id)
