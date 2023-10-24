@@ -456,6 +456,7 @@ const applyToItem = async ({
   locale,
   contentGet,
   loadContext,
+  params,
 }) => {
   setProgressText(
     loadContext,
@@ -499,7 +500,17 @@ const applyToItem = async ({
     loadContext,
     `Updating ${contentItemToUpdate.label} (${locale}).`
   );
-  return contentItemToUpdate.related.update(result);
+  let resultItem = await contentItemToUpdate.related.update(result);
+
+  setProgress(loadContext, 1, 'Updating workflow state.');
+
+  if (params.statuses && params.statuses.translated) {
+    resultItem = await resultItem.related.assignWorkflowState(
+      new WorkflowState({ id: params.statuses.translated })
+    );
+  }
+
+  return resultItem;
 };
 
 const getUpdatedBody = (contentItemToUpdate, contentItem) => ({
@@ -515,6 +526,7 @@ const deepApply = async ({
   source_locale,
   locale,
   loadContext,
+  params,
 }) => {
   const mapping: any = {};
 
@@ -537,6 +549,7 @@ const deepApply = async ({
           locale,
           contentGet: dcManagement.contentItems.get,
           loadContext,
+          params,
         }));
       }
 
@@ -595,6 +608,7 @@ const deepApply = async ({
                 locale,
                 contentGet: dcManagement.contentItems.get,
                 loadContext,
+                params,
               }))
             );
           }
@@ -609,6 +623,7 @@ const deepApply = async ({
               locale,
               contentGet: dcManagement.contentItems.get,
               loadContext,
+              params,
             }))
           );
         }
@@ -698,6 +713,7 @@ const downloadAndApply = async (
       source_locale,
       locale,
       loadContext,
+      params,
     });
 
     setProgressStage(loadContext, 3, 'Updating status...', 3);
