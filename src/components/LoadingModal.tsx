@@ -8,7 +8,7 @@ import {
   DialogContentText,
   Divider,
 } from '@material-ui/core';
-import { useEffect, useReducer, useState } from 'react';
+import { Fragment, useEffect, useReducer, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { LoadList, LoadProgress } from '../store/loadings/loadProgress';
 import { setDialogLoader } from '../store/loadings/loadings.actions';
@@ -99,7 +99,7 @@ const LoadingModal = ({
         </DialogTitle>
       )}
 
-      {progressList.progress.map((progress) => {
+      {progressList.progress.map((progress, index) => {
         const pL = progress ?? defaultLoadProgress;
 
         const progressFrac = pL.currentProgress.num / pL.totalProgress;
@@ -110,7 +110,7 @@ const LoadingModal = ({
         const sinceStart = timeSpanString(now - pL.startTime);
 
         return (
-          <>
+          <Fragment key={index}>
             {progress ? (
               <>
                 <DialogTitle id="alert-dialog-title">
@@ -127,9 +127,32 @@ const LoadingModal = ({
                     style={{ marginBottom: '12px' }}
                     color={progress.error ? 'secondary' : 'primary'}
                   />
-                  <DialogContentText id="alert-dialog-progress">
-                    {progress.currentProgress.text}
-                  </DialogContentText>
+                  {progress.modal ? (
+                    <>
+                      <DialogContentText id="alert-dialog-progress">
+                        {progress.modal.message}
+                      </DialogContentText>
+                      <DialogActions>
+                        {progress.modal.actions.map((action, index) => (
+                          <Button
+                            autoFocus
+                            color={action.primary ? 'primary' : 'default'}
+                            onClick={() =>
+                              progress.modal?.answer(action.result)
+                            }
+                            key={index}
+                          >
+                            {action.caption}
+                          </Button>
+                        ))}
+                      </DialogActions>
+                    </>
+                  ) : (
+                    <DialogContentText id="alert-dialog-progress">
+                      {progress.currentProgress.text}
+                    </DialogContentText>
+                  )}
+
                   {progress.error && (
                     <DialogContentText
                       id="alert-dialog-error"
@@ -143,7 +166,7 @@ const LoadingModal = ({
             ) : (
               <></>
             )}
-          </>
+          </Fragment>
         );
       })}
 

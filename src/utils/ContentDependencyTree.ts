@@ -465,7 +465,8 @@ export async function deepCopy(
   ids: string[],
   contentItemProvider: (id: string) => Promise<ContentItem>,
   contentItemPicker: (original: ContentItem, body: any) => Promise<ContentItem>,
-  circularMode = CircularMode.Ignore
+  circularMode = CircularMode.Ignore,
+  incorrectSourceLocale: Set<ContentItem> = new Set<ContentItem>()
 ): Promise<any> {
   const cache: any = {};
   const mapping: any = {};
@@ -508,6 +509,8 @@ export async function deepCopy(
           { repo: undefined as any, content: item },
         ])[0];
 
+        const noLocale = item.locale == null;
+
         for (let i = 0; i < deps.dependencies.length; i++) {
           const { id } = deps.dependencies[i].dependency;
           if (id != null) {
@@ -521,7 +524,18 @@ export async function deepCopy(
                 circular.add(id);
               }
             } else {
-              await processItem(id, [...parents, id]);
+              const child = await processItem(id, [...parents, id]);
+
+              if (
+                noLocale &&
+                (child.locale != null || (child as any).hasChildLocale)
+              ) {
+                // Child has locale, but we don't...
+                // Add to a list so it can be dealt with.
+
+                incorrectSourceLocale.add(item);
+                (item as any).hasChildLocale = true;
+              }
             }
           }
         }

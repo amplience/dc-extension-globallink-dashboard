@@ -35,6 +35,7 @@ import {
   setProgressStage,
 } from '../loadings/loadProgress';
 import { CircularMode, deepCopy } from '../../utils/ContentDependencyTree';
+import { LoadModal } from '../loadings/loadModal';
 
 export const SET_SUBMISSIONS = 'SET_SUBMISSIONS';
 export const SET_SELECTED_SUBMISSION = 'SET_SELECTED_SUBMISSION';
@@ -269,84 +270,125 @@ export const createSubmission =
         setProgress(loadContext, 0, `Scanning...`);
 
         try {
-          await deepCopy(
-            [contentItemId],
-            dcManagement.contentItems.get,
-            async (contentItem) => {
-              setProgress(
-                loadContext,
-                0,
-                `Scanning: ${contentItem?.id ?? contentItemId}`
-              );
+          const incorrectSourceLocale = new Set<ContentItem>();
 
-              const contentType =
-                contentItem &&
-                project &&
-                project.contentTypes.find(
-                  ({ uri }: { uri: string }) =>
-                    uri === contentItem.body._meta.schema
+          let run = true;
+
+          while (run) {
+            run = false;
+            await deepCopy(
+              [contentItemId],
+              dcManagement.contentItems.get,
+              async (contentItem) => {
+                setProgress(
+                  loadContext,
+                  0,
+                  `Scanning: ${contentItem?.id ?? contentItemId}`
                 );
 
-              if (contentItemId === contentItem.id) {
-                const ct =
-                  hubContentTypes &&
-                  hubContentTypes.find(
-                    ({ contentTypeUri }: ContentType) =>
-                      contentType &&
-                      contentTypeUri &&
-                      contentType.uri &&
-                      contentTypeUri.toLowerCase() ===
-                        contentType.uri.toLowerCase()
+                const contentType =
+                  contentItem &&
+                  project &&
+                  project.contentTypes.find(
+                    ({ uri }: { uri: string }) =>
+                      uri === contentItem.body._meta.schema
                   );
-                const defaultVizObject =
-                  ct && ct.settings && ct.settings.visualizations
-                    ? ct.settings.visualizations.find((viz) => viz.default)
-                    : { templatedUri: '' };
-
-                const defaultViz =
-                  defaultVizObject && defaultVizObject.templatedUri
-                    ? defaultVizObject.templatedUri
-                        .replace(/{{vse.domain}}/g, params.vse)
-                        .replace(/{{content.sys.id}}/g, contentItem.id)
-                    : '';
-                idMappingTable[contentItemId].label = contentItem.label;
-                idMappingTable[contentItemId].contextUrl = defaultViz || '';
-              }
-
-              if (contentType && contentType.translatableFields) {
-                const fileJson = contentType.translatableFields.reduce(
-                  (acc: any, field: string) => {
-                    const nodes = jsonpath.nodes(
-                      contentItem.body,
-                      field[0] === '[' ? `$${field}` : `$.${field}`
-                    );
-
-                    nodes.forEach(({ path, value }) => {
-                      if (value && !ContentLink.isContentLink(value)) {
-                        acc.push({
-                          key: pathToString(path as any),
-                          value,
-                        });
-                      }
-                    });
-
-                    return acc;
-                  },
-                  []
-                );
 
                 if (contentItemId === contentItem.id) {
-                  idMappingTable[contentItemId].translations = fileJson;
-                } else if (sourceLocale === contentItem.locale) {
-                  idMappingTable[contentItemId].nested[contentItem.id] =
-                    fileJson;
-                }
-              }
+                  const ct =
+                    hubContentTypes &&
+                    hubContentTypes.find(
+                      ({ contentTypeUri }: ContentType) =>
+                        contentType &&
+                        contentTypeUri &&
+                        contentType.uri &&
+                        contentTypeUri.toLowerCase() ===
+                          contentType.uri.toLowerCase()
+                    );
+                  const defaultVizObject =
+                    ct && ct.settings && ct.settings.visualizations
+                      ? ct.settings.visualizations.find((viz) => viz.default)
+                      : { templatedUri: '' };
 
-              return contentItem;
-            },
-            CircularMode.Throw
-          );
+                  const defaultViz =
+                    defaultVizObject && defaultVizObject.templatedUri
+                      ? defaultVizObject.templatedUri
+                          .replace(/{{vse.domain}}/g, params.vse)
+                          .replace(/{{content.sys.id}}/g, contentItem.id)
+                      : '';
+                  idMappingTable[contentItemId].label = contentItem.label;
+                  idMappingTable[contentItemId].contextUrl = defaultViz || '';
+                }
+
+                if (contentType && contentType.translatableFields) {
+                  const fileJson = contentType.translatableFields.reduce(
+                    (acc: any, field: string) => {
+                      const nodes = jsonpath.nodes(
+                        contentItem.body,
+                        field[0] === '[' ? `$${field}` : `$.${field}`
+                      );
+
+                      nodes.forEach(({ path, value }) => {
+                        if (value && !ContentLink.isContentLink(value)) {
+                          acc.push({
+                            key: pathToString(path as any),
+                            value,
+                          });
+                        }
+                      });
+
+                      return acc;
+                    },
+                    []
+                  );
+
+                  if (contentItemId === contentItem.id) {
+                    idMappingTable[contentItemId].translations = fileJson;
+                  } else if (sourceLocale === contentItem.locale) {
+                    idMappingTable[contentItemId].nested[contentItem.id] =
+                      fileJson;
+                  }
+                }
+
+                return contentItem;
+              },
+              CircularMode.Throw,
+              incorrectSourceLocale
+            );
+
+            if (incorrectSourceLocale.size > 0) {
+              const modal = new LoadModal(
+                `${incorrectSourceLocale.size} content item(s) don't have a source locale, but have children that do. These children will be translated, but they will not be properly referenced unless all parents have the source locale. You can either cancel submission, ignore, or force the locale on the affected items.`,
+                [
+                  { caption: 'Cancel', result: 'cancel' },
+                  { caption: 'Ignore', result: 'ignore' },
+                  { caption: 'Force Locale', result: 'force', primary: true },
+                ]
+              );
+
+              const result = await modal.activate(loadContext);
+
+              switch (result) {
+                case 'cancel':
+                  throw new Error(
+                    'Submission cancelled: Missing source locale on content items.'
+                  );
+
+                case 'force':
+                  await Promise.all(
+                    Array.from(incorrectSourceLocale).map((item) =>
+                      item.related.setLocale(sourceLocale)
+                    )
+                  );
+
+                  run = true;
+                  break;
+
+                default:
+                  break;
+              }
+            }
+          }
 
           setProgress(loadContext, 1, `Uploading for translation...`);
 

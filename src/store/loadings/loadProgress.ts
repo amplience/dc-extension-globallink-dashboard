@@ -1,4 +1,5 @@
 import { AppDispatch } from '../store';
+import { LoadModal } from './loadModal';
 import { setDialogLoader } from './loadings.actions';
 
 export enum SubmissionStage {}
@@ -28,6 +29,8 @@ export interface LoadProgress {
 
   error?: string;
   errorTime?: number;
+
+  modal?: LoadModal;
 }
 
 export interface ProgressContext {
@@ -220,4 +223,13 @@ export function setProgressError(progress: ProgressContext, error: any) {
   }
 
   return progress.dispatch(setDialogLoader({ ...progress.array }));
+}
+
+export function setProgressModal(
+  progress: ProgressContext,
+  modal: LoadModal | undefined
+) {
+  progress.elem.modal = modal;
+
+  progress.dispatch(setDialogLoader({ ...progress.array }));
 }
