@@ -451,6 +451,7 @@ const updateDependency = (
 const applyToItem = async ({
   contentItemToUpdate,
   translations = [],
+  sourceContentItem,
   body,
   updatedBodyObj,
   locale,
@@ -502,10 +503,22 @@ const applyToItem = async ({
   );
   let resultItem = await contentItemToUpdate.related.update(result);
 
-  setProgress(loadContext, 1, 'Updating workflow state.');
+  setProgress(loadContext, 1, 'Updating target workflow state.');
 
   if (params.statuses && params.statuses.translated) {
     resultItem = await resultItem.related.assignWorkflowState(
+      new WorkflowState({ id: params.statuses.translated })
+    );
+  }
+
+  setProgress(
+    loadContext,
+    1,
+    `Updating ${sourceContentItem.label} source workflow state.`
+  );
+
+  if (params.statuses && params.statuses.translated) {
+    await sourceContentItem.related.assignWorkflowState(
       new WorkflowState({ id: params.statuses.translated })
     );
   }
@@ -544,6 +557,7 @@ const deepApply = async ({
         return (mapping[contentItemToUpdate.id] = applyToItem({
           contentItemToUpdate,
           translations: translatedTask.translations,
+          sourceContentItem: contentItem,
           body,
           updatedBodyObj: updatedBody,
           locale,
@@ -603,6 +617,7 @@ const deepApply = async ({
               (mapping[localized.id] = await applyToItem({
                 contentItemToUpdate: localized,
                 translations,
+                sourceContentItem: contentItem,
                 body,
                 updatedBodyObj,
                 locale,
@@ -619,6 +634,7 @@ const deepApply = async ({
               contentItemToUpdate: nestedLocalized,
               translations,
               body,
+              sourceContentItem: contentItem,
               updatedBodyObj,
               locale,
               contentGet: dcManagement.contentItems.get,
