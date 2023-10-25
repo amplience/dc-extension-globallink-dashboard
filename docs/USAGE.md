@@ -215,7 +215,11 @@ The status of the submission will be updated automatically in the submissions li
 
 #### Completed translations
 
-Once a translation has been applied via a task or submission, the GlobalLink extension will automatically tag the source content item with the **[Translation Complete](#configurable-values)** workflow state.
+Once a translation has been applied via a task or submission, the GlobalLink extension will automatically tag the following items with the **[Translation Complete](#configurable-values)** workflow state:
+- the source Content Item
+- any source child Content Item that has been translated
+- the target Content Item
+- any target child Content Item that has been translated
 
 As with in-progress translations, this does not prevent you from making further modifications to the content item, but if you wish to submit these modifications for translation these will again need to be prepared and sent for translation, starting with the “[Preparing your content](#preparing-your-content)” step.
 
