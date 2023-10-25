@@ -246,7 +246,7 @@ In order to ensure consistency, this extension follows the same process both whe
 
 See [Updating source content and retranslating](#updating-source-content-and-retranslating) for further details.
 
-If there is one or more items without a locale in the content graph, the following warning will be shown:
+If there are one or more items without a locale in the content graph, the following warning will be shown:
 
 ![](./images/submission-warning-1.png)
 
