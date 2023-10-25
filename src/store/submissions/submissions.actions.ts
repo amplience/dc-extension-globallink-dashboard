@@ -270,11 +270,10 @@ export const createSubmission =
         setProgress(loadContext, 0, `Scanning...`);
 
         try {
-          const incorrectSourceLocale = new Set<ContentItem>();
-
           let run = true;
 
           while (run) {
+            const incorrectSourceLocale = new Set<ContentItem>();
             run = false;
             await deepCopy(
               [contentItemId],
