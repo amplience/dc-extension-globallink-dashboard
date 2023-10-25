@@ -239,8 +239,10 @@ In order to ensure consistency, this extension follows the same process both whe
 
 1. Take the source item
 2. Send the translatable fields from the source item and send them for translation
-3. Once the translations have completed, set the submission in the 'ready' state
-4. When the user chooses to apply the translations it will take the source item, apply the translated fields and either create or update the translated content items.
+4. Navigate through the children items and send to translation if they have a locale
+5. If intermediate children don't have a locale, a warning message will be displayed
+6. Once the translations have completed, set the submission in the 'ready' state
+7. When the user chooses to apply the translations it will take the source item, apply the translated fields and either create or update the translated content items.
 
 See [Updating source content and retranslating](#updating-source-content-and-retranslating) for further details.
 
