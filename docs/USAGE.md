@@ -246,6 +246,18 @@ In order to ensure consistency, this extension follows the same process both whe
 
 See [Updating source content and retranslating](#updating-source-content-and-retranslating) for further details.
 
+If there is one or more items without a locale in the content graph, the following warning will be shown:
+
+![](./images/submission-warning-1.png)
+
+You can either:
+- ignore the warning, and the translations will be applied to all child items with a locale
+- or force locale for all the child items without a locale and apply translations if possible
+
+If you cancel, you will get the following message:
+
+![](./images/submission-warning-2.png)
+
 ### Updating source content and retranslating
 
 The first time a content item is translated, localized versions of the content item will be created from the source locale, and the translation will be applied on top. However, you are also allowed to iterate on content and retranslate as needed, though some simple rules need to be considered:
