@@ -110,8 +110,9 @@ export function parallelProcess<T>(
 
           const task = action(elem, newIndex);
 
-          task.then(() => nextTask(newIndex));
-          task.catch((e) => onError(e, newIndex));
+          task
+            .catch((e) => onError(e, newIndex))
+            .then(() => nextTask(newIndex));
         } else if (!ended && toComplete.size === 0) {
           ended = true;
           resolve();
