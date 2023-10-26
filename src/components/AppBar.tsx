@@ -5,7 +5,6 @@ import {
   Select,
   FormControl,
   makeStyles,
-  MenuItem,
   Typography,
   Breadcrumbs,
   Link,
@@ -229,7 +228,13 @@ ${tasks
               onChange={(e) => dispatch(setProject(e.target.value as string))}
             >
               {data.map(({ connector_key, connector_name }) => (
-                <option key={connector_key} value={connector_key}>
+                <option
+                  key={connector_key}
+                  value={connector_key}
+                  style={{
+                    padding: 12,
+                  }}
+                >
                   {connector_name}
                 </option>
               ))}
