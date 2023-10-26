@@ -60,8 +60,6 @@ export const fetchSDK = () => async (dispatch: Dispatch) => {
         ) !== -1
     );
 
-    debugger;
-
     dispatch(setApi(GCCInstance));
 
     dispatch(setSDK(sdkInited));
