@@ -38,6 +38,7 @@ export interface SubmissionFilterInt {
   is_error?: number;
   is_overdue?: number;
   is_redelivery?: number;
+  connector_key?: string[];
 }
 
 export interface FilterObject {
@@ -49,6 +50,7 @@ export interface FilterObject {
   is_overdue: number;
   is_redelivery: number;
   tags?: string[];
+  connector_key?: string[];
 }
 
 export interface SubmissionsFilterBarInterface {

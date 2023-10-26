@@ -715,7 +715,11 @@ const downloadAndApply = async (
   try {
     setProgressStage(loadContext, 0, 'Downloading task...', 1);
     setProgress(loadContext, 0, 'Downloading task.');
-    let translatedTask = await Api.downloadTask(task_id, selectedProject);
+    let translatedTask = await withRetry(
+      Api.downloadTask,
+      task_id,
+      selectedProject
+    );
 
     if (typeof translatedTask === 'string') {
       translatedTask = JSON.parse(fixupJSON(translatedTask));
@@ -747,7 +751,7 @@ const downloadAndApply = async (
     setProgressStage(loadContext, 3, 'Updating status...', 3);
     setProgress(loadContext, 0, 'Updating task metadata.');
 
-    await Api.updateTaskMetadata(task_id, selectedProject, {
+    await withRetry(Api.updateTaskMetadata, task_id, selectedProject, {
       localizedId: contentItemToUpdate && contentItemToUpdate.id,
     });
 
@@ -761,12 +765,12 @@ const downloadAndApply = async (
     }
 
     setProgress(loadContext, 2, 'Confirming task completion.');
-    await Api.confirmDownload(task_id, selectedProject);
+    await withRetry(Api.confirmDownload, task_id, selectedProject);
 
     return false;
   } catch (e: any) {
     dispatch(setError(e.message));
-    await Api.errorTask(task_id, selectedProject, e.message);
+    await withRetry(Api.errorTask, task_id, selectedProject, e.message);
 
     throw e;
   }
@@ -834,7 +838,7 @@ export const cancelTask =
 
       dispatch(setContentLoader(true));
 
-      await Api.cancelTask(task_id, projects.selectedProject);
+      await withRetry(Api.cancelTask, task_id, projects.selectedProject);
 
       dispatch(getTasks(0));
 
@@ -880,7 +884,7 @@ export const getTasks =
           current_page_number,
           total_result_pages_count,
           tasks_list = [],
-        } = await Api.getTasks({
+        } = await withRetry(Api.getTasks, {
           selectedProject: projects.selectedProject,
           selectedSubmission,
           pageNumber: pageNumber || page || 1,

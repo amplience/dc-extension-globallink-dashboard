@@ -33,6 +33,7 @@ import ErrorOutline from '@material-ui/icons/ErrorOutline';
 import ReactCountryFlag from 'react-country-flag';
 import {
   LoadingsInterface,
+  ProjectStateInterface,
   RootStateInt,
   SubmissionInt,
   SubmissionsInterface,
@@ -71,6 +72,9 @@ const Submissions = (props) => {
   );
   const { data: users }: { data: UserInterface[] } = useSelector(
     (state: RootStateInt) => state.users
+  );
+  const { selectedProject }: ProjectStateInterface = useSelector(
+    (state: RootStateInt) => state.projects
   );
 
   const [applyRow, setApplyRow] = useState<SubmissionInt | undefined>();
@@ -295,21 +299,23 @@ const Submissions = (props) => {
   ];
 
   useEffect(() => {
-    if (pagination && !pagination.page) {
-      dispatch(getSubmissions(1, filter));
-    }
-    if (POLLING_TIME) {
-      const interval = setInterval(() => {
-        if (pagination && !pagination.page) {
-          dispatch(getSubmissions(1, filter));
-        } else if (pagination && pagination.page) {
-          dispatch(getSubmissions(pagination.page, filter));
-        }
-      }, POLLING_TIME);
-      return () => clearInterval(interval);
+    if (selectedProject) {
+      if (pagination && !pagination.page) {
+        dispatch(getSubmissions(1, filter));
+      }
+      if (POLLING_TIME) {
+        const interval = setInterval(() => {
+          if (pagination && !pagination.page) {
+            dispatch(getSubmissions(1, filter));
+          } else if (pagination && pagination.page) {
+            dispatch(getSubmissions(pagination.page, filter));
+          }
+        }, POLLING_TIME);
+        return () => clearInterval(interval);
+      }
     }
     return () => {};
-  }, [pagination, dispatch, filter]);
+  }, [pagination, dispatch, filter, selectedProject]);
 
   const applyTask = (apply: boolean) => {
     if (apply && applyRow) {

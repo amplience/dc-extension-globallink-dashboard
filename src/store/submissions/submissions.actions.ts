@@ -103,6 +103,7 @@ export const getSubmissions =
           filter: storedFilter,
           pagination: { page: currentPage },
         },
+        projects: { selectedProject },
       }: RootStateInt = getState();
 
       dispatch(setContentLoader(true));
@@ -131,8 +132,16 @@ export const getSubmissions =
         filterObject.tags = [globalFilter];
       }
 
+      if (selectedProject) {
+        filterObject.connector_key = [selectedProject];
+      }
+
       const { current_page_number, total_result_pages_count, submission_list } =
-        await Api.getSubmissions(page || currentPage || 0, filterObject);
+        await withRetry(
+          Api.getSubmissions,
+          page || currentPage || 0,
+          filterObject
+        );
 
       dispatch(setSubmissions(submission_list));
       dispatch(
@@ -157,7 +166,11 @@ export const cancelSubmission =
       dispatch(setContentLoader(true));
 
       if (submission_id) {
-        await Api.cancelSubmission(submission_id, projects.selectedProject);
+        await withRetry(
+          Api.cancelSubmission,
+          submission_id,
+          projects.selectedProject
+        );
       }
 
       dispatch(setContentLoader(false));
@@ -394,7 +407,7 @@ export const createSubmission =
 
           const objJsonStr = JSON.stringify(idMappingTable[contentItemId]);
 
-          const { content_id } = await Api.createNodeFile({
+          const { content_id } = await withRetry(Api.createNodeFile, {
             file: new Blob([objJsonStr], {
               type: 'application/json',
             }),
@@ -449,7 +462,7 @@ export const createSubmission =
         submissionData.config = config;
       }
 
-      await Api.createSubmission(submissionData);
+      await withRetry(Api.createSubmission, submissionData);
 
       setProgressStage(
         loadContext,
