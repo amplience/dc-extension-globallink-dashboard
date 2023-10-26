@@ -49,7 +49,19 @@ export const fetchSDK = () => async (dispatch: Dispatch) => {
 
     const users = await extension.users.list();
 
-    const projects: Project[] = await GCCInstance.getProjects();
+    let projects: Project[] = await GCCInstance.getProjects();
+
+    // Only count projects that have been configured.
+    projects = projects.filter(
+      (project: Project) =>
+        params.projects &&
+        params.projects.findIndex(
+          (config) => config.id === project.connector_key
+        ) !== -1
+    );
+
+    debugger;
+
     dispatch(setApi(GCCInstance));
 
     dispatch(setSDK(sdkInited));
