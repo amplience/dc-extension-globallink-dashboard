@@ -36,6 +36,7 @@ import {
 } from '../loadings/loadProgress';
 import { CircularMode, deepCopy } from '../../utils/ContentDependencyTree';
 import { LoadModal } from '../loadings/loadModal';
+import { withRetry } from '../../utils/withRetry';
 
 export const SET_SUBMISSIONS = 'SET_SUBMISSIONS';
 export const SET_SELECTED_SUBMISSION = 'SET_SELECTED_SUBMISSION';
@@ -376,7 +377,7 @@ export const createSubmission =
                 case 'force':
                   await Promise.all(
                     Array.from(incorrectSourceLocale).map((item) =>
-                      item.related.setLocale(sourceLocale)
+                      withRetry(item.related.setLocale, sourceLocale)
                     )
                   );
 
@@ -463,12 +464,14 @@ export const createSubmission =
 
       await Promise.all(
         contentItems.map(async (id: string) => {
-          const contentItem: ContentItem = await dcManagement.contentItems.get(
+          const contentItem: ContentItem = await withRetry(
+            dcManagement.contentItems.get,
             id
           );
 
           if (params.statuses && params.statuses.inProgress) {
-            await contentItem.related.assignWorkflowState(
+            await withRetry(
+              contentItem.related.assignWorkflowState,
               new WorkflowState({ id: params.statuses.inProgress })
             );
           }

@@ -1,5 +1,6 @@
 import { ContentItem, ContentRepository } from 'dc-management-sdk-js';
 import { Body } from './body';
+import { withRetry } from './withRetry';
 
 export type DependencyContentTypeSchema =
   | 'http://bigcontent.io/cms/schema/v1/core#/definitions/content-link'
@@ -502,7 +503,7 @@ export async function deepCopy(
       return cache[id];
     }
 
-    return (cache[id] = contentItemProvider(id)
+    return (cache[id] = withRetry(contentItemProvider, id)
       .then(async (item) => {
         // visit children
         const deps = ContentDependencyTree.identifyContentDependencies([

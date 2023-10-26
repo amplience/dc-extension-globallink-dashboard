@@ -20,6 +20,7 @@ import {
   RootStateInt,
 } from '../../types/types';
 import { PAGE_SIZE } from '../../utils/GCCRestApi';
+import { withRetry } from '../../utils/withRetry';
 
 export const SET_CONTENT_ITEMS = 'SET_CONTENT_ITEMS';
 export const SET_CONTENT_ITEMS_PAGINATION = 'SET_CONTENT_ITEMS_PAGINATION';
@@ -51,8 +52,10 @@ const getAllContentTypes = async (
   data: ContentType[] = [],
   pageNumber = 0
 ): Promise<ContentType[]> => {
-  const contentTypePage: Page<ContentType> =
-    await hub.related.contentTypes.list({ size: 100, page: pageNumber });
+  const contentTypePage: Page<ContentType> = await withRetry(
+    hub.related.contentTypes.list,
+    { size: 100, page: pageNumber }
+  );
   const items = contentTypePage.getItems() as ContentType[];
   data = data.concat(items);
 
@@ -143,8 +146,9 @@ export const getContentItems =
         .filter((el: any) => !el.dependency)
         .map((el: any) => el.uri.toLowerCase());
 
-      const hub = await dcManagement.hubs.get(hubId);
-      const facets = await hub.related.contentItems.facet(
+      const hub = await withRetry(dcManagement.hubs.get, hubId);
+      const facets = await withRetry(
+        hub.related.contentItems.facet,
         {
           fields: [
             {
@@ -226,7 +230,9 @@ export const getContentItems =
               })
             ) as Option[],
             repositories: (
-              await hub.related.contentRepositories.list({ size: 100 })
+              await withRetry(hub.related.contentRepositories.list, {
+                size: 100,
+              })
             )
               .getItems()
               .map((el: ContentRepository) => ({

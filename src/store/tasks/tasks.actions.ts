@@ -33,6 +33,7 @@ import {
   setProgressStage,
   setProgressText,
 } from '../loadings/loadProgress';
+import { withRetry } from '../../utils/withRetry';
 
 export const SET_TASKS = 'SET_TASKS';
 export const SET_TASKS_PAGINATION = 'SET_TASKS_PAGINATION';
@@ -52,8 +53,10 @@ const getAllLocalization = async (
   localizations: ContentItem[] = [],
   pageNumber = 0
 ): Promise<ContentItem[]> => {
-  const localizationPage: Page<ContentItem> =
-    await contentItem.related.localizations({ size: 100, page: pageNumber });
+  const localizationPage: Page<ContentItem> = await withRetry(
+    contentItem.related.localizations,
+    { size: 100, page: pageNumber }
+  );
   const items: ContentItem[] = localizationPage.getItems();
   localizations = localizations.concat(items);
 
@@ -156,7 +159,8 @@ const getContentItemToUpdate = async ({
 }) => {
   setProgress(loadContext, 0, `Getting root ${unique_identifier}`);
 
-  const sourceContentItem = await dcManagement.contentItems.get(
+  const sourceContentItem: ContentItem = await withRetry(
+    dcManagement.contentItems.get,
     unique_identifier
   );
 
@@ -176,7 +180,7 @@ const getContentItemToUpdate = async ({
       2,
       `Creating a localized version of ${sourceContentItem.label}.`
     );
-    await sourceContentItem.related.localize([locale]);
+    await withRetry(sourceContentItem.related.localize, [locale]);
 
     const localized: ContentItem | undefined =
       await getLocalizedAfterJobStarted(sourceContentItem, locale);
@@ -186,7 +190,8 @@ const getContentItemToUpdate = async ({
       3,
       `Fetching localized version of ${sourceContentItem.label}.`
     );
-    contentItemToUpdate = await dcManagement.contentItems.get(
+    contentItemToUpdate = await withRetry(
+      dcManagement.contentItems.get,
       localized && localized.id
     );
   } else {
@@ -196,7 +201,8 @@ const getContentItemToUpdate = async ({
       `Fetching existing localized version of ${sourceContentItem.label}.`
     );
 
-    contentItemToUpdate = await dcManagement.contentItems.get(
+    contentItemToUpdate = await withRetry(
+      dcManagement.contentItems.get,
       contentItemToUpdate.id
     );
   }
@@ -418,7 +424,7 @@ const updateDependencyLocales = async (
     );
 
     // Fetch the content for ID, and determine if it has the target locale.
-    const refItem = (await contentGet(id)) as ContentItem;
+    const refItem = (await withRetry(contentGet, id)) as ContentItem;
 
     if (refItem.locale != null && refItem.locale !== locale) {
       // If it has a locale and it doesn't match the target, see if there is a localized version that can be substituted.
@@ -501,12 +507,13 @@ const applyToItem = async ({
     loadContext,
     `Updating ${contentItemToUpdate.label} (${locale}).`
   );
-  let resultItem = await contentItemToUpdate.related.update(result);
+  let resultItem = await withRetry(contentItemToUpdate.related.update, result);
 
   setProgress(loadContext, 1, 'Updating target workflow state.');
 
   if (params.statuses && params.statuses.translated) {
-    resultItem = await resultItem.related.assignWorkflowState(
+    resultItem = await withRetry(
+      (resultItem as any).related.assignWorkflowState,
       new WorkflowState({ id: params.statuses.translated })
     );
   }
@@ -518,7 +525,8 @@ const applyToItem = async ({
   );
 
   if (params.statuses && params.statuses.translated) {
-    await sourceContentItem.related.assignWorkflowState(
+    await withRetry(
+      sourceContentItem.related.assignWorkflowState,
       new WorkflowState({ id: params.statuses.translated })
     );
   }
@@ -581,7 +589,7 @@ const deepApply = async ({
 
         nestedLocalized =
           nestedLocalized &&
-          (await dcManagement.contentItems.get(nestedLocalized.id));
+          (await withRetry(dcManagement.contentItems.get, nestedLocalized.id));
 
         const updatedBodyObj = getUpdatedBody(nestedLocalized, contentItem);
 
@@ -594,7 +602,10 @@ const deepApply = async ({
               `Setting source locale for '${contentItem.label}'`
             );
 
-            await contentItem.related.setLocale(source_locale.locale);
+            await withRetry(
+              contentItem.related.setLocale,
+              source_locale.locale
+            );
           }
 
           if (!nestedLocalized) {
@@ -603,12 +614,13 @@ const deepApply = async ({
               `Creating locale ${locale} for '${contentItem.label}'`
             );
 
-            await contentItem.related.localize([locale]);
+            await withRetry(contentItem.related.localize, [locale]);
 
             let localized: ContentItem | undefined =
               await getLocalizedAfterJobStarted(contentItem, locale);
 
-            localized = await dcManagement.contentItems.get(
+            localized = await withRetry(
+              dcManagement.contentItems.get,
               localized && localized.id
             );
 
@@ -742,7 +754,8 @@ const downloadAndApply = async (
     setProgress(loadContext, 1, 'Updating workflow state.');
 
     if (params.statuses && params.statuses.translated) {
-      await sourceContentItem.related.assignWorkflowState(
+      await withRetry(
+        sourceContentItem.related.assignWorkflowState,
         new WorkflowState({ id: params.statuses.translated })
       );
     }
