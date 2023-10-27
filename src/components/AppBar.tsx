@@ -12,6 +12,7 @@ import {
   Button,
   IconButton,
   Box,
+  MenuItem,
 } from '@material-ui/core';
 import RefreshIcon from '@material-ui/icons/Refresh';
 
@@ -231,15 +232,9 @@ ${tasks
               }}
             >
               {data.map(({ connector_key, connector_name }) => (
-                <option
-                  key={connector_key}
-                  value={connector_key}
-                  style={{
-                    padding: 12,
-                  }}
-                >
+                <MenuItem key={connector_key} value={connector_key}>
                   {connector_name}
-                </option>
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
