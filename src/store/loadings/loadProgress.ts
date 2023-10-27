@@ -31,6 +31,7 @@ export interface LoadProgress {
   errorTime?: number;
 
   modal?: LoadModal;
+  retryNumber?: number;
 }
 
 export interface ProgressContext {
@@ -231,6 +232,15 @@ export function setProgressModal(
   modal: LoadModal | undefined
 ) {
   progress.elem.modal = modal;
+
+  progress.dispatch(setDialogLoader({ ...progress.array }));
+}
+
+export function setProgressRetry(
+  progress: ProgressContext,
+  retry: number | undefined
+) {
+  progress.elem.retryNumber = retry;
 
   progress.dispatch(setDialogLoader({ ...progress.array }));
 }

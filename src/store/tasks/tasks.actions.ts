@@ -98,7 +98,7 @@ const getLocalizedAfterJobStarted = async (
   contentItem: ContentItem,
   locale: string
 ): Promise<ContentItem | undefined> => {
-  let localized: ContentItem | undefined = new ContentItem({});
+  let localized: ContentItem | undefined;
 
   do {
     const allLocalized = await throttled(contentItem);
@@ -109,10 +109,13 @@ const getLocalizedAfterJobStarted = async (
       );
   } while (!localized);
 
-  const allLocalized = await getAllLocalization(contentItem);
-  localized = allLocalized.find(
-    ({ locale: contentLocale }: ContentItem) => contentLocale === locale
-  );
+  // Second pass is needed as the first tends to get an invalid item.
+  do {
+    const allLocalized = await getAllLocalization(contentItem);
+    localized = allLocalized.find(
+      ({ locale: contentLocale }: ContentItem) => contentLocale === locale
+    );
+  } while (!localized);
 
   return localized;
 };
@@ -507,7 +510,23 @@ const applyToItem = async ({
     loadContext,
     `Updating ${contentItemToUpdate.label} (${locale}).`
   );
-  let resultItem = await withRetry(contentItemToUpdate.related.update, result);
+
+  const getAndUpdate = async (body: any) => {
+    try {
+      return await contentItemToUpdate.related.update(body);
+    } catch (e: any) {
+      if (
+        e?.response?.data?.errors &&
+        e?.response?.data?.errors[0]?.code === 'CONTENT_ITEM_VERSION_NOT_LATEST'
+      ) {
+        contentItemToUpdate = await contentGet(contentItemToUpdate.id);
+      }
+
+      throw e;
+    }
+  };
+
+  let resultItem = await withRetry(getAndUpdate, result);
 
   setProgress(loadContext, 1, 'Updating target workflow state.');
 
