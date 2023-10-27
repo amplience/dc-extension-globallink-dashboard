@@ -221,7 +221,10 @@ ${tasks
         <Toolbar disableGutters variant="dense">
           <FormControl classes={{ root: classes.formControl }} variant="filled">
             <Select
-              disabled={location.pathname.includes('/tasks')}
+              disabled={
+                location.pathname.includes('/tasks') ||
+                location.pathname.includes('/create')
+              }
               variant="filled"
               value={selectedProject}
               classes={{ filled: classes.filledInput }}
