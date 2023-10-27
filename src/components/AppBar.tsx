@@ -225,7 +225,10 @@ ${tasks
               inputProps={{
                 margin: 'none',
               }}
-              onChange={(e) => dispatch(setProject(e.target.value as string))}
+              onChange={(e) => {
+                dispatch(setProject(e.target.value as string));
+                dispatch(getSubmissions());
+              }}
             >
               {data.map(({ connector_key, connector_name }) => (
                 <option
