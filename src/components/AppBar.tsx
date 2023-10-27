@@ -227,7 +227,7 @@ ${tasks
               }}
               onChange={(e) => {
                 dispatch(setProject(e.target.value as string));
-                dispatch(getSubmissions());
+                dispatch(getSubmissions(1));
               }}
             >
               {data.map(({ connector_key, connector_name }) => (
