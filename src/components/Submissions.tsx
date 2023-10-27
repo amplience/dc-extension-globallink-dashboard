@@ -161,6 +161,12 @@ const Submissions = (props) => {
       ),
     },
     {
+      id: 'created_at',
+      label: 'Creation Date',
+      format: (timestamp: number) =>
+        new Date(timestamp).toLocaleDateString().replaceAll('.', '/'),
+    },
+    {
       id: 'due_date',
       label: 'Due Date',
       format: (timestamp: number) =>
