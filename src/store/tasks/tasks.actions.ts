@@ -33,7 +33,7 @@ import {
   setProgressStage,
   setProgressText,
 } from '../loadings/loadProgress';
-import { withRetry } from '../../utils/withRetry';
+import { withRetry, withRetryContext } from '../../utils/withRetry';
 
 export const SET_TASKS = 'SET_TASKS';
 export const SET_TASKS_PAGINATION = 'SET_TASKS_PAGINATION';
@@ -162,8 +162,9 @@ const getContentItemToUpdate = async ({
 }) => {
   setProgress(loadContext, 0, `Getting root ${unique_identifier}`);
 
-  const sourceContentItem: ContentItem = await withRetry(
+  const sourceContentItem: ContentItem = await withRetryContext(
     dcManagement.contentItems.get,
+    loadContext,
     unique_identifier
   );
 
@@ -183,7 +184,9 @@ const getContentItemToUpdate = async ({
       2,
       `Creating a localized version of ${sourceContentItem.label}.`
     );
-    await withRetry(sourceContentItem.related.localize, [locale]);
+    await withRetryContext(sourceContentItem.related.localize, loadContext, [
+      locale,
+    ]);
 
     const localized: ContentItem | undefined =
       await getLocalizedAfterJobStarted(sourceContentItem, locale);
@@ -193,8 +196,9 @@ const getContentItemToUpdate = async ({
       3,
       `Fetching localized version of ${sourceContentItem.label}.`
     );
-    contentItemToUpdate = await withRetry(
+    contentItemToUpdate = await withRetryContext(
       dcManagement.contentItems.get,
+      loadContext,
       localized && localized.id
     );
   } else {
@@ -204,8 +208,9 @@ const getContentItemToUpdate = async ({
       `Fetching existing localized version of ${sourceContentItem.label}.`
     );
 
-    contentItemToUpdate = await withRetry(
+    contentItemToUpdate = await withRetryContext(
       dcManagement.contentItems.get,
+      loadContext,
       contentItemToUpdate.id
     );
   }
@@ -427,7 +432,11 @@ const updateDependencyLocales = async (
     );
 
     // Fetch the content for ID, and determine if it has the target locale.
-    const refItem = (await withRetry(contentGet, id)) as ContentItem;
+    const refItem = (await withRetryContext(
+      contentGet,
+      loadProgress,
+      id
+    )) as ContentItem;
 
     if (refItem.locale != null && refItem.locale !== locale) {
       // If it has a locale and it doesn't match the target, see if there is a localized version that can be substituted.
@@ -526,13 +535,14 @@ const applyToItem = async ({
     }
   };
 
-  let resultItem = await withRetry(getAndUpdate, result);
+  let resultItem = await withRetryContext(getAndUpdate, loadContext, result);
 
   setProgress(loadContext, 1, 'Updating target workflow state.');
 
   if (params.statuses && params.statuses.translated) {
-    resultItem = await withRetry(
+    resultItem = await withRetryContext(
       (resultItem as any).related.assignWorkflowState,
+      loadContext,
       new WorkflowState({ id: params.statuses.translated })
     );
   }
@@ -544,8 +554,9 @@ const applyToItem = async ({
   );
 
   if (params.statuses && params.statuses.translated) {
-    await withRetry(
+    await withRetryContext(
       sourceContentItem.related.assignWorkflowState,
+      loadContext,
       new WorkflowState({ id: params.statuses.translated })
     );
   }
@@ -608,7 +619,11 @@ const deepApply = async ({
 
         nestedLocalized =
           nestedLocalized &&
-          (await withRetry(dcManagement.contentItems.get, nestedLocalized.id));
+          (await withRetryContext(
+            dcManagement.contentItems.get,
+            loadContext,
+            nestedLocalized.id
+          ));
 
         const updatedBodyObj = getUpdatedBody(nestedLocalized, contentItem);
 
@@ -621,8 +636,9 @@ const deepApply = async ({
               `Setting source locale for '${contentItem.label}'`
             );
 
-            await withRetry(
+            await withRetryContext(
               contentItem.related.setLocale,
+              loadContext,
               source_locale.locale
             );
           }
@@ -633,13 +649,16 @@ const deepApply = async ({
               `Creating locale ${locale} for '${contentItem.label}'`
             );
 
-            await withRetry(contentItem.related.localize, [locale]);
+            await withRetryContext(contentItem.related.localize, loadContext, [
+              locale,
+            ]);
 
             let localized: ContentItem | undefined =
               await getLocalizedAfterJobStarted(contentItem, locale);
 
-            localized = await withRetry(
+            localized = await withRetryContext(
               dcManagement.contentItems.get,
+              loadContext,
               localized && localized.id
             );
 
@@ -734,8 +753,9 @@ const downloadAndApply = async (
   try {
     setProgressStage(loadContext, 0, 'Downloading task...', 1);
     setProgress(loadContext, 0, 'Downloading task.');
-    let translatedTask = await withRetry(
+    let translatedTask = await withRetryContext(
       Api.downloadTask,
+      loadContext,
       task_id,
       selectedProject
     );
@@ -770,26 +790,44 @@ const downloadAndApply = async (
     setProgressStage(loadContext, 3, 'Updating status...', 3);
     setProgress(loadContext, 0, 'Updating task metadata.');
 
-    await withRetry(Api.updateTaskMetadata, task_id, selectedProject, {
-      localizedId: contentItemToUpdate && contentItemToUpdate.id,
-    });
+    await withRetryContext(
+      Api.updateTaskMetadata,
+      loadContext,
+      task_id,
+      selectedProject,
+      {
+        localizedId: contentItemToUpdate && contentItemToUpdate.id,
+      }
+    );
 
     setProgress(loadContext, 1, 'Updating workflow state.');
 
     if (params.statuses && params.statuses.translated) {
-      await withRetry(
+      await withRetryContext(
         sourceContentItem.related.assignWorkflowState,
+        loadContext,
         new WorkflowState({ id: params.statuses.translated })
       );
     }
 
     setProgress(loadContext, 2, 'Confirming task completion.');
-    await withRetry(Api.confirmDownload, task_id, selectedProject);
+    await withRetryContext(
+      Api.confirmDownload,
+      loadContext,
+      task_id,
+      selectedProject
+    );
 
     return false;
   } catch (e: any) {
     dispatch(setError(e.message));
-    await withRetry(Api.errorTask, task_id, selectedProject, e.message);
+    await withRetryContext(
+      Api.errorTask,
+      loadContext,
+      task_id,
+      selectedProject,
+      e.message
+    );
 
     throw e;
   }

@@ -150,6 +150,9 @@ const LoadingModal = ({
                   ) : (
                     <DialogContentText id="alert-dialog-progress">
                       {progress.currentProgress.text}
+                      {progress.retryNumber != null
+                        ? ` (Attempt ${progress.retryNumber})`
+                        : ''}
                     </DialogContentText>
                   )}
 

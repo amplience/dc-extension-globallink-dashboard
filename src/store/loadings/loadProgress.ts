@@ -240,7 +240,9 @@ export function setProgressRetry(
   progress: ProgressContext,
   retry: number | undefined
 ) {
-  progress.elem.retryNumber = retry;
+  if (retry !== progress.elem.retryNumber) {
+    progress.elem.retryNumber = retry;
 
-  progress.dispatch(setDialogLoader({ ...progress.array }));
+    progress.dispatch(setDialogLoader({ ...progress.array }));
+  }
 }

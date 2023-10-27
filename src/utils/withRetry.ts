@@ -26,10 +26,6 @@ export async function withRetryContext<T>(
   context: ProgressContext | undefined,
   ...args: any[]
 ): Promise<T> {
-  if (args.length > 0 && args[0] === undefined) {
-    debugger;
-  }
-
   let lastError: any;
   let delayMs = retryDelayBase;
   for (let i = 0; i < retryCount; i++) {

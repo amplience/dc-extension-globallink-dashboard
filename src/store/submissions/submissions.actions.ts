@@ -36,7 +36,7 @@ import {
 } from '../loadings/loadProgress';
 import { CircularMode, deepCopy } from '../../utils/ContentDependencyTree';
 import { LoadModal } from '../loadings/loadModal';
-import { withRetry } from '../../utils/withRetry';
+import { withRetry, withRetryContext } from '../../utils/withRetry';
 
 export const SET_SUBMISSIONS = 'SET_SUBMISSIONS';
 export const SET_SELECTED_SUBMISSION = 'SET_SELECTED_SUBMISSION';
@@ -390,7 +390,11 @@ export const createSubmission =
                 case 'force':
                   await Promise.all(
                     Array.from(incorrectSourceLocale).map((item) =>
-                      withRetry(item.related.setLocale, sourceLocale)
+                      withRetryContext(
+                        item.related.setLocale,
+                        loadContext,
+                        sourceLocale
+                      )
                     )
                   );
 
@@ -407,18 +411,22 @@ export const createSubmission =
 
           const objJsonStr = JSON.stringify(idMappingTable[contentItemId]);
 
-          const { content_id } = await withRetry(Api.createNodeFile, {
-            file: new Blob([objJsonStr], {
-              type: 'application/json',
-            }),
-            unique_identifier: contentItemId,
-            public_preview_url: idMappingTable[contentItemId].contextUrl,
-            name: idMappingTable[contentItemId].label,
-            submitter,
-            source_locale: sourceLocale,
-            file_type: params.fileType || 'json',
-            connector_key: selectedProject || '',
-          });
+          const { content_id } = await withRetryContext(
+            Api.createNodeFile,
+            loadContext,
+            {
+              file: new Blob([objJsonStr], {
+                type: 'application/json',
+              }),
+              unique_identifier: contentItemId,
+              public_preview_url: idMappingTable[contentItemId].contextUrl,
+              name: idMappingTable[contentItemId].label,
+              submitter,
+              source_locale: sourceLocale,
+              file_type: params.fileType || 'json',
+              connector_key: selectedProject || '',
+            }
+          );
 
           tasks.push(content_id);
         } catch (e) {
@@ -462,7 +470,7 @@ export const createSubmission =
         submissionData.config = config;
       }
 
-      await withRetry(Api.createSubmission, submissionData);
+      await withRetryContext(Api.createSubmission, loadContext, submissionData);
 
       setProgressStage(
         loadContext,
@@ -477,14 +485,16 @@ export const createSubmission =
 
       await Promise.all(
         contentItems.map(async (id: string) => {
-          const contentItem: ContentItem = await withRetry(
+          const contentItem: ContentItem = await withRetryContext(
             dcManagement.contentItems.get,
+            loadContext,
             id
           );
 
           if (params.statuses && params.statuses.inProgress) {
-            await withRetry(
+            await withRetryContext(
               contentItem.related.assignWorkflowState,
+              loadContext,
               new WorkflowState({ id: params.statuses.inProgress })
             );
           }
