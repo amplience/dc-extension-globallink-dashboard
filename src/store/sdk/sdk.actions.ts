@@ -15,6 +15,7 @@ import { ParamsInt, Project, SDKInterface } from '../../types/types';
 import { defaultSdk } from './sdk.reducer';
 
 export const SET_SDK = 'SET_SDK';
+export const MAX_PROJECTS = 10;
 
 export const setSDK = (value: SDKInterface) => ({
   type: SET_SDK,
@@ -57,7 +58,7 @@ export const fetchSDK = () => async (dispatch: Dispatch) => {
       const matchingProject = projects.find(
         (config) => config.connector_key === project.id
       );
-      if (matchingProject) {
+      if (matchingProject && finalProjects.length < MAX_PROJECTS) {
         finalProjects.push(matchingProject);
       }
     });
