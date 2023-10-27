@@ -17,7 +17,7 @@ import {
 import RefreshIcon from '@material-ui/icons/Refresh';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { Route } from 'react-router';
+import { Route, useLocation } from 'react-router';
 import { Link as RouterLink } from 'react-router-dom';
 import { RootState } from '../store/store';
 import { setProject } from '../store/project/project.actions';
@@ -67,6 +67,7 @@ const LinkRouter = (props: LinkRouterProps) => (
 
 const NavBar = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const classes = useStyles();
   const {
     data,
@@ -220,6 +221,7 @@ ${tasks
         <Toolbar disableGutters variant="dense">
           <FormControl classes={{ root: classes.formControl }} variant="filled">
             <Select
+              disabled={location.pathname.includes('/tasks')}
               variant="filled"
               value={selectedProject}
               classes={{ filled: classes.filledInput }}
