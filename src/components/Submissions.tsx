@@ -92,6 +92,20 @@ const Submissions = (props) => {
     {
       id: 'submission_name',
       label: 'Submission name',
+      format: (submission_name: string) => (
+        <div
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            width: '300px',
+          }}
+          title={submission_name}
+        >
+          <Typography noWrap variant="body2">
+            {submission_name}
+          </Typography>
+        </div>
+      ),
     },
     {
       id: 'submitter',

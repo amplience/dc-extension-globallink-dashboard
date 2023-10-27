@@ -99,6 +99,20 @@ const Tasks = () => {
     {
       id: 'name',
       label: 'Name',
+      format: (name: string) => (
+        <div
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            width: '300px',
+          }}
+          title={name}
+        >
+          <Typography noWrap variant="body2">
+            {name}
+          </Typography>
+        </div>
+      ),
     },
     {
       id: 'source_locale',
