@@ -50,13 +50,12 @@ const ContentItems = ({
 
   const addToBasket = (item: ContentItem | ContentItem[]): void => {
     if (Array.isArray(item)) {
-      const set = new Set(basketContent);
+      const newItems = item.filter(
+        (item) =>
+          basketContent.findIndex((existing) => existing.id === item.id) === -1
+      );
 
-      item.forEach((element) => {
-        set.add(element);
-      });
-
-      setBasketContent(Array.from(set));
+      setBasketContent([...basketContent, ...newItems]);
     } else if (
       !basketContent.filter((element) => element.id === item.id).length
     ) {
@@ -73,7 +72,9 @@ const ContentItems = ({
           (element) => item.findIndex((nElem) => nElem.id === element.id) === -1
         )
       );
-    } else if (basketContent.includes(item)) {
+    } else if (
+      basketContent.findIndex((element) => element.id === item.id) !== -1
+    ) {
       setBasketContent(
         basketContent.filter((element) => element.id !== item.id)
       );
