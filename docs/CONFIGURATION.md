@@ -160,11 +160,11 @@ When configuring content types for translation, this uses  JSONPath for defining
 
 
 ### Delivery Keys
-You are free to use Delivery Keys but please be aware of the following:
+You are free to use Delivery Keys, but please be aware of the following:
 
-- Don't set Delivery Keys as Mandatory or translations will fail
-- If you define a Delivery Key format in the Schema eg content/* after you have already created content, you'll need to sync to enable the translations to proceed
-- If using Regexp, use prefix as _locale which is used as a suffix for translations
+- Don't set Delivery Keys as Mandatory or translations will fail.
+- If you define a Delivery Key format in the Schema (eg. content/*) after you have already created content, you'll need to sync to enable the translations to proceed.
+- If using a regular expression to validate your delivery key, your pattern should allow for a suffix, as localised items automatically generate with delivery keys suffixed with `_<locale>`, eg. `_en-GB`. If your delivery key pattern only requires a suffix, such as `content/`, then it should work without issue.
 
 ### Locales
-It is important to note that target or source Locales are not managed/defined within Amplience. These are managed by GlobalLink and therefore, these are not configurable within the Amplience Schemas ie through Settings, Locale.
+It is important to note that target or source locales you can select are not managed/defined within Amplience. These are managed by GlobalLink and thus are not configurable within the Amplience extension configuration. The preset locales selected for specific templates _are_ configured in the Amplience extension configuration, but these locales must be configured on GlobalLink first to use them.

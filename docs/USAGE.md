@@ -45,7 +45,7 @@ When you create your content, there are a couple of things you will need to do t
 
 1. Assign the source locale to your content item.
    - For example, if you are looking to translate your content from English to German, you may want to assign en-US.
-2. (Optionally) assign the content item to a person/s.
+2. (Optionally) assign the content item to at least one person.
    - This is not mandatory for translation but may help with finding the content item when you create a submission, as content items can be filtered by assignees.
 3. Flag your content item as ready for translation with a workflow state.
    - To ensure that content is not sent for translation prematurely, the GlobalLink dashboard uses workflow states to determine what can and cannot be sent for translation. To flag your content item for translation, set the workflow state to **[Ready For Translation](#configurable-values)**.
