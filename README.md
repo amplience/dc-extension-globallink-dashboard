@@ -8,7 +8,7 @@ This extension was developed and tested using:
 - npm 9.x
 - node 16.x
 
-To switch to the correct node version it is recommended to have Node Version Manager installed. Commands:
+To switch to the correct node version it is recommended to have [Node Version Manager](https://github.com/nvm-sh/nvm) installed. Commands:
 
 nvm install 16
 
