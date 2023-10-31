@@ -51,6 +51,7 @@ import SubmissionFilterBar from './SubmissionFilterBar';
 import { useStyles } from './Tasks';
 import LoadingModal from './LoadingModal';
 import ConfirmationDialog from './ConfirmationDialog';
+import { getCountryCode } from '../utils/locale';
 
 export const SUBMISSION_STATUSES: { [key: string]: string } = {
   Delivered: 'Translation Complete',
@@ -85,8 +86,6 @@ const Submissions = (props) => {
   const handleClose = () => {
     setOpenModal(false);
   };
-
-  const getCountryCode = (code: string) => code.split('-')[1] || '';
 
   const columns = [
     {

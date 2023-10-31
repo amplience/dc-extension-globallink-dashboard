@@ -28,6 +28,7 @@ import ContentItems from './ContentItems';
 import { createSubmission } from '../store/submissions/submissions.actions';
 import { setError } from '../store/error/error.actions';
 import LoadingModal from './LoadingModal';
+import { getCountryCode } from '../utils/locale';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -68,8 +69,6 @@ const useStyles = makeStyles(() => ({
   },
   select: {},
 }));
-
-const getCountryCode = (code: string) => code.split('-')[1] || '';
 
 const endOfDay = (date: Date) => {
   date.setHours(23, 59, 59, 0);

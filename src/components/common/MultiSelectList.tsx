@@ -10,8 +10,7 @@ import {
   Box,
 } from '@material-ui/core';
 import ReactCountryFlag from 'react-country-flag';
-
-const getCountryCode = (code: string) => code.split('-')[1] || '';
+import { getCountryCode } from '../../utils/locale';
 
 interface ListInterface {
   locale_label: string;

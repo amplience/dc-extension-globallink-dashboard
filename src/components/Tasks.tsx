@@ -48,8 +48,7 @@ import {
 } from '../types/types';
 import LoadingModal from './LoadingModal';
 import ConfirmationDialog from './ConfirmationDialog';
-
-const getCountryCode = (code: string) => code.split('-')[1] || '';
+import { getCountryCode } from '../utils/locale';
 
 export const useStyles = makeStyles(() => ({
   status: {
