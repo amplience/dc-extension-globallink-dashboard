@@ -10,7 +10,7 @@ This extension was developed and tested using:
 
 To switch to the correct node version it is recommended to have Node Version Manager installed. Commands:
 
-nvm install 18
+nvm install 18  - latest
 
 nvm use 16
 
