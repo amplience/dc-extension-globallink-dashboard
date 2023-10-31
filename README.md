@@ -1,8 +1,18 @@
 # dc-extension-globallink-dashboard
-
 The GlobalLink Connect dashboard extension allows content producers in Amplience Dynamic Content to submit content for translation using GlobalLink Connect Cloud API, monitor the translation status, and to apply completed translations to [localized content items](https://amplience.com/docs/production/contentitemlocalization.html).
 
 ![](./docs/images/review-submissions.png)
+
+## Building
+This extension was developed and tested using:
+- npm 9.x
+- node 16.x
+
+To switch to the correct node version it is recommended to have Node Version Manager installed. Commands:
+
+nvm install 18
+
+nvm use 16
 
 # Table of Contents
 - [Features](#features)
