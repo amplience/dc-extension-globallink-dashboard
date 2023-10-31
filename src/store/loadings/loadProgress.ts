@@ -2,10 +2,6 @@ import { AppDispatch } from '../store';
 import { LoadModal } from './loadModal';
 import { setDialogLoader } from './loadings.actions';
 
-export enum SubmissionStage {}
-
-export enum ImportStage {}
-
 export interface LoadList {
   title?: string;
   startTime: number;

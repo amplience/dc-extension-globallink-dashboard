@@ -465,7 +465,6 @@ const FilterBar = ({
               size="small"
               onClick={() => {
                 dispatch(getContentItems(locale, 1, filter));
-                // setSelectedContent([]);
               }}
             >
               <Refresh />
@@ -519,7 +518,7 @@ const FilterBar = ({
             <div className={classes.popover}>
               <div className={classes.filterHeading}>
                 <TextField
-                  placeholder="Content item name"
+                  placeholder="Content item label"
                   name="label"
                   value={filter.text}
                   style={{
