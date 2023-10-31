@@ -19,6 +19,9 @@ Alternatively, return to [README.md](../README.md) for more information on the e
     - [Projects](#projects)
     - [Translatable fields](#translatable-fields)
     - [Templates](#templates)
+  - [Delivery Keys](#delivery-keys)
+  - [Locales](#locales)
+
 
 <!-- /MarkdownTOC -->
 
@@ -59,7 +62,7 @@ To use the GlobalLink Connect dashboard extension, this extension must be [regis
 
 Once the extension has been registered, it can then be configured from within the "Installation Parameters" tab of the extension.
 
-An example configuration as well as detailed definitions can be found below, to help you get stared with configuring your extension.
+An example configuration as well as detailed definitions can be found below, to help you get started with configuring your extension.
 
 ### Example Configuration
 
@@ -143,7 +146,7 @@ When configuring content types for translation, this uses  JSONPath for defining
 | String                                                       | Starting within the Schema's `properties` object, provide the path to the string property you would like to translate. | **Schema:**<br />![](./images/schema-string.png)<br /><br />**Config:**<br />`"translatableFields": ["header.headline"]` |
 | Array of Strings                                             | Starting within the Schema's `properties` object, provide the path to the array of strings you would like to translate, including the index selection. | **Schema:**<br />![](./images/schema-array.png)<br /><br />**Config (all in array):**<br />`"translatableFields": ["body.paragraphs[*]"]`<br />**Config (first in array):**<br />`"translatableFields": ["body.paragraphs[0]"]` |
 | Partial                                                      | This requires the fully qualified JSONPath to the [partial](https://amplience.com/docs/integration/usingpartials.html) you wish to translate.<br /><br />Starting within the Schema's `properties` object, provide the path to the partial reference.<br /><br />Then, continuing from the point of reference within target schema's `definitions` object, provide the remainder of the path to the desired property. | **Schema:**<br />![](./images/schema-partial.png)<br /><br />**Config (all in array):**<br />`"translatableFields": ["body[*].paragraph"]`<br />**Config (first in array):**<br />`"translatableFields": ["body[0].paragraph"]` |
-| Content Choosers<br /><br />(eg `content-link` & `content-reference`) | This does not require a JSONPath to be provided in the parent content item.<br /><br />You would instead configure the translatable fields for any child schemas referened in the Content Link/Reference.<br /><br />The parent schema will still need to be defined within `contentTypes` in the extension's configuration if you wish for it to be available for submission. | **Schema (parent):**<br />![](./images/schema-contentlink-parent.png)<br />**Schema (child)**:<br />![](./images/schema-contentlink-child.png)<br /><br />**Config (parent):**<br />`"translatableFields": []`<br />**Config (child):**<br />`"translatableFields": ["paragraph"]` |
+| Content Choosers<br /><br />(eg `content-link` & `content-reference`) | This does not require a JSONPath to be provided in the parent content item.<br /><br />You would instead configure the translatable fields for any child schemas referenced in the Content Link/Reference.<br /><br />The parent schema will still need to be defined within `contentTypes` in the extension's configuration if you wish for it to be available for submission. | **Schema (parent):**<br />![](./images/schema-contentlink-parent.png)<br />**Schema (child)**:<br />![](./images/schema-contentlink-child.png)<br /><br />**Config (parent):**<br />`"translatableFields": []`<br />**Config (child):**<br />`"translatableFields": ["paragraph"]` |
 
 #### Templates
 
@@ -154,3 +157,14 @@ When configuring content types for translation, this uses  JSONPath for defining
 | sourceLocale<br /><br />*(optional)*           | string   | The original locale of the content item, which the submitted items will be translated from. This locale must be configured within your Dynamic Content hub.<br /><br />The source locale is constructed from a mandatory language code ([ISO  639-1:2002](https://www.iso.org/standard/22109.html)), and an optional country code ([ISO  3166-2:2013](https://www.iso.org/standard/63546.html)). |
 | targetLocales<br /><br />*(optional)*          | array    | One or more locales, which the submitted items will be translated to. These locales must be configured within your Dynamic Content hub.<br /><br />Destination locales are constructed from a mandatory language code ([ISO  639-1:2002](https://www.iso.org/standard/22109.html)), and an optional country code ([ISO  3166-2:2013](https://www.iso.org/standard/63546.html)). |
 | additionalInstructions<br /><br />*(optional)* | string   | Any additional instructions to send along with the submission. |
+
+
+### Delivery Keys
+You are free to use Delivery Keys but please be aware of the following:
+
+- Don't set Delivery Keys as Mandatory or translations will fail
+- If you define a Delivery Key format in the Schema eg content/* after you have already created content, you'll need to sync to enable the translations to proceed
+- If using Regexp, use prefix as _locale which is used as a suffix for translations
+
+
+### Locales
