@@ -19,8 +19,6 @@ Alternatively, return to [README.md](../README.md) for more information on the e
     - [Projects](#projects)
     - [Translatable fields](#translatable-fields)
     - [Templates](#templates)
-  - [Delivery Keys](#delivery-keys)
-  - [Locales](#Locales)
 
 <!-- /MarkdownTOC -->
 
