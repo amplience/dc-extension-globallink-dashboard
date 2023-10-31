@@ -10,9 +10,13 @@ This extension was developed and tested using:
 
 To switch to the correct node version it is recommended to have [Node Version Manager](https://github.com/nvm-sh/nvm) installed. Commands:
 
+```
 nvm install 16
-
 nvm use 16
+npm i
+```
+
+Live development on the project can be done via `npm run start`. You can build the project for deployment with `npm run build`.
 
 # Table of Contents
 - [Features](#features)
