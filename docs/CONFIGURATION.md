@@ -166,5 +166,5 @@ You are free to use Delivery Keys but please be aware of the following:
 - If you define a Delivery Key format in the Schema eg content/* after you have already created content, you'll need to sync to enable the translations to proceed
 - If using Regexp, use prefix as _locale which is used as a suffix for translations
 
-
 ### Locales
+It is important to note that target or source Locales are not managed/defined within Amplience. These are managed by GlobalLink and therefore, these are not configurable within the Amplience Schemas ie through Settings, Locale.
