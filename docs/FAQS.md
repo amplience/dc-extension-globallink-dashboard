@@ -4,7 +4,7 @@
 
 - Q. What is the maximum number of Content Items I can submit? 
 
-A. The maximum number of Content Items I can submit is defaulted to 50. This is configurable in the Installation Parameters of the GlobalLink extension. 
+A. The maximum number of Content Items you can submit defaults to 50. This is configurable in the Installation Parameters of the GlobalLink extension. 
 
 - Q. What is the default duration for translation Due Dates? 
 
@@ -20,11 +20,11 @@ A. Enforcing mandatory Delivery Keys will cause localisation to fail.
 
 - Q. What is the maximum number of projects I can use? 
 
-A. 10, If you require more, you can create another Extension. 
+A. 10, If you require more, you can register another instance of the extension. 
 
 - Q. Can I choose to add/remove Source and Target Locales from Settings in Amplience? 
 
-A. This is possible in Amplience but it does not affect those available via the GlobalLink extension. These are defined and maintained by GlobalLink. 
+A. Source and Target locales can be configured for different templates in the Amplience Extension parameters, but they must be a subset of the locales defined and maintained within GlobalLink. Locales available in your Dynamic Content hub must be reflected in GlobalLink for submission.
 
 
 ## Usage
@@ -43,7 +43,7 @@ A. Yes, you can add further details in the Additional Instructions field.
 
 - Q. Can I assign Submissions? 
 
-A. No. The Content Items can be assigned. The Submissions allow you to select a user from your work group as the submitter. 
+A. No. The Content Items can be assigned. The Submissions allow you to select a user from your work group as the submitter, but only at time of submission. 
 
 - Q. Can I run multiple Submissions simultaneously? 
 
@@ -67,4 +67,4 @@ A. Yes, the targets (children) will reflect the changes made to the source (pare
 
 - Q. If I run a Translation, remove some translatable text on the source content item (parent) so it is empty and translate again, will the targets (children) be updated accordingly? 
 
-A. No, the children will retain their original text. 
+A. The children will be resubmitted with the parent. Depending on the translator, you might get a different result. With AI Translation, you typically get the same result.
