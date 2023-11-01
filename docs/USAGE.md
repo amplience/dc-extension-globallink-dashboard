@@ -258,6 +258,34 @@ If you cancel, you will get the following message:
 
 ![](./images/submission-warning-2.png)
 
+### Content without Source Locales
+
+As described above, content should have a source locale that matches your translation template to be submitted for translation. However, it's possible for localised root items to contain content without source locales, which will stop them from being translated.
+
+This is useful if your localised content needs to contain some piece of content that is the same between all locales, such as a style, configuration or site structure related content item. This can easily show up due to user error, though, so it's important to make sure that all content you intend to translate has a source locale assigned.
+
+Example of this kind of use:
+- content (en-US)
+  - child (en-US)
+  - **child2 (no locale)**
+
+`content` and `child` are sent for translation, and `child2` is not.
+
+It's possible to create an invalid configuration by having a child without a locale have its own child that matches the source locale. This _should_ be submitted for translation, but since its parent is not localised, its content link can only point to one of the locales.
+
+This case looks something like this:
+- content (en-US)
+  - **child (no locale)**
+    - child child (en-US)
+  
+It can go deeper:
+- content (en-US)
+  - **child (no locale)**
+    - **child child (no locale)**
+      - child child child (en-US)
+
+In this case, each root locale would link to _the same_ child item, losing the localisation on any lower levels. This will show the warning discussed and pictured above. It's recommened to review the locale on your content items before going through with generating locales for the intermediate items or continuing anyways.
+
 ### Updating source content and retranslating
 
 The first time a content item is translated, localized versions of the content item will be created from the source locale, and the translation will be applied on top. However, you are also allowed to iterate on content and retranslate as needed, though some simple rules need to be considered:
