@@ -20,10 +20,11 @@ Alternatively, return to [README.md](../README.md) for more information on the e
     - [Filtering submissions](#filtering-submissions)
   - [Applying a translation](#applying-a-translation)
     - [Applying translation from Tasks view](#applying-translation-from-tasks-view)
-    - [Applying translation from Submissions view](#applying-translation-from-submissions-view)
+    - [Applying translations from Submissions view](#applying-translations-from-submissions-view)
     - [Completed translations](#completed-translations)
   - [Expected behaviour](#expected-behaviour)
   - [Updating source content and retranslating](#updating-source-content-and-retranslating)
+  - [Delivery Keys](#delivery-keys)
 
 <!-- /MarkdownTOC -->
 
@@ -43,17 +44,17 @@ Some values within the GlobalLink Connect dashboard are configurable at the poin
 When you create your content, there are a couple of things you will need to do to ensure that this content is available for translation:
 
 1. Assign the source locale to your content item.
-   - For example, if you are looking to translate your content from English to German, you may want to assign en-US, or en-GB.
-2. (Optionally) assign the content item to a person.
-   - This is not mandatory for translation but may help with finding the content item when you create a submission, as content items can be filtered by assignee.
+   - For example, if you are looking to translate your content from English to German, you may want to assign en-US.
+2. (Optionally) assign the content item to at least one person.
+   - This is not mandatory for translation but may help with finding the content item when you create a submission, as content items can be filtered by assignees.
 3. Flag your content item as ready for translation with a workflow state.
-   - To ensure that content is not sent for translation prematurely, the GlobalLink dashboard uses workflow states to determine what can and cannot be sent for translation. To flag your content item for translation, set the workflow state to **[ready](#configurable-values)**
+   - To ensure that content is not sent for translation prematurely, the GlobalLink dashboard uses workflow states to determine what can and cannot be sent for translation. To flag your content item for translation, set the workflow state to **[Ready For Translation](#configurable-values)**.
 
 Each of these settings can either be applied via the “Save content” menu when you first save a content item, or can be applied by right-clicking your content item from the content library afterwards (“Assign Locale”, “Assign to”, and “Set status” respectively).
 
 ### Creating a submission
 
-Once you have created one or more content items and made them ready for translation, these can now be sent for submission to GlobalLink via the dashboard extension. This can be found by navigating to the “Dashboard” tab within Dynamic Content, and selecting **[GlobalLink Connect](#configurable-values)**.
+Once you have created one or more content items and made them ready for translation, these can now be sent for submission to GlobalLink via the dashboard extension. This can be found by navigating to the “Dashboard” tab within Dynamic Content, and selecting **[GlobalLink](#configurable-values)**.
 
 This will take you to the GlobalLink dashboard extension and will provide you with an overview of existing submissions and the ability to create new submissions, for any configured projects.
 
@@ -84,7 +85,7 @@ As well as the submission details, this stage will allow you to select the conte
 
 1. Locale matches your chosen source locale
 
-2. Workflow state is set to **[ready](#configurable-values)**
+2. Workflow state is set to **[Ready For Translation](#configurable-values)**
 
 3. The content type is configured to allow translation
 
@@ -103,11 +104,15 @@ This list of content items can be filtered further by the filter controls at the
 
 Up to **[50](#configurable-values)** content items can be selected for a single submission via a checkbox selection. Once you have filtered and selected the desired content items to send for translation, click “Create” to send this submission to GlobalLink. Alternatively click “Back” if you do not wish to proceed at this stage.
 
+![](./images/new-submission-send.png)
+
+When sending the submission to GlobalLink, the progression of the request will be displayed in a modal dialog. You will be redirected to the submission list once the submission is sent.
+
 #### In-progress translations
 
 Once a content item has been sent for translation via a submission, the GlobalLink extension will automatically tag that content item with the **[inProgress](#configurable-values)** workflow state.
 
-This does not prevent you from making further modifications to the content item, but if you wish to submit these modifications for translation these will again need to be prepared and sent for translation, starting with the “[Preparing your content](#Preparing your content)” step.
+This does not prevent you from making further modifications to the content item, but if you wish to submit these modifications for translation these will again need to be prepared and sent for translation, starting with the “[Preparing your content](#preparing-your-content)” step.
 
 ![](./images/content-inprogress.png)
 
@@ -117,7 +122,15 @@ With your submission created you can now review and monitor its progress, along 
 
 This will show you an overview of the all submissions on your project from their inception (Pre-process) through to their successful application to your content (Translation Complete).
 
-![](./images/review-submissions.png)
+![](./images/submissions-in-progress.png)
+
+Depending on the status of the submission, you will be able to:
+- `View Details` of the submission (in JSON format)
+- `Cancel` the submission, when in `Translating` state
+- `View Tasks`, when submission is in `Translation Ready`, `Translation Complete` or `Cancelled` states
+- `Apply All Translations`, when in `Translation Ready` state
+
+![](./images/submissions-menu.png)
 
 The individual tasks for each submission can also be viewed, either by double-clicking the desired submission row, or selecting “View Tasks” from its context menu to the right.
 
@@ -150,17 +163,65 @@ Each translation will create a localized copy of the content item in the target 
 
 #### Applying translation from Tasks view
 
+You can apply each translation individually in the Tasks view.
+
 ![](./images/apply-translation-task.png)
 
-#### Applying translation from Submissions view
+A confirmation dialog will appear and you can then confirm and apply the translation.
+
+![](./images/apply-translation-task-confirm.png)
+
+Once confirmed, you can follow the progress of the translation in a modal dialog.
+
+![](./images/apply-translation-task-progress.png)
+
+When the action is complete, the view will reload and you can check the task:
+- you can `View Details` (JSON format)
+- you can `View Source` content in Amplience Dynamic Content
+- you can `View Translated` content in Amplience Dynamic Content
+
+![](./images/apply-translation-task-complete.png)
+
+You can also `Apply All` translations from the same Tasks view. Again, a confirm dialog will show up with a summary of the tasks that will be processed.
+
+![](./images/apply-translation-task-all.png)
+
+Once confirmed, you can follow the progress of the translations. This is particulary useful if you have many items to translate.
+
+![](./images/apply-translation-task-all-progress.png)
+
+When the action is complete, the view will reload and you can check the task like described above.
+
+![](./images/apply-translation-task-all-complete.png)
+
+#### Applying translations from Submissions view
+
+You can also apply all translations from the Submission view.
 
 ![](./images/apply-translation-submission.png)
 
+A confirmation dialog will first appear.
+
+![](./images/apply-translation-submission-confirm.png)
+
+Once started, you will be able to follow the progress of the translations.
+
+![](./images/apply-translation-submission-progress.png)
+
+When the translations are processed, you can see the details using `View Tasks` from the row menu.
+
+The status of the submission will be updated automatically in the submissions list as the interface is polling statuses from GlobalLink every 15 seconds.
+
+
 #### Completed translations
 
-Once a translation has been applied via a task or submission, the GlobalLink extension will automatically tag the source content item with the **[translated](#configurable-values)** workflow state.
+Once a translation has been applied via a task or submission, the GlobalLink extension will automatically tag the following items with the **[Translation Complete](#configurable-values)** workflow state:
+- the source Content Item
+- any source child Content Item that has been translated
+- the target Content Item
+- any target child Content Item that has been translated
 
-As with in-progress translations, this does not prevent you from making further modifications to the content item, but if you wish to submit these modifications for translation these will again need to be prepared and sent for translation, starting with the “[Preparing your content](#Preparing your content)” step.
+As with in-progress translations, this does not prevent you from making further modifications to the content item, but if you wish to submit these modifications for translation these will again need to be prepared and sent for translation, starting with the “[Preparing your content](#preparing-your-content)” step.
 
 ![](./images/content-completed.png)
 
@@ -171,27 +232,88 @@ With the translation complete, you should now also be able to find localized and
 ### Expected behaviour
 
 #### Content Setup - Item Level Localization
-This translation extension works by creating localized copies from the source content. In order for this extension to work, you must have implemented `content-item` level localization on your account. For more information about the different localization setup available in Amplience please visit our [Localization developer guide](https://amplience.com/developers/docs/dev-tools/guides-tutorials/localization/)
+This translation extension works by creating localized copies from the source content. In order for this extension to work, you must have implemented `content-item` level localization on your account. For more information about the different localization setup available in Amplience please visit our [Localization developer guide](https://amplience.com/developers/docs/dev-tools/guides-tutorials/localization/).
 
 #### Translation flow
-In order to ensure consistency, this extension follows the same process both when translating a piece of content for the first time and retranslating an item. It will overwrite the translated items based on the source and apply they translatable fields:
+In order to ensure consistency, this extension follows the same process both when translating a piece of content for the first time and retranslating an item. It will overwrite the translated items based on the source and apply the translatable fields:
 
 1. Take the source item
 2. Send the translatable fields from the source item and send them for translation
-3. Once the translations have completed, set the submission in the 'ready' state
-4. When the user chooses to apply the translations it will take take the source item, apply the translated fields and either create or update the translated content items.
+4. Navigate through the children items and send to translation if they have a locale
+5. If intermediate children don't have a locale, a warning message will be displayed
+6. Once the translations have completed, set the submission in the 'ready' state
+7. When the user chooses to apply the translations it will take the source item, apply the translated fields and either create or update the translated content items.
 
 See [Updating source content and retranslating](#updating-source-content-and-retranslating) for further details.
+
+If there are one or more items without a locale in the content graph, the following warning will be shown:
+
+![](./images/submission-warning-1.png)
+
+You can either:
+- ignore the warning, and the translations will be applied to all child items with a locale
+- or force locale for all the child items without a locale and apply translations if possible
+
+If you cancel, you will get the following message:
+
+![](./images/submission-warning-2.png)
+
+### Content without Source Locales
+
+As described above, content should have a source locale that matches your translation template to be submitted for translation. However, it's possible for localised root items to contain content without source locales, which will stop them from being translated.
+
+This is useful if your localised content needs to contain some piece of content that is the same between all locales, such as a style, configuration or site structure related content item. This can easily show up due to user error, though, so it's important to make sure that all content you intend to translate has a source locale assigned.
+
+Example of this kind of use:
+- content (en-US)
+  - child (en-US)
+  - **child2 (no locale)**
+
+`content` and `child` are sent for translation, and `child2` is not.
+
+It's possible to create an invalid configuration by having a child without a locale have its own child that matches the source locale. This _should_ be submitted for translation, but since its parent is not localised, its content link can only point to one of the locales.
+
+This case looks something like this:
+- content (en-US)
+  - **child (no locale)**
+    - child child (en-US)
+  
+It can go deeper:
+- content (en-US)
+  - **child (no locale)**
+    - **child child (no locale)**
+      - child child child (en-US)
+
+In this case, each root locale would link to _the same_ child item, losing the localisation on any lower levels. This will show the warning discussed and pictured above. It's recommened to review the locale on your content items before going through with generating locales for the intermediate items or continuing anyways.
 
 ### Updating source content and retranslating
 
 The first time a content item is translated, localized versions of the content item will be created from the source locale, and the translation will be applied on top. However, you are also allowed to iterate on content and retranslate as needed, though some simple rules need to be considered:
 
-- Re-submitting content for translation and applying will update _all_ fields based on the item with the source locale, then apply the new translation on top.
+- **Re-submitting content for translation and applying** will update _all_ fields based on the item with the source locale, then apply the new translation on top.
   - Fields not submitted for translation will be copied from the source locale.
   - Fields submitted for translation will obviously be translated again, and may change.
   - _No changes to the target locale made manually will persist._
-- Changes to the content item for the source locale will _not_ automatically persist to the other locales, even if those fields are not to be translated.
+- **Changes to the content item for the source locale** will _not_ automatically persist to the other locales, even if those fields are not to be translated.
   - To persist changes, either copy the changes manually to each locale of the item, or _resubmit_ the item for translation.
     - When the new submission is applied, the new base values will be copied with the new translation applied on top.
-  - It's recommended that you minimize the number of changes to content items that are localized to avoid extra work. Try to get non-localized properties like styling and image links finalized before submitting for translation.
+  - It is recommended that you minimize the number of changes to content items that are localized to avoid extra work. Try to get non-localized properties like styling and image links finalized before submitting for translation.
+
+### Delivery Keys
+Delivery keys must be 'websafe' characters and also unique to an Amplience Dynamic Content hub. When localizing content with this extension will attempt the following:
+
+* If there IS NO delivery key in the source item, then will be no delivery keys in the translated items.
+* If there IS a delivery key in the source item, then the delivery key for the translated item will be attempted with the source delivery key with a suffix of the target locale `mydeliverykey_fr-FR`.
+
+#### Delivery Key Patterns / Validation
+If your delivery key has a pattern / validation regular expression, there is a chance that the translated content will not be created. If there is a delivery key present in the source item, the extension will attempt to create the translated content item with the locale appended to the end if the delivery key (see above).
+
+If your validation in your schemas for your content types does not allow for this then you have the following options:
+1) Alter the delivery key validation in your schema.
+2) Create and host a custom version of this extension see `src/store/tasks/tasks.actions.ts` and `generateLocaleDeliveryKey`.
+
+#### Mandatory Delivery Keys with localization
+Mandatory delivery keys are not supported with this extension.
+If you would like to use this extension with delivery keys it is recommended to not have the delivery key as mandatory in your schema.
+
+More information about [Amplience Delivery Keys](https://amplience.com/developers/docs/concepts/content-delivery/#delivery-key).

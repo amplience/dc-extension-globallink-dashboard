@@ -12,7 +12,11 @@ import {
   Checkbox,
   FormGroup,
   TextField,
+  Box,
+  Typography,
 } from '@material-ui/core';
+import ShoppingBasketIcon from '@material-ui/icons/ShoppingBasket';
+import Refresh from '@material-ui/icons/Refresh';
 import PopupState, {
   bindTrigger,
   bindPopover,
@@ -35,6 +39,22 @@ export const useStyles = makeStyles(() => ({
     margin: 0,
     height: 24,
     width: 24,
+    minHeight: 24,
+    minWidth: 24,
+    borderRadius: 3,
+    '& image': {
+      width: 24,
+      height: 24,
+    },
+    '&:hover': {
+      backgroundColor: '#c5c5c5',
+    },
+  },
+  basketBtn: {
+    backgroundColor: '#c5c5c5',
+    padding: '0px 5px 0px 5px',
+    margin: '0px 10px 0px 0px',
+    height: 24,
     minHeight: 24,
     minWidth: 24,
     borderRadius: 3,
@@ -99,7 +119,6 @@ export const useStyles = makeStyles(() => ({
     color: '#666',
     margin: '0 8px 0 0',
     fontWeight: 400,
-    fontFamily: 'Roboto',
   },
   filterValue: {
     display: 'flex',
@@ -200,6 +219,9 @@ export const FilterStatus = ({ label, onClear }: any) => (
 );
 
 const FilterBar = ({
+  setOpenBasket,
+  basketContent,
+  max,
   facets,
   locale,
   filter: appliedFilter,
@@ -219,7 +241,7 @@ const FilterBar = ({
     onlyFacets?: boolean
   ) => {
     dispatch(setFilterValue(filterItem));
-    dispatch(getContentItems(locale, 1, filterItem, onlyFacets));
+    dispatch(getContentItems(locale, 1, filterItem, onlyFacets, !onlyFacets));
     popupState.close();
   };
 
@@ -319,6 +341,32 @@ const FilterBar = ({
     );
   };
 
+  const clearAllFilters = () => {
+    setFilter({
+      contentTypes: [],
+      assignees: [],
+      repositories: '',
+      text: '',
+    });
+    dispatch(
+      setFilterValue({
+        contentTypes: [],
+        assignees: [],
+        repositories: '',
+        text: '',
+      })
+    );
+
+    dispatch(
+      getContentItems(locale, 1, {
+        contentTypes: [],
+        assignees: [],
+        repositories: '',
+        text: '',
+      })
+    );
+  };
+
   const handleSetFilter = (e, key = 'repositories') => {
     setFilter({
       ...filter,
@@ -392,17 +440,64 @@ const FilterBar = ({
                 </div>
               </div>
             ) : null}
+            {appliedFilter.repositories ||
+            appliedFilter.assignees.length ||
+            appliedFilter.text ||
+            appliedFilter.contentTypes.length ||
+            filter.text ? (
+              <div>
+                <h3 className={classes.filterName}>Filters</h3>
+                <div className={classes.filterValue}>
+                  <FilterStatus
+                    popupState={popupState}
+                    label="Clear all"
+                    value="clear-all"
+                    onClear={() => clearAllFilters()}
+                  />
+                </div>
+              </div>
+            ) : null}
           </div>
-
-          <IconButton
-            ref={filterRef}
-            className={classes.filterBtn}
-            aria-label="toggle"
-            size="small"
-            {...bindTrigger(popupState)}
-          >
-            <img alt="filter icon" src={FilterIcon} />
-          </IconButton>
+          <Box>
+            <IconButton
+              className={classes.basketBtn}
+              aria-label="toggle"
+              size="small"
+              onClick={() => {
+                dispatch(getContentItems(locale, 1, filter));
+              }}
+            >
+              <Refresh />
+            </IconButton>
+            <IconButton
+              className={classes.basketBtn}
+              aria-label="toggle"
+              size="small"
+              onClick={() => {
+                setOpenBasket(true);
+              }}
+            >
+              <ShoppingBasketIcon />
+              <Typography
+                variant="caption"
+                color={
+                  basketContent.length < max ? 'textPrimary' : 'textSecondary'
+                }
+                style={{ paddingLeft: 2, paddingRight: 2 }}
+              >
+                {basketContent.length}/{max}
+              </Typography>
+            </IconButton>
+            <IconButton
+              ref={filterRef}
+              className={classes.filterBtn}
+              aria-label="toggle"
+              size="small"
+              {...bindTrigger(popupState)}
+            >
+              <img alt="filter icon" src={FilterIcon} />
+            </IconButton>
+          </Box>
           <Popover
             {...bindPopover(popupState)}
             anchorReference="anchorEl"
@@ -423,7 +518,7 @@ const FilterBar = ({
             <div className={classes.popover}>
               <div className={classes.filterHeading}>
                 <TextField
-                  placeholder="Search"
+                  placeholder="Content item label"
                   name="label"
                   value={filter.text}
                   style={{

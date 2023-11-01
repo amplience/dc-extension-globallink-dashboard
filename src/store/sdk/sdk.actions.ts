@@ -15,6 +15,7 @@ import { ParamsInt, Project, SDKInterface } from '../../types/types';
 import { defaultSdk } from './sdk.reducer';
 
 export const SET_SDK = 'SET_SDK';
+export const MAX_PROJECTS = 10;
 
 export const setSDK = (value: SDKInterface) => ({
   type: SET_SDK,
@@ -50,6 +51,18 @@ export const fetchSDK = () => async (dispatch: Dispatch) => {
     const users = await extension.users.list();
 
     const projects: Project[] = await GCCInstance.getProjects();
+
+    // Only use projects that have been configured, in the same order.
+    const finalProjects: Project[] = [];
+    params.projects.forEach((project) => {
+      const matchingProject = projects.find(
+        (config) => config.connector_key === project.id
+      );
+      if (matchingProject && finalProjects.length < MAX_PROJECTS) {
+        finalProjects.push(matchingProject);
+      }
+    });
+
     dispatch(setApi(GCCInstance));
 
     dispatch(setSDK(sdkInited));
@@ -57,13 +70,13 @@ export const fetchSDK = () => async (dispatch: Dispatch) => {
 
     dispatch({
       type: SET_PROJECTS,
-      value: projects,
+      value: finalProjects,
     });
 
-    if (projects && projects.length) {
-      dispatch(setProject(projects[0].connector_key));
+    if (finalProjects && finalProjects.length) {
+      dispatch(setProject(finalProjects[0].connector_key));
       const config = await GCCInstance.getProjectConfig(
-        projects[0].connector_key
+        finalProjects[0].connector_key
       );
       dispatch(setProjectConfig(config));
     }

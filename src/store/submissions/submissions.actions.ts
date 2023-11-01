@@ -4,7 +4,6 @@ import jsonpath from 'jsonpath';
 import {
   ContentType,
   WorkflowState,
-  ContentGraph,
   ContentLink,
   ContentItem,
 } from 'dc-management-sdk-js';
@@ -17,7 +16,7 @@ import {
 } from '../tasks/tasks.actions';
 import {
   setContentLoader,
-  setCreateLoader,
+  setDialogLoader,
 } from '../loadings/loadings.actions';
 import {
   Pagination,
@@ -26,6 +25,18 @@ import {
   SubmissionInt,
   FilterObject,
 } from '../../types/types';
+import {
+  createProgressContext,
+  createProgressList,
+  freeProgressContext,
+  parallelProcess,
+  setProgress,
+  setProgressError,
+  setProgressStage,
+} from '../loadings/loadProgress';
+import { CircularMode, deepCopy } from '../../utils/ContentDependencyTree';
+import { LoadModal } from '../loadings/loadModal';
+import { withRetry, withRetryContext } from '../../utils/withRetry';
 
 export const SET_SUBMISSIONS = 'SET_SUBMISSIONS';
 export const SET_SELECTED_SUBMISSION = 'SET_SELECTED_SUBMISSION';
@@ -92,6 +103,7 @@ export const getSubmissions =
           filter: storedFilter,
           pagination: { page: currentPage },
         },
+        projects: { selectedProject },
       }: RootStateInt = getState();
 
       dispatch(setContentLoader(true));
@@ -120,8 +132,16 @@ export const getSubmissions =
         filterObject.tags = [globalFilter];
       }
 
+      if (selectedProject) {
+        filterObject.connector_key = [selectedProject];
+      }
+
       const { current_page_number, total_result_pages_count, submission_list } =
-        await Api.getSubmissions(page || currentPage || 0, filterObject);
+        await withRetry(
+          Api.getSubmissions,
+          page || currentPage || 0,
+          filterObject
+        );
 
       dispatch(setSubmissions(submission_list));
       dispatch(
@@ -146,7 +166,11 @@ export const cancelSubmission =
       dispatch(setContentLoader(true));
 
       if (submission_id) {
-        await Api.cancelSubmission(submission_id, projects.selectedProject);
+        await withRetry(
+          Api.cancelSubmission,
+          submission_id,
+          projects.selectedProject
+        );
       }
 
       dispatch(setContentLoader(false));
@@ -155,6 +179,27 @@ export const cancelSubmission =
       dispatch(setContentLoader(false));
     }
   };
+
+const specialRegex = /\W|_/g;
+
+const pathToString = (path: string[]) => {
+  let result = '';
+  for (let i = path[0] === '$' ? 1 : 0; i < path.length; i++) {
+    const hasSpecialChar = String(path[i]).match(specialRegex);
+
+    if (!hasSpecialChar) {
+      if (i !== 0) {
+        result += '.';
+      }
+
+      result += path[i];
+    } else {
+      result += `['${String(path[i]).replaceAll("'", "\\'")}']`;
+    }
+  }
+
+  return result;
+};
 
 export const createSubmission =
   ({
@@ -181,6 +226,15 @@ export const createSubmission =
     config: { [key: string]: any };
   }) =>
   async (dispatch: AppDispatch, getState: () => RootState) => {
+    const progress = createProgressList(1, 1);
+    const loadContext = createProgressContext(
+      progress,
+      'Creating Submission...',
+      3,
+      dispatch
+    );
+    let threadedPart = false;
+
     try {
       const {
         Api,
@@ -195,100 +249,198 @@ export const createSubmission =
         (el: any) => el.id === selectedProject
       );
 
-      dispatch(setCreateLoader(true));
+      setProgressStage(
+        loadContext,
+        0,
+        'Scanning content...',
+        contentItems.length
+      );
+
       const idMappingTable: { [key: string]: any } = {};
       const tasks: string[] = [];
 
-      for (let i = contentItems.length - 1; i >= 0; i--) {
-        const contentItemId = contentItems[i];
+      // Becomes multithreaded here.
+      const threadedProgress = createProgressList(
+        contentItems.length,
+        3,
+        'Creating Submission...',
+        progress.startTime
+      );
+      threadedPart = true;
+
+      await parallelProcess(contentItems, 3, async (contentItemId, index) => {
         idMappingTable[contentItemId] = {
           nested: {},
         };
-        await ContentGraph.deepCopy(
-          [contentItemId],
-          dcManagement.contentItems.get,
-          async (contentItem) => {
-            const contentType =
-              contentItem &&
-              project &&
-              project.contentTypes.find(
-                ({ uri }: { uri: string }) =>
-                  uri === contentItem.body._meta.schema
-              );
 
-            if (contentItemId === contentItem.id) {
-              const ct =
-                hubContentTypes &&
-                hubContentTypes.find(
-                  ({ contentTypeUri }: ContentType) =>
-                    contentType &&
-                    contentTypeUri &&
-                    contentType.uri &&
-                    contentTypeUri.toLowerCase() ===
-                      contentType.uri.toLowerCase()
-                );
-              const defaultVizObject =
-                ct && ct.settings && ct.settings.visualizations
-                  ? ct.settings.visualizations.find((viz) => viz.default)
-                  : { templatedUri: '' };
-
-              const defaultViz =
-                defaultVizObject && defaultVizObject.templatedUri
-                  ? defaultVizObject.templatedUri
-                      .replace(/{{vse.domain}}/g, params.vse)
-                      .replace(/{{content.sys.id}}/g, contentItem.id)
-                  : '';
-              idMappingTable[contentItemId].label = contentItem.label;
-              idMappingTable[contentItemId].contextUrl = defaultViz || '';
-            }
-
-            if (contentType && contentType.translatableFields) {
-              const fileJson = contentType.translatableFields.reduce(
-                (acc: any, field: string) => {
-                  const nodes = jsonpath.nodes(contentItem.body, `$.${field}`);
-
-                  nodes.forEach(({ path, value }) => {
-                    if (value && !ContentLink.isContentLink(value)) {
-                      acc.push({
-                        key: path.join('.').replace('$.', ''),
-                        value,
-                      });
-                    }
-                  });
-
-                  return acc;
-                },
-                []
-              );
-
-              if (contentItemId === contentItem.id) {
-                idMappingTable[contentItemId].translations = fileJson;
-              } else if (sourceLocale === contentItem.locale) {
-                idMappingTable[contentItemId].nested[contentItem.id] = fileJson;
-              }
-            }
-
-            return contentItem;
-          }
+        const loadContext = createProgressContext(
+          threadedProgress,
+          `Submitting ${contentItemId} (${index + 1}/${contentItems.length})`,
+          1,
+          dispatch
         );
 
-        const objJsonStr = JSON.stringify(idMappingTable[contentItemId]);
+        setProgressStage(loadContext, 0, `Processing: ${contentItemId}`, 2);
+        setProgress(loadContext, 0, `Scanning...`);
 
-        const { content_id } = await Api.createNodeFile({
-          file: new Blob([objJsonStr], {
-            type: 'application/json',
-          }),
-          unique_identifier: contentItemId,
-          public_preview_url: idMappingTable[contentItemId].contextUrl,
-          name: idMappingTable[contentItemId].label,
-          submitter,
-          source_locale: sourceLocale,
-          file_type: params.fileType || 'json',
-          connector_key: selectedProject || '',
-        });
+        try {
+          let run = true;
 
-        tasks.push(content_id);
-      }
+          while (run) {
+            const incorrectSourceLocale = new Set<ContentItem>();
+            run = false;
+            await deepCopy(
+              [contentItemId],
+              dcManagement.contentItems.get,
+              async (contentItem) => {
+                setProgress(
+                  loadContext,
+                  0,
+                  `Scanning: ${contentItem?.id ?? contentItemId}`
+                );
+
+                const contentType =
+                  contentItem &&
+                  project &&
+                  project.contentTypes.find(
+                    ({ uri }: { uri: string }) =>
+                      uri === contentItem.body._meta.schema
+                  );
+
+                if (contentItemId === contentItem.id) {
+                  const ct =
+                    hubContentTypes &&
+                    hubContentTypes.find(
+                      ({ contentTypeUri }: ContentType) =>
+                        contentType &&
+                        contentTypeUri &&
+                        contentType.uri &&
+                        contentTypeUri.toLowerCase() ===
+                          contentType.uri.toLowerCase()
+                    );
+                  const defaultVizObject =
+                    ct && ct.settings && ct.settings.visualizations
+                      ? ct.settings.visualizations.find((viz) => viz.default)
+                      : { templatedUri: '' };
+
+                  const defaultViz =
+                    defaultVizObject && defaultVizObject.templatedUri
+                      ? defaultVizObject.templatedUri
+                          .replace(/{{vse.domain}}/g, params.vse)
+                          .replace(/{{content.sys.id}}/g, contentItem.id)
+                      : '';
+                  idMappingTable[contentItemId].label = contentItem.label;
+                  idMappingTable[contentItemId].contextUrl = defaultViz || '';
+                }
+
+                if (contentType && contentType.translatableFields) {
+                  const fileJson = contentType.translatableFields.reduce(
+                    (acc: any, field: string) => {
+                      const nodes = jsonpath.nodes(
+                        contentItem.body,
+                        field[0] === '[' ? `$${field}` : `$.${field}`
+                      );
+
+                      nodes.forEach(({ path, value }) => {
+                        if (value && !ContentLink.isContentLink(value)) {
+                          acc.push({
+                            key: pathToString(path as any),
+                            value,
+                          });
+                        }
+                      });
+
+                      return acc;
+                    },
+                    []
+                  );
+
+                  if (contentItemId === contentItem.id) {
+                    idMappingTable[contentItemId].translations = fileJson;
+                  } else if (sourceLocale === contentItem.locale) {
+                    idMappingTable[contentItemId].nested[contentItem.id] =
+                      fileJson;
+                  }
+                }
+
+                return contentItem;
+              },
+              CircularMode.Throw,
+              incorrectSourceLocale
+            );
+
+            if (incorrectSourceLocale.size > 0) {
+              const modal = new LoadModal(
+                `${incorrectSourceLocale.size} content item(s) don't have a source locale, but have children that do. These children will be translated, but they will not be properly referenced unless all parents have the source locale. You can either cancel submission, ignore, or force the locale on the affected items.`,
+                [
+                  { caption: 'Cancel', result: 'cancel' },
+                  { caption: 'Ignore', result: 'ignore' },
+                  { caption: 'Force Locale', result: 'force', primary: true },
+                ]
+              );
+
+              const result = await modal.activate(loadContext);
+
+              switch (result) {
+                case 'cancel':
+                  throw new Error(
+                    'Submission cancelled: Missing source locale on content items.'
+                  );
+
+                case 'force':
+                  await Promise.all(
+                    Array.from(incorrectSourceLocale).map((item) =>
+                      withRetryContext(
+                        item.related.setLocale,
+                        loadContext,
+                        sourceLocale
+                      )
+                    )
+                  );
+
+                  run = true;
+                  break;
+
+                default:
+                  break;
+              }
+            }
+          }
+
+          setProgress(loadContext, 1, `Uploading for translation...`);
+
+          const objJsonStr = JSON.stringify(idMappingTable[contentItemId]);
+
+          const { content_id } = await withRetryContext(
+            Api.createNodeFile,
+            loadContext,
+            {
+              file: new Blob([objJsonStr], {
+                type: 'application/json',
+              }),
+              unique_identifier: contentItemId,
+              public_preview_url: idMappingTable[contentItemId].contextUrl,
+              name: idMappingTable[contentItemId].label,
+              submitter,
+              source_locale: sourceLocale,
+              file_type: params.fileType || 'json',
+              connector_key: selectedProject || '',
+            }
+          );
+
+          tasks.push(content_id);
+        } catch (e) {
+          setProgressError(loadContext, e);
+
+          throw e;
+        }
+
+        freeProgressContext(loadContext);
+      });
+
+      threadedPart = false;
+
+      setProgressStage(loadContext, 1, 'Creating submission...', 1);
 
       const submissionData: SubmissionInt = {
         submission_name: name,
@@ -318,19 +470,36 @@ export const createSubmission =
         submissionData.config = config;
       }
 
-      await Api.createSubmission(submissionData);
+      await withRetryContext(Api.createSubmission, loadContext, submissionData);
+
+      setProgressStage(
+        loadContext,
+        2,
+        'Assigning workflow states...',
+        contentItems.length
+      );
+
+      let completeCount = 0;
+
+      setProgress(loadContext, 0, 'Assigning states...');
 
       await Promise.all(
         contentItems.map(async (id: string) => {
-          const contentItem: ContentItem = await dcManagement.contentItems.get(
+          const contentItem: ContentItem = await withRetryContext(
+            dcManagement.contentItems.get,
+            loadContext,
             id
           );
 
           if (params.statuses && params.statuses.inProgress) {
-            await contentItem.related.assignWorkflowState(
+            await withRetryContext(
+              contentItem.related.assignWorkflowState,
+              loadContext,
               new WorkflowState({ id: params.statuses.inProgress })
             );
           }
+
+          setProgress(loadContext, ++completeCount, 'Assigning states...');
 
           return contentItem;
         })
@@ -339,9 +508,12 @@ export const createSubmission =
       dispatch(getSubmissions(0));
 
       history.push('/');
-      return dispatch(setCreateLoader(false));
+      return dispatch(setDialogLoader(undefined));
     } catch (e: any) {
-      dispatch(setError(e.toString()));
-      return dispatch(setCreateLoader(false));
+      if (!threadedPart) {
+        setProgressError(loadContext, e);
+      }
+
+      return dispatch(setError(e.toString()));
     }
   };

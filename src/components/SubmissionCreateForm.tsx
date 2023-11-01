@@ -10,10 +10,12 @@ import {
   FormControl,
   Divider,
   Button,
+  FormHelperText,
 } from '@material-ui/core';
 import { DatePicker } from '@material-ui/pickers';
 import { useDispatch, useSelector } from 'react-redux';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import ReactCountryFlag from 'react-country-flag';
 import { RootState } from '../store/store';
 import {
   LoadingsInterface,
@@ -24,13 +26,22 @@ import {
 import MultiSelectList from './common/MultiSelectList';
 import ContentItems from './ContentItems';
 import { createSubmission } from '../store/submissions/submissions.actions';
-import Loader from './common/Loader';
 import { setError } from '../store/error/error.actions';
+import LoadingModal from './LoadingModal';
+import { getCountryCode } from '../utils/locale';
 
 const useStyles = makeStyles(() => ({
   paper: {
     padding: '20px',
-    width: '50%',
+    width: '30%',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'auto',
+    position: 'relative',
+  },
+  paperAlt: {
+    padding: '20px',
+    width: '70%',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'auto',
@@ -42,8 +53,8 @@ const useStyles = makeStyles(() => ({
   },
   formControl: {
     display: 'block',
-    width: 400,
-    marginTop: 30,
+    width: '100%',
+    marginTop: 20,
     '& > div': {
       width: '100%',
     },
@@ -58,6 +69,12 @@ const useStyles = makeStyles(() => ({
   },
   select: {},
 }));
+
+const endOfDay = (date: Date) => {
+  date.setHours(23, 59, 59, 0);
+
+  return date;
+};
 
 const SubmissionCreateForm = () => {
   const dispatch = useDispatch();
@@ -77,7 +94,7 @@ const SubmissionCreateForm = () => {
   const { data }: { data: UserInterface[] } = useSelector(
     (state: RootState) => state.users
   );
-  const { create }: LoadingsInterface = useSelector(
+  const { dialog }: LoadingsInterface = useSelector(
     (state: RootState) => state.loadings
   );
   const sourceLocales = selectedProjectConfig.supported_locales.filter(
@@ -92,7 +109,9 @@ const SubmissionCreateForm = () => {
     name: `Submission-${new Date().getTime()}`,
     additionalInstruction: '',
     dueDate: new Date(
-      new Date().getTime() + dueDateParam * 24 * 60 * 60 * 1000
+      endOfDay(
+        new Date(new Date().getTime() + dueDateParam * 24 * 60 * 60 * 1000)
+      )
     ),
     targetLocales: [],
     additional: {},
@@ -154,9 +173,19 @@ const SubmissionCreateForm = () => {
     setTemplate(template);
 
     if (template) {
+      let { workflow } = template;
+
+      if (
+        selectedProjectConfig &&
+        selectedProjectConfig.workflows &&
+        selectedProjectConfig.workflows.indexOf(workflow) === -1
+      ) {
+        workflow = '';
+      }
+
       return setFormValues({
         ...formValues,
-        workflow: template.workflow,
+        workflow,
         sourceLocale: template.sourceLocale,
         targetLocales: template.targetLocales,
         additionalInstructions: template.additionalInstructions,
@@ -183,9 +212,10 @@ const SubmissionCreateForm = () => {
       },
     });
   };
+
   return (
     <form onSubmit={onSubmit}>
-      {create ? <Loader className="content-loader" /> : null}
+      <LoadingModal loadProgress={dialog} />
       <Button
         variant="contained"
         color="primary"
@@ -202,6 +232,9 @@ const SubmissionCreateForm = () => {
           classes={{ root: classes.paper }}
         >
           <Typography variant="h5">New Submission Details</Typography>
+          <Typography variant="h6" style={{ marginTop: 20 }}>
+            General Configuration
+          </Typography>
           <FormControl className={classes.formControl}>
             <TextField
               label="Name"
@@ -209,6 +242,9 @@ const SubmissionCreateForm = () => {
               name="name"
               value={formValues.name}
               onChange={handleChange}
+              inputProps={{
+                maxLength: 150,
+              }}
               InputLabelProps={{
                 shrink: true,
               }}
@@ -228,7 +264,7 @@ const SubmissionCreateForm = () => {
               onChange={(date) => {
                 setFormValues({
                   ...formValues,
-                  dueDate: date,
+                  dueDate: endOfDay(date as Date),
                 });
               }}
             />
@@ -246,6 +282,9 @@ const SubmissionCreateForm = () => {
                 <TextField {...params} label="Submitter" margin="normal" />
               )}
             />
+            <FormHelperText id="submitter-helper-text">
+              Empty submitter will default to Amplience
+            </FormHelperText>
           </FormControl>
           <FormControl className={classes.formControl}>
             <InputLabel id="template-label">Template</InputLabel>
@@ -263,9 +302,15 @@ const SubmissionCreateForm = () => {
                 </MenuItem>
               ))}
             </Select>
+            <FormHelperText id="workflow-helper-text">
+              Clearing Template will also clear Workflow, Source Locale and
+              Target Locales
+            </FormHelperText>
           </FormControl>
           <FormControl className={classes.formControl}>
-            <InputLabel id="workflow-label">Workflow</InputLabel>
+            <InputLabel required id="workflow-label">
+              Workflow
+            </InputLabel>
             <Select
               labelId="workflow-label"
               label="Workflow"
@@ -275,6 +320,7 @@ const SubmissionCreateForm = () => {
               onChange={handleChange}
               classes={{ outlined: classes.select }}
             >
+              <MenuItem value="">None</MenuItem>
               {selectedProjectConfig &&
                 selectedProjectConfig.workflows &&
                 selectedProjectConfig.workflows.map((label: string) => (
@@ -285,7 +331,9 @@ const SubmissionCreateForm = () => {
             </Select>
           </FormControl>
           <FormControl className={classes.formControl}>
-            <InputLabel id="source-locale-label">Source Locale</InputLabel>
+            <InputLabel id="source-locale-label" required>
+              Source Locale
+            </InputLabel>
             <Select
               labelId="source-locale-label"
               label="Source Locale"
@@ -295,11 +343,15 @@ const SubmissionCreateForm = () => {
               onChange={handleChange}
               classes={{ outlined: classes.select }}
             >
+              <MenuItem value="">None</MenuItem>
               {sourceLocales.map(({ locale_label, connector_locale }: any) => (
-                <MenuItem
-                  value={connector_locale}
-                  key={connector_locale}
-                >{`${locale_label} (${connector_locale})`}</MenuItem>
+                <MenuItem value={connector_locale} key={connector_locale}>
+                  <ReactCountryFlag
+                    countryCode={getCountryCode(connector_locale)}
+                    style={{ marginRight: 4 }}
+                  />
+                  {`${locale_label} (${connector_locale})`}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
@@ -327,7 +379,7 @@ const SubmissionCreateForm = () => {
             />
           </FormControl>
           <Divider className={classes.divider} />
-          <Typography variant="h5">Custom Parameters</Typography>
+          <Typography variant="h6">Custom Parameters</Typography>
           {selectedProjectConfig.submission_options.attributes.map(
             ({
               key,
@@ -387,7 +439,7 @@ const SubmissionCreateForm = () => {
           )}
 
           <Divider className={classes.divider} />
-          <Typography variant="h5">Custom Configuration</Typography>
+          <Typography variant="h6">Custom Configuration</Typography>
           {selectedProjectConfig.submission_options.config.map(
             ({
               key,
@@ -444,16 +496,24 @@ const SubmissionCreateForm = () => {
           elevation={1}
           variant="outlined"
           square
-          classes={{ root: classes.paper }}
+          classes={{ root: classes.paperAlt }}
         >
+          <Typography variant="h5">Content Items Selection</Typography>
           {formValues.sourceLocale ? (
-            <ContentItems
-              getSelectedIds={(content: string[]) =>
-                setSelectedContent(content)
-              }
-              locale={formValues.sourceLocale}
-            />
-          ) : null}
+            <>
+              <ContentItems
+                setSelectedIds={(content: string[]) =>
+                  setSelectedContent(content)
+                }
+                selectedContent={selectedContent}
+                locale={formValues.sourceLocale}
+              />
+            </>
+          ) : (
+            <Typography style={{ marginTop: 20 }}>
+              Choose a Source Locale to list Content Items...
+            </Typography>
+          )}
         </Paper>
       </div>
     </form>

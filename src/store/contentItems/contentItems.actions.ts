@@ -20,6 +20,7 @@ import {
   RootStateInt,
 } from '../../types/types';
 import { PAGE_SIZE } from '../../utils/GCCRestApi';
+import { withRetry } from '../../utils/withRetry';
 
 export const SET_CONTENT_ITEMS = 'SET_CONTENT_ITEMS';
 export const SET_CONTENT_ITEMS_PAGINATION = 'SET_CONTENT_ITEMS_PAGINATION';
@@ -51,8 +52,10 @@ const getAllContentTypes = async (
   data: ContentType[] = [],
   pageNumber = 0
 ): Promise<ContentType[]> => {
-  const contentTypePage: Page<ContentType> =
-    await hub.related.contentTypes.list({ size: 100, page: pageNumber });
+  const contentTypePage: Page<ContentType> = await withRetry(
+    hub.related.contentTypes.list,
+    { size: 100, page: pageNumber }
+  );
   const items = contentTypePage.getItems() as ContentType[];
   data = data.concat(items);
 
@@ -73,7 +76,13 @@ const getAllContentTypes = async (
 };
 
 export const getContentItems =
-  (locale: string, pageNumber: number, filter?: any, onlyFacets?: boolean) =>
+  (
+    locale: string,
+    pageNumber: number,
+    filter?: any,
+    onlyFacets?: boolean,
+    clear?: boolean
+  ) =>
   async (dispatch: Dispatch, getState: () => RootState) => {
     try {
       const {
@@ -84,8 +93,9 @@ export const getContentItems =
         contentTypes: { data: contentTypesList },
         users: { data: usersList },
         projects: { selectedProject },
-        contentItems: { data, pagination },
+        contentItems: { pagination, data },
       }: RootStateInt = getState();
+
       if (!dcManagement) {
         return dispatch(setError('No DC Management SDK found'));
       }
@@ -98,7 +108,16 @@ export const getContentItems =
         return dispatch(setError('No Content Types found in project'));
       }
 
-      if (data && Math.ceil(data.length / 10) >= pageNumber && !filter) {
+      if (clear) {
+        data.splice(0, data.length);
+      }
+
+      if (
+        data &&
+        data[(pageNumber - 1) * data.length] != null &&
+        Math.ceil(data.length / 20) >= pageNumber &&
+        !filter
+      ) {
         dispatch(setContentLoader(false));
         return dispatch(
           setPagination({
@@ -127,8 +146,9 @@ export const getContentItems =
         .filter((el: any) => !el.dependency)
         .map((el: any) => el.uri.toLowerCase());
 
-      const hub = await dcManagement.hubs.get(hubId);
-      const facets = await hub.related.contentItems.facet(
+      const hub = await withRetry(dcManagement.hubs.get, hubId);
+      const facets = await withRetry(
+        hub.related.contentItems.facet,
         {
           fields: [
             {
@@ -210,7 +230,9 @@ export const getContentItems =
               })
             ) as Option[],
             repositories: (
-              await hub.related.contentRepositories.list({ size: 100 })
+              await withRetry(hub.related.contentRepositories.list, {
+                size: 100,
+              })
             )
               .getItems()
               .map((el: ContentRepository) => ({
@@ -268,9 +290,22 @@ export const getContentItems =
         })
       );
 
-      dispatch(
-        setContent(filter ? mappedContent : [...data, ...mappedContent])
+      const insert = (dest, src, offset) => {
+        const newDest = [...dest];
+
+        for (let i = 0; i < src.length; i++) {
+          newDest[i + offset] = src[i];
+        }
+
+        return newDest;
+      };
+
+      const newContent = insert(
+        data,
+        mappedContent,
+        (pageNumber - 1) * PAGE_SIZE
       );
+      dispatch(setContent(newContent));
 
       if (facets && facets.page && facets.page.number !== undefined) {
         dispatch(

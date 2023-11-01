@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   makeStyles,
   Table as TableComponent,
@@ -9,8 +9,11 @@ import {
   TableRow,
   Paper,
   Checkbox,
+  IconButton,
 } from '@material-ui/core';
+import CloseIcon from '@material-ui/icons/Close';
 import isFunction from 'lodash/isFunction';
+import _ from 'lodash';
 
 interface Column {
   id: string;
@@ -23,16 +26,23 @@ interface Column {
 interface TableComponentProps {
   columns: Column[];
   data: object[];
+  selectedContent?: string[];
   currentPage: number;
+  pageSize: number;
   maxContentInSubmission?: number;
   checkBox?: boolean;
+  removeButton?: boolean;
+  indexes?: boolean;
   rowClick?(id: number): void;
-  getSelectedIds?: (content: string[]) => void;
+  setSelectedIds?: (content: string[]) => void;
+  removeFromBasket?: (item: any) => void;
+  addToBasket?: (item: any) => void;
 }
 
 const useStyles = makeStyles(() => ({
   root: {
     width: '100%',
+    maxHeight: '85%',
   },
 }));
 
@@ -42,13 +52,22 @@ const Table = ({
   data,
   rowClick,
   currentPage = 0,
+  pageSize = 10,
   checkBox = false,
-  getSelectedIds = () => {},
+  removeButton = false,
+  indexes = false,
+  selectedContent = [],
+  setSelectedIds = () => {},
+  removeFromBasket = () => {},
+  addToBasket = () => {},
 }: TableComponentProps) => {
   const classes = useStyles();
-  const [selected, setSelected] = React.useState<{ [key: string]: boolean }>(
-    {}
-  );
+  const selectedMap: { [key: string]: boolean } = {};
+  selectedContent.forEach((id: string) => {
+    selectedMap[id] = true;
+  });
+  const [selected, setSelected] =
+    React.useState<{ [key: string]: boolean }>(selectedMap);
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -57,11 +76,13 @@ const Table = ({
         newSelecteds[n.id] = true;
       });
 
+      addToBasket(data);
+
       setSelected({
         ...selected,
         ...newSelecteds,
       });
-      getSelectedIds(
+      setSelectedIds(
         Object.keys({
           ...selected,
           ...newSelecteds,
@@ -74,8 +95,11 @@ const Table = ({
     data.forEach((n: any) => {
       delete newUnselecteds[n.id];
     });
+
+    removeFromBasket(data);
+
     setSelected(newUnselecteds);
-    getSelectedIds(Object.keys(newUnselecteds));
+    setSelectedIds(Object.keys(newUnselecteds));
   };
 
   const isSelected = (id: string) => selected[id];
@@ -86,7 +110,8 @@ const Table = ({
         ...selected,
         [id]: true,
       });
-      getSelectedIds(
+      addToBasket(data.find((item: any) => item.id === id));
+      setSelectedIds(
         Object.keys({
           ...selected,
           [id]: true,
@@ -96,8 +121,13 @@ const Table = ({
       const sel = { ...selected };
       delete sel[id];
       setSelected(sel);
-      getSelectedIds(Object.keys(sel));
+      setSelectedIds(Object.keys(sel));
+      removeFromBasket(data.find((item: any) => item.id === id));
     }
+  };
+
+  const handleBasketClick = (id: string) => {
+    removeFromBasket(data.find((item: any) => item.id === id));
   };
 
   const ids = data.map(({ id }: any) => id);
@@ -106,13 +136,46 @@ const Table = ({
     0
   );
 
+  useEffect(() => {
+    const selectedMap: { [key: string]: boolean } = {};
+    selectedContent.forEach((id: string) => {
+      selectedMap[id] = true;
+    });
+
+    // If the selection matches, don't bother.
+    if (!_.isEqual(selectedMap, selected)) {
+      setSelected({
+        ...selectedMap,
+      });
+      setSelectedIds(
+        Object.keys({
+          ...selectedMap,
+        })
+      );
+    }
+  }, [selectedContent]);
+
   const checkedAll = data.length > 0 && found > 0 && data.length === found;
   return (
     <Paper className={classes.root}>
-      <TableContainer>
+      <TableContainer style={{ maxHeight: '100%' }}>
         <TableComponent stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
+              {removeButton ? (
+                <TableCell padding="checkbox">
+                  <IconButton
+                    title="Remove all"
+                    size="small"
+                    color="primary"
+                    onClick={() => {
+                      removeFromBasket(null);
+                    }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </TableCell>
+              ) : null}
               {checkBox ? (
                 <TableCell padding="checkbox">
                   <Checkbox
@@ -120,19 +183,22 @@ const Table = ({
                     checked={checkedAll}
                     disabled={
                       !checkedAll &&
-                      (Object.keys(selected).length >= maxContentInSubmission ||
+                      (Object.keys(selected).length >=
+                        maxContentInSubmission - data.length + 1 ||
                         data.length > maxContentInSubmission)
                     }
                     onChange={handleSelectAllClick}
                   />
                 </TableCell>
               ) : null}
-              <TableCell>#</TableCell>
+              {indexes ? (
+                <TableCell style={{ fontWeight: 'bold' }}>#</TableCell>
+              ) : null}
               {columns.map((column, index) => (
                 <TableCell
                   key={index}
                   align={column.align}
-                  style={{ minWidth: column.minWidth }}
+                  style={{ minWidth: column.minWidth, fontWeight: 'bold' }}
                 >
                   {column.label}
                 </TableCell>
@@ -148,11 +214,27 @@ const Table = ({
                   onDoubleClick={() =>
                     rowClick && isFunction(rowClick) && rowClick(row)
                   }
+                  style={{
+                    cursor:
+                      rowClick && isFunction(rowClick) ? 'pointer' : 'default',
+                  }}
                   hover
                   role="checkbox"
                   tabIndex={-1}
                   key={`row_${index}`}
                 >
+                  {removeButton ? (
+                    <TableCell padding="checkbox">
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        title="Remove"
+                        onClick={() => handleBasketClick(row.id)}
+                      >
+                        <CloseIcon />
+                      </IconButton>
+                    </TableCell>
+                  ) : null}
                   {checkBox ? (
                     <TableCell padding="checkbox">
                       <Checkbox
@@ -166,9 +248,11 @@ const Table = ({
                       />
                     </TableCell>
                   ) : null}
-                  <TableCell key={`cell_${index}`}>
-                    {(currentPage - 1) * 10 + index + 1}
-                  </TableCell>
+                  {indexes ? (
+                    <TableCell key={`cell_${index}`}>
+                      {(currentPage - 1) * pageSize + index + 1}
+                    </TableCell>
+                  ) : null}
                   {columns.map((column, ind) => {
                     const value = row[column.id];
                     return (
@@ -195,8 +279,13 @@ const Table = ({
 Table.defaultProps = {
   maxContentInSubmission: 50,
   checkBox: false,
-  rowClick: () => {},
-  getSelectedIds: () => {},
+  removeButton: false,
+  indexes: false,
+  rowClick: null,
+  selectedContent: [],
+  setSelectedIds: () => {},
+  removeFromBasket: () => {},
+  addToBasket: () => {},
 };
 
 export default Table;

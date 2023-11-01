@@ -19,6 +19,9 @@ Alternatively, return to [README.md](../README.md) for more information on the e
     - [Projects](#projects)
     - [Translatable fields](#translatable-fields)
     - [Templates](#templates)
+  - [Delivery Keys](#delivery-keys)
+  - [Locales](#locales)
+
 
 <!-- /MarkdownTOC -->
 
@@ -59,7 +62,7 @@ To use the GlobalLink Connect dashboard extension, this extension must be [regis
 
 Once the extension has been registered, it can then be configured from within the "Installation Parameters" tab of the extension.
 
-An example configuration as well as detailed definitions can be found below, to help you get stared with configuring your extension.
+An example configuration as well as detailed definitions can be found below, to help you get started with configuring your extension.
 
 ### Example Configuration
 
@@ -117,13 +120,13 @@ An example configuration as well as detailed definitions can be found below, to 
 | **Property**                                   | **Type** | **Description**                                              |
 | ---------------------------------------------- | -------- | ------------------------------------------------------------ |
 | hubId                                          | string   | ID for the Dynamic Content hub from which you will be submitting your translation requests. |
-| vse                                            | String   | URL for your preferred [Virtual Staging Environment](https://amplience.com/docs/development/virtual-staging.html) within Dynamic Content. <br /><br />Visualizations configured for content types will be sent to GlobalLink for context in their translations, using this URL. |
+| vse                                            | string   | URL for your preferred [Virtual Staging Environment](https://amplience.com/docs/development/virtual-staging.html) within Dynamic Content. <br /><br />Visualizations configured for content types will be sent to GlobalLink for context in their translations, using this URL. |
 | statuses                                       | object   | A mapping of Dynamic Content’s workflow states to determine which content items can be translated, and where they are in the translation process.<br /><br />**ready:** ID of the workflow state denoting that the content item is ready to translate.<br />**inProgress:** ID of the workflow state denoting that the content item has an open submission.<br />**translated:** ID of the workflow state denoting that the content item’s submission is complete, and its translations applied. |
 | apiKey                                         | string   | API Key to allow the dashboard extension to authenticate with the GlobalLink Connect API. |
 | apiUrl                                         | string   | API URL for the GlobalLink Connect Cloud API.<br /><br />The current version of the GlobalLink Dashboard extension is compatible with v3 (https://connect-dev.translations.com/rest-api/v3). |
-| globalFilter<br /><br />*(optional)*           | string   | A configurable tag which can be optionally used to globally filter submissions created within the GlobalLink Dashboard extension.<br /><br />When configured, all new submissions will be sent with the configured tag applied, and only submissions with that tag applied will appear in the list view.<br /><br />When not configured, no tag will be applied to new submissions, and all Submissions for your configured project will be displayed. |
+| globalFilter<br /><br />*(optional)*           | string   | A configurable tag which can be optionally used to globally filter submissions created within the GlobalLink Dashboard extension.<br /><br />When configured, all new submissions will be sent with the configured tag applied, and only submissions with that tag applied will appear in the list view.<br /><br />When not configured, no tag will be applied to new submissions, and all submissions for your configured project will be displayed. |
 | maxContentInSubmission<br /><br />*(optional)* | integer  | The maximum number of content items which can be included in a single submission.<br /><br />(Default: 50) |
-| dueDate<br /><br />*(optional)*                | Integer  | The number of days from the current date, which will be used as the default due date when creating a new submission.<br /><br />(Default: 7) |
+| dueDate<br /><br />*(optional)*                | integer  | The number of days from the current date, which will be used as the default due date when creating a new submission.<br /><br />(Default: 7) |
 | projects                                       | array    | Configuration of each GlobalLink Connect project from which submissions should be possible in the dashboard.<br /><br />Detailed specification [below](#_Projects). |
 | templates<br /><br />*(optional)*              | array    | Configuration of any pre-defined templates which can be used to streamline the submission process.<br /><br />Detailed specification [below](#_Templates). |
 
@@ -143,7 +146,7 @@ When configuring content types for translation, this uses  JSONPath for defining
 | String                                                       | Starting within the Schema's `properties` object, provide the path to the string property you would like to translate. | **Schema:**<br />![](./images/schema-string.png)<br /><br />**Config:**<br />`"translatableFields": ["header.headline"]` |
 | Array of Strings                                             | Starting within the Schema's `properties` object, provide the path to the array of strings you would like to translate, including the index selection. | **Schema:**<br />![](./images/schema-array.png)<br /><br />**Config (all in array):**<br />`"translatableFields": ["body.paragraphs[*]"]`<br />**Config (first in array):**<br />`"translatableFields": ["body.paragraphs[0]"]` |
 | Partial                                                      | This requires the fully qualified JSONPath to the [partial](https://amplience.com/docs/integration/usingpartials.html) you wish to translate.<br /><br />Starting within the Schema's `properties` object, provide the path to the partial reference.<br /><br />Then, continuing from the point of reference within target schema's `definitions` object, provide the remainder of the path to the desired property. | **Schema:**<br />![](./images/schema-partial.png)<br /><br />**Config (all in array):**<br />`"translatableFields": ["body[*].paragraph"]`<br />**Config (first in array):**<br />`"translatableFields": ["body[0].paragraph"]` |
-| Content Choosers<br /><br />(eg `content-link` & `content-reference`) | This does not require a JSONPath to be provided in the parent content item.<br /><br />You would instead configure the translatable fields for any child schemas referened in the Content Link/Reference.<br /><br />The parent schema will still need to be defined within `contentTypes` in the extension's configuration if you wish for it to be available for submission. | **Schema (parent):**<br />![](./images/schema-contentlink-parent.png)<br />**Schema (child)**:<br />![](./images/schema-contentlink-child.png)<br /><br />**Config (parent):**<br />`"translatableFields": []`<br />**Config (child):**<br />`"translatableFields": ["paragraph"]` |
+| Content Choosers<br /><br />(eg `content-link` & `content-reference`) | This does not require a JSONPath to be provided in the parent content item.<br /><br />You would instead configure the translatable fields for any child schemas referenced in the Content Link/Reference.<br /><br />The parent schema will still need to be defined within `contentTypes` in the extension's configuration if you wish for it to be available for submission. | **Schema (parent):**<br />![](./images/schema-contentlink-parent.png)<br />**Schema (child)**:<br />![](./images/schema-contentlink-child.png)<br /><br />**Config (parent):**<br />`"translatableFields": []`<br />**Config (child):**<br />`"translatableFields": ["paragraph"]` |
 
 #### Templates
 
@@ -154,3 +157,14 @@ When configuring content types for translation, this uses  JSONPath for defining
 | sourceLocale<br /><br />*(optional)*           | string   | The original locale of the content item, which the submitted items will be translated from. This locale must be configured within your Dynamic Content hub.<br /><br />The source locale is constructed from a mandatory language code ([ISO  639-1:2002](https://www.iso.org/standard/22109.html)), and an optional country code ([ISO  3166-2:2013](https://www.iso.org/standard/63546.html)). |
 | targetLocales<br /><br />*(optional)*          | array    | One or more locales, which the submitted items will be translated to. These locales must be configured within your Dynamic Content hub.<br /><br />Destination locales are constructed from a mandatory language code ([ISO  639-1:2002](https://www.iso.org/standard/22109.html)), and an optional country code ([ISO  3166-2:2013](https://www.iso.org/standard/63546.html)). |
 | additionalInstructions<br /><br />*(optional)* | string   | Any additional instructions to send along with the submission. |
+
+
+### Delivery Keys
+You are free to use Delivery Keys, but please be aware of the following:
+
+- Don't set Delivery Keys as Mandatory or translations will fail.
+- If you define a Delivery Key format in the Schema (eg. content/*) after you have already created content, you'll need to sync to enable the translations to proceed.
+- If using a regular expression to validate your delivery key, your pattern should allow for a suffix, as localised items automatically generate with delivery keys suffixed with `_<locale>`, eg. `_en-GB`. If your delivery key pattern only requires a suffix, such as `content/`, then it should work without issue.
+
+### Locales
+It is important to note that target or source locales you can select are not managed/defined within Amplience. These are managed by GlobalLink and thus are not configurable within the Amplience extension configuration. The preset locales selected for specific templates _are_ configured in the Amplience extension configuration, but these locales must be configured on GlobalLink first to use them.

@@ -2,15 +2,16 @@ import { AnyAction } from 'redux';
 import {
   SET_CONTENT,
   SET_TABLE,
-  SET_CREATE,
+  SET_DIALOG,
   SET_LOADING_BY_ID,
 } from './loadings.actions';
 import { LoadingsInterface } from '../../types/types';
+import { LoadList } from './loadProgress';
 
 const defaultState = {
   content: false,
   table: false,
-  create: false,
+  dialog: undefined,
   loadingIds: {},
 };
 
@@ -29,10 +30,10 @@ export function loadingsReducer(
         ...state,
         table: Boolean(action.value),
       };
-    case SET_CREATE:
+    case SET_DIALOG:
       return {
         ...state,
-        create: Boolean(action.value),
+        dialog: action.value as LoadList | undefined,
       };
     case SET_LOADING_BY_ID:
       return {

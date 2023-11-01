@@ -1,5 +1,6 @@
 import { DashboardExtension } from 'dc-extensions-sdk';
 import { ContentItem, ContentType, DynamicContent } from 'dc-management-sdk-js';
+import { LoadList } from '../store/loadings/loadProgress';
 
 export interface Option {
   label: string;
@@ -23,8 +24,11 @@ export interface FacetsInt {
 
 export interface FilterBarInterface {
   facets: FacetsInt;
+  max: number;
   locale: string;
   filter: FilterInt;
+  setOpenBasket: (openBasket: boolean) => void;
+  basketContent: object[];
 }
 
 export interface SubmissionFilterInt {
@@ -34,6 +38,7 @@ export interface SubmissionFilterInt {
   is_error?: number;
   is_overdue?: number;
   is_redelivery?: number;
+  connector_key?: string[];
 }
 
 export interface FilterObject {
@@ -45,6 +50,7 @@ export interface FilterObject {
   is_overdue: number;
   is_redelivery: number;
   tags?: string[];
+  connector_key?: string[];
 }
 
 export interface SubmissionsFilterBarInterface {
@@ -168,7 +174,7 @@ export interface SDKInterface {
 export interface LoadingsInterface {
   content: boolean;
   table: boolean;
-  create: boolean;
+  dialog: LoadList | undefined;
   loadingIds: { [key: string]: boolean };
 }
 
