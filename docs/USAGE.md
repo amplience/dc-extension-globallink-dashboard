@@ -186,7 +186,7 @@ You can also `Apply All` translations from the same Tasks view. Again, a confirm
 
 ![](./images/apply-translation-task-all.png)
 
-Once confirmed, you can follow the progress of the translations. This is particulary useful if you have many items to translate.
+Once confirmed, you can follow the progress of the translations. This is particularly useful if you have many items to translate.
 
 ![](./images/apply-translation-task-all-progress.png)
 
