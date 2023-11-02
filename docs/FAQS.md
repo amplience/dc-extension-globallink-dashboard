@@ -12,7 +12,7 @@ A. 14 days, but this is configurable in the Installation Parameters of the Globa
 
 - Q. Can I use Delivery Keys? 
 
-Yes. Delivery Keys can be used and their format defined in the Content Type Schemas. 
+A. Yes. Delivery Keys can be used and their format defined in the Content Type Schemas. 
 
 - Q. Can I enforce mandatory Delivery Keys? 
 
