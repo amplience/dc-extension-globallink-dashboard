@@ -14,7 +14,7 @@
     "dc-extensions-sdk": "^2.0.0",
     "dc-management-sdk-js": "^1.15.0",
     "jsonpath": "^1.1.1",
-    "lodash": "^4.17.21",
+    "lodash": "^4.18.1",
     "material-ui-popup-state": "^1.8.3",
     "moment": "^2.29.1",
     "react": "^17.0.2",
